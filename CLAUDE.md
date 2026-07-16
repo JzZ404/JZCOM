@@ -3,7 +3,7 @@
 Personal portfolio for Joyce (Jiayi) Zhou — design technologist (UX/product, AI, robotics). Full context: [PORTFOLIO_HANDOFF.md](PORTFOLIO_HANDOFF.md). Ship checklist: [PORTFOLIO_TODO.md](PORTFOLIO_TODO.md).
 
 ## Tech stack (do not substitute)
-Next.js · Tailwind CSS · Framer Motion · deployed on Vercel.
+Next.js 16 (App Router) · Tailwind CSS v4 · Framer Motion · deployed on Vercel. See `AGENTS.md` — this Next.js version has breaking changes vs. older training data; check `node_modules/next/dist/docs/` before assuming an API/convention.
 
 ## Non-negotiable code organization
 - **Content out of components.** All project data lives in `data/projects.ts` (or `.json`) — title, tags, summary, role, links, images. Adding/editing a project = editing one data file, never JSX.
@@ -11,7 +11,7 @@ Next.js · Tailwind CSS · Framer Motion · deployed on Vercel.
 - **Comment non-obvious logic only** — filtering/tagging logic, animation sequencing.
 - **One component, one responsibility.** No mega-components mixing layout + data-fetching + content.
 - **Folder structure:** `/components`, `/data`, `/app`, `/public` for images.
-- **Design tokens live in `tailwind.config`** (colors, type scale, spacing) — never scattered arbitrary values in class names.
+- **Design tokens live in `app/globals.css`'s `@theme` block** (colors, type scale) — this project uses Tailwind v4, which is CSS-native config, not a `tailwind.config.js` file. Never scatter arbitrary values in class names.
 
 ## Design tokens — not finalized
 Do not invent a real palette/type scale. If you must scaffold before Joyce confirms values (from Figma or direct hex/font choices), use an obviously-fake placeholder token set and mark every placeholder value with a comment: `// PLACEHOLDER — confirm with Joyce`.
