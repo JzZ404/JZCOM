@@ -19,7 +19,7 @@ export default function Nav() {
         >
           JZ
         </Link>
-        <ul className="flex gap-20 text-[15px]">
+        <ul className="flex gap-20 text-[15px] font-bold">
           {LINKS.map((link) => (
             <li key={link.href}>
               <Link href={link.href} className="hover:text-[var(--color-accent)]">
