@@ -54,7 +54,7 @@ export const projects: Project[] = [
     tags: ["Interactive/Creative"],
     summary: "PLACEHOLDER — confirm with Joyce.",
     role: "PLACEHOLDER — confirm with Joyce.",
-    featured: false,
+    featured: true,
     coverImage: "/images/placeholder-4.jpg",
   },
   {
