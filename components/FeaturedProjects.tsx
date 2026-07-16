@@ -7,7 +7,7 @@ export default function FeaturedProjects({ projects }: { projects: Project[] }) 
   const featured = projects.slice(0, 4);
 
   return (
-    <section className="mx-auto max-w-5xl px-6 py-16">
+    <section className="mx-auto max-w-5xl px-6 pt-40 pb-16">
       <div className="flex items-baseline justify-between">
         <h2 className="text-[length:var(--text-h2)] font-semibold tracking-tight">
           Featured work
