@@ -11,7 +11,15 @@ export default function Home() {
         name="Joyce Zhou"
         leadWord="A"
         headlineLine1="Design technologist"
-        headlineLine2="working across UX, AI, and robotics."
+        headlineLine2={[
+          { text: "working across " },
+          { text: "UX", bold: true },
+          { text: ", " },
+          { text: "AI", bold: true },
+          { text: ", and " },
+          { text: "Robotics", bold: true },
+          { text: "." },
+        ]}
       />
       <FeaturedProjects projects={featured} />
     </>

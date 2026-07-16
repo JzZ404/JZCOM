@@ -1,8 +1,13 @@
+type HeadlineSegment = {
+  text: string;
+  bold?: boolean;
+};
+
 type HeroSectionProps = {
   name: string;
   leadWord: string; // regular-weight lead-in, e.g. "A"
   headlineLine1: string; // bold, continues leadWord on the same visual line
-  headlineLine2: string; // regular weight, forced onto its own line
+  headlineLine2: HeadlineSegment[]; // mixed weight, forced onto its own line
 };
 
 export default function HeroSection({
@@ -21,7 +26,11 @@ export default function HeroSection({
         <span className="font-normal">{leadWord} </span>
         <span className="font-bold">{headlineLine1}</span>
         <br />
-        <span className="font-normal">{headlineLine2}</span>
+        {headlineLine2.map((segment, i) => (
+          <span key={i} className={segment.bold ? "font-bold" : "font-normal"}>
+            {segment.text}
+          </span>
+        ))}
       </h1>
     </section>
   );
