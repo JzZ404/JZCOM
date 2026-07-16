@@ -2,15 +2,15 @@
 
 Companion to [PORTFOLIO_HANDOFF.md](PORTFOLIO_HANDOFF.md). Ordered phases, each with what blocks it and — where useful — which Claude Code skill to reach for. Check items off as they land; don't reorder past a blocked item without Joyce's sign-off.
 
-**Status as of 2026-07-15:** nothing built yet. Repo contains only the handoff doc.
+**Status as of 2026-07-15:** scaffold + Home/Work/Archive/About/Contact placeholder routes are built and pushed to `main`. IA changed from the original handoff — see note under Phase 2.
 
 ---
 
 ## Phase 0 — Repo hygiene (before anything else)
 
-- [ ] **Fix git repo scope.** `.git` currently lives at `/Users/jz` (home directory) — `git status` from this project shows Desktop, Downloads, `.ssh`, `.claude.json` etc. as untracked. Do not push this repo anywhere until resolved. Recommended: `git init` a fresh repo scoped to `/Users/jz/Documents/JZCOM`, migrate `PORTFOLIO_HANDOFF.md`/`CLAUDE.md`/`PORTFOLIO_TODO.md` into it, and treat the home-level `.git` as legacy/unrelated.
-- [ ] Add `.gitignore` (Next.js default: `node_modules`, `.next`, `.env*.local`, `.vercel`).
-- [ ] Create GitHub remote (or confirm existing one) once repo scope is fixed.
+- [x] **Fix git repo scope.** Rescoped to a fresh repo at `/Users/jz/Documents/JZCOM`, remote set to `https://github.com/JzZ404/JZCOM.git`, pushed. The stray home-level `.git` at `/Users/jz` is untouched/unrelated — leave it alone.
+- [x] Add `.gitignore` (Next.js default, from `create-next-app`).
+- [x] GitHub remote added and pushed.
 
 ## Phase 1 — Blocking decisions (need Joyce, not code)
 
@@ -28,33 +28,38 @@ Per the handoff's Pre-Build Prep section — resolve or explicitly placeholder-a
 
 ## Phase 2 — Scaffold
 
-- [ ] `create-next-app` with TypeScript + Tailwind + App Router in `JZCOM/`.
-- [ ] Install Framer Motion.
-- [ ] Folder structure: `/app`, `/components`, `/data`, `/public/images`.
-- [ ] Layout shell + nav (Home / Work / About / Contact), empty route stubs.
-- [ ] Design tokens wired into `tailwind.config` — real values if Phase 1 resolved, otherwise clearly-marked placeholders (see `CLAUDE.md`).
-- [ ] Deploy immediately to a Vercel preview URL with placeholder content — don't wait for polish. No domain/DNS work yet.
-- [ ] First commit: "scaffold: project structure + empty routes."
+- [x] `create-next-app` with TypeScript + Tailwind v4 + App Router in `JZCOM/`.
+- [x] Install Framer Motion.
+- [x] Folder structure: `/app`, `/components`, `/data`, `/public/images`.
+- [x] Layout shell + nav. **IA changed from the original handoff** — nav is now Work / Archive / About / Contact (no explicit "Home" link; the logo/name links home). Archive is a new section: an image-only masonry/waterfall wall of older or miscellaneous work, distinct from Work's curated case studies — no per-item pages, just a visual gallery Joyce fills in later. Confirmed with Joyce 2026-07-15.
+- [x] Design tokens wired into `app/globals.css`'s `@theme` block (Tailwind v4 is CSS-native, not a `tailwind.config.js` file) — placeholders, all marked `PLACEHOLDER — confirm with Joyce`.
+- [ ] Deploy to a Vercel preview URL. **Blocked on Joyce** — needs her Vercel account. Recommended path: import the `JzZ404/JZCOM` GitHub repo from the Vercel dashboard (auto-deploys on push to `main`), rather than the CLI.
+- [x] Scaffold + data + route commits pushed to `main`.
 
-*Tool: `/ship` once there's a working diff to PR; `/setup-deploy` to wire the Vercel deploy config if not already automatic.*
+*Tool: `/setup-deploy` once Joyce has connected the Vercel project, to wire deploy config into `CLAUDE.md` for future automated checks.*
 
 ## Phase 3 — Content data file (build before components that render it)
 
-- [ ] `data/projects.ts` — every project from the handoff's list as a typed entry: title, tags (1–3 from the fixed set), summary, role, links, image paths. Use placeholder summaries where copy isn't final, but keep attribution framing correct from day one (see `CLAUDE.md` attribution rules).
-- [ ] Type the tag set as a union (`Robotics | AI/ML | UX/Product | Interactive/Creative | PM`) so filter logic is exhaustive-checked.
-- [ ] Commit: "data: project content file."
+- [x] `data/projects.ts` — schema in place (slug, title, tags, summary, role, featured, coverImage, links) with **5 placeholder entries only**, at Joyce's request — she'll add the rest of the real 26-project list herself later.
+- [x] `data/archive.ts` — separate schema for the Archive wall (id, image, aspectRatio), 9 placeholder entries with varied ratios to drive the masonry layout until real images land.
+- [x] Tag set typed as a union (`Robotics | AI/ML | UX/Product | Interactive/Creative | PM`).
+- [ ] Joyce fills in real project data + attribution-correct copy (see `CLAUDE.md`) — remaining 21 projects, real summaries/roles, real images under `/public/images/...`.
 
 ## Phase 4 — Build section by section
 
 Build and deploy-check after each section, don't batch:
 
-- [ ] **Hero** (`HeroSection.tsx`) — commit + verify on preview URL.
-- [ ] **Project grid** (`ProjectGrid.tsx`, `ProjectCard.tsx`) with tag filtering — commit + verify.
-- [ ] **Project detail template** (`/work/[slug]`, driven entirely by `data/projects.ts`) — commit + verify.
-- [ ] **About** — commit + verify.
-- [ ] **Contact** — commit + verify.
+- [x] **Hero** (`HeroSection.tsx`) — built, verified locally (desktop + mobile screenshots).
+- [x] **Featured work** (`FeaturedProjects.tsx`) — 2x2 interactive grid (Framer Motion hover), capped to first 4 featured projects.
+- [x] **Work grid** (`app/work/page.tsx`, `ProjectCard.tsx`) — flat grid of all projects, no tag filtering yet.
+- [x] **Project detail/gallery template** (`/work/[slug]`) — driven by `data/projects.ts`, placeholder image blocks (3 per project) standing in for a real gallery.
+- [x] **Archive** (`app/archive/page.tsx`) — CSS-columns masonry waterfall, driven by `data/archive.ts`.
+- [x] **About** — structural placeholder only, no real copy (per handoff: don't invent it).
+- [x] **Contact** — structural placeholder only (placeholder email), no real copy.
+- [ ] Tag filtering on the Work grid (deferred — not yet built).
+- [ ] Verify all of the above on a **deployed** preview URL, not just local dev, once Vercel is connected.
 
-*Tool: `/browse` or `/qa` to actually click through the deployed preview after each section rather than eyeballing code.*
+*Tool: `/browse` or `/qa` to click through the deployed preview once it exists.*
 
 ## Phase 5 — Attribution QA pass
 
@@ -92,4 +97,8 @@ Build and deploy-check after each section, don't batch:
 
 Anything Joyce answers that changes a Phase 1 item should get logged here with a date, so later sessions don't re-litigate it.
 
-- (none yet)
+- **2026-07-15 — Git repo scope:** rescope to `JZCOM/`, remote is `https://github.com/JzZ404/JZCOM.git`.
+- **2026-07-15 — Routing:** confirmed separate routes (`/work/[slug]`), not expandable sections.
+- **2026-07-15 — Scaffold timing:** start immediately with placeholders rather than waiting on real design tokens/images.
+- **2026-07-15 — Nav / IA:** final nav is Work, Archive, About, Contact. Archive is a new section (not in the original handoff) — a masonry/waterfall wall of older/miscellaneous work, no case study pages, images inserted later. Work stays the curated, tag-filterable case study grid with detail pages.
+- **2026-07-15 — `data/projects.ts` scope:** only 5 placeholder entries for now, not the full 26-project list — Joyce will add real projects herself.
