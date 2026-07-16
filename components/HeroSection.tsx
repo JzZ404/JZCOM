@@ -2,7 +2,7 @@ type HeroSectionProps = {
   name: string;
   leadWord: string; // regular-weight lead-in, e.g. "A"
   headlineLine1: string; // bold, continues leadWord on the same visual line
-  headlineLine2: string; // bold, forced onto its own line
+  headlineLine2: string; // regular weight, forced onto its own line
 };
 
 export default function HeroSection({
@@ -21,7 +21,7 @@ export default function HeroSection({
         <span className="font-normal">{leadWord} </span>
         <span className="font-bold">{headlineLine1}</span>
         <br />
-        <span className="font-bold">{headlineLine2}</span>
+        <span className="font-normal">{headlineLine2}</span>
       </h1>
     </section>
   );
