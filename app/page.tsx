@@ -9,9 +9,9 @@ export default function Home() {
     <>
       <HeroSection
         name="Joyce Zhou"
-        // Drawn from PORTFOLIO_HANDOFF.md positioning statement — adjust wording, not the substance
-        positioning="A design technologist working across the full stack of an idea — from interface to physical system."
-        bio="Currently finishing an MS in Technology Innovation (Robotics concentration) at UW GIX. Background in Interdisciplinary Computing & Arts, Communication, and Cognitive Science from UC San Diego."
+        leadWord="A"
+        headlineLine1="Design technologist"
+        headlineLine2="working across UX, AI, and robotics."
       />
       <FeaturedProjects projects={featured} />
     </>
