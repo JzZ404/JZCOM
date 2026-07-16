@@ -10,14 +10,14 @@ export default function Home() {
       <HeroSection
         name="Joyce Zhou"
         leadWord="A"
-        headlineLine1="Design technologist"
+        headlineLine1="Design Technologist"
         headlineLine2={[
           { text: "working across " },
-          { text: "UX", bold: true },
+          { text: "UX" },
           { text: ", " },
-          { text: "AI", bold: true },
+          { text: "AI" },
           { text: ", and " },
-          { text: "Robotics", bold: true },
+          { text: "Robotics" },
           { text: "." },
         ]}
       />
