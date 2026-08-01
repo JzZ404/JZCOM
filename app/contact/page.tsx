@@ -6,7 +6,7 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   return (
-    <section className="mx-auto max-w-3xl px-6 py-16">
+    <section className="mx-auto max-w-3xl px-4 py-16">
       <h1 className="text-[length:var(--text-h1)] font-semibold tracking-tight">Contact</h1>
       {/* PLACEHOLDER — real contact method(s) confirmed by Joyce */}
       <p className="mt-6 text-[var(--color-fg)]">

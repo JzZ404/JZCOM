@@ -1,10 +1,7 @@
 import HeroSection from "@/components/HeroSection";
-import FeaturedProjects from "@/components/FeaturedProjects";
-import { projects } from "@/data/projects";
+import WorkSection from "@/components/WorkSection";
 
 export default function Home() {
-  const featured = projects.filter((project) => project.featured);
-
   return (
     <>
       <HeroSection
@@ -21,7 +18,7 @@ export default function Home() {
           { text: "." },
         ]}
       />
-      <FeaturedProjects projects={featured} />
+      <WorkSection />
     </>
   );
 }

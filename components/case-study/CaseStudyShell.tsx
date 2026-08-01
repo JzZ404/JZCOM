@@ -1,0 +1,139 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import type { Project } from "@/data/projects";
+import CaseStudySidebar, { type CaseStudyMode, type CaseStudyTocItem } from "./CaseStudySidebar";
+import PlaceholderBlock from "./PlaceholderBlock";
+import CaseStudyLinkIcons, { type CaseStudyLink } from "./CaseStudyLinkIcons";
+
+// The chrome every case study shares — sidebar, overview header, hero image,
+// Detailed/TL;DR toggle, next-case-study footer — regardless of how
+// different their own detailed content ends up looking (Nest's bespoke
+// sections vs. a plain skeleton). `children` is that detailed-mode content.
+export type CaseStudyShellData = {
+  title: string;
+  subheading: string;
+  tldr: string;
+  heroLabel: string;
+  heroVideo?: string; // optional cover video shown in place of the hero placeholder
+  heroImage?: string; // optional static cover image — checked if heroVideo isn't set
+  meta: { label: string; value: string }[];
+  links?: CaseStudyLink[]; // optional external links (GitHub, Kaggle, etc.), shown top-right of the title
+};
+
+export default function CaseStudyShell({
+  caseStudy,
+  tocItems,
+  nextProject,
+  children,
+}: {
+  caseStudy: CaseStudyShellData;
+  tocItems: CaseStudyTocItem[];
+  nextProject: Project;
+  children: React.ReactNode;
+}) {
+  const [mode, setMode] = useState<CaseStudyMode>("detailed");
+  const detailed = mode === "detailed";
+  // Falls back to a plain solid background if the next project doesn't
+  // have a cover image yet (see ProjectCard for the same pattern).
+  const [coverFailed, setCoverFailed] = useState(false);
+
+  return (
+    <div className="mx-auto flex max-w-[1280px]">
+      <CaseStudySidebar mode={mode} onModeChange={setMode} tocItems={tocItems} />
+
+      <div className="min-w-0 flex-1">
+        {/* pt-9 matches the sidebar's py-9, so the title lines up with
+            "Back to work" instead of sitting lower than it. */}
+        <div id="overview" className="scroll-mt-28 px-10 pt-9">
+          <div className="mb-5 flex items-center justify-between gap-6">
+            <h1 className="font-serif text-[56px] leading-[1.1] font-bold text-[var(--color-fg)]">
+              {caseStudy.title}
+            </h1>
+            {caseStudy.links && <CaseStudyLinkIcons links={caseStudy.links} />}
+          </div>
+          <p className="mb-14 w-full text-[24px] leading-relaxed font-semibold text-[var(--color-muted)]">
+            {caseStudy.subheading}
+          </p>
+          {/* grid-cols-4 splits the row into 4 equal columns with a
+              consistent gap, instead of a fixed gap that just pushes items
+              apart by the same amount regardless of row width — and it
+              bounds each item's width so a long value wraps instead of
+              overflowing into the next column. */}
+          <div className="grid grid-cols-4 gap-6 border-b border-[var(--color-border)] pb-7">
+            {caseStudy.meta.map((item) => (
+              <div key={item.label} className="flex min-w-0 flex-col gap-1">
+                <span className="text-[12px] font-semibold tracking-wider text-[var(--color-primary)] uppercase">
+                  {item.label}
+                </span>
+                <span className="text-[16px] font-semibold text-balance text-[var(--color-fg)]">
+                  {item.value}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {caseStudy.heroVideo ? (
+          // overflow-hidden + a slight scale crops out the black stroke
+          // baked into the source recording's edges.
+          <div className="mx-10 my-7 w-[calc(100%-5rem)] overflow-hidden rounded-xl">
+            <video
+              src={caseStudy.heroVideo}
+              className="w-full scale-[1.03]"
+              autoPlay
+              muted
+              loop
+              playsInline
+            />
+          </div>
+        ) : caseStudy.heroImage ? (
+          <img
+            src={caseStudy.heroImage}
+            alt={caseStudy.heroLabel}
+            className="mx-10 my-7 w-[calc(100%-5rem)] rounded-xl object-cover"
+          />
+        ) : (
+          <PlaceholderBlock label={caseStudy.heroLabel} height={360} className="mx-10 my-7" />
+        )}
+
+        {detailed ? (
+          children
+        ) : (
+          <div className="mx-10 mb-10 rounded-xl bg-[var(--color-surface)] p-7">
+            <div className="mb-2 font-mono text-xs font-semibold tracking-wider text-[var(--color-primary)] uppercase">
+              TL;DR
+            </div>
+            <p className="text-[16px] leading-relaxed text-[var(--color-muted)]">
+              {caseStudy.tldr}
+            </p>
+          </div>
+        )}
+
+        <Link
+          href={`/work/${nextProject.slug}`}
+          className="relative block overflow-hidden bg-[var(--color-fg)] px-10 py-14 text-center no-underline"
+        >
+          {!coverFailed && (
+            <>
+              <img
+                src={nextProject.coverImage}
+                alt=""
+                onError={() => setCoverFailed(true)}
+                className="absolute inset-0 h-full w-full scale-110 object-cover blur-sm"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30" />
+            </>
+          )}
+          <div className="relative mb-3 text-[0.9375rem] text-white opacity-70">
+            Next case study
+          </div>
+          <div className="relative font-serif text-2xl font-bold text-white">
+            {nextProject.title} →
+          </div>
+        </Link>
+      </div>
+    </div>
+  );
+}

@@ -1,51 +1,262 @@
 @import "tailwindcss";
 
+
 /*
- * PLACEHOLDER DESIGN TOKENS — confirm with Joyce.
- * Every value below (color, font, type scale) is an obviously-generic
- * stand-in so build/layout work can proceed. None of this is final brand
- * design. Spacing uses Tailwind's default scale, which is already
- * token-consistent, so it's left alone pending a real spec.
+ * TRIAL DESIGN TOKENS — Joyce's confirmed palette (2026-07-15), applied to
+ * the home page to preview before it's written into a final spec. Type
+ * scale below is still placeholder pending a real type choice.
+ *
+ * Role naming follows Material Design 3's color-role system: primary is the
+ * dominant brand/interactive color, accent maps to M3's secondary/tertiary
+ * role (used sparingly for highlights), and every colored surface pairs with
+ * an on-color for the text/icon sitting on top of it. Per M3, on-colors are
+ * chosen for contrast, not just re-using the page's default text color —
+ * WCAG contrast math (see below) showed light-mode primary/accent only hit
+ * ~3:1 against the cream text color, so their on-colors use the background
+ * instead; in dark mode it's the reverse (primary/accent are bright enough
+ * that on-color = background, not the near-white text).
+ * --color-muted / --color-border are derived from fg/bg via color-mix()
+ * rather than invented hex values.
  */
 :root {
-  /* PLACEHOLDER — confirm with Joyce: brand color palette (hex) */
-  --color-bg: #fafafa;
-  --color-fg: #171717;
-  --color-muted: #6b7280;
-  --color-border: #e5e7eb;
-  --color-accent: #7c9a2e;
+  --color-bg: #f6f4ec;
+  --color-fg: #2b3a1a;
+  --color-primary: #679c1b;
+  --color-on-primary: #2b3a1a;
+  --color-accent: #d9762e;
+  --color-on-accent: #2b3a1a;
+  --color-muted: color-mix(in srgb, var(--color-fg) 55%, var(--color-bg));
+  --color-border: color-mix(in srgb, var(--color-fg) 18%, var(--color-bg));
+  /* Green-shade variants of primary, for the hero's gradient-text word — no new hue introduced. */
+  --color-primary-light: color-mix(in srgb, var(--color-primary) 80%, var(--color-bg));
+  --color-primary-dark: color-mix(in srgb, var(--color-primary) 55%, var(--color-fg));
+  /* Slightly-raised card surface (TL;DR blocks, problem/goal cards, toggle track) — a touch
+     darker than the page background, same color-mix approach as muted/border above. */
+  --color-surface: color-mix(in srgb, var(--color-fg) 6%, var(--color-bg));
+  /* A whiter/lighter-than-background card (case-study Problem/Goal/Research
+     boxes). Mix percentage is set per-theme below — in light mode "whiter"
+     means closer to pure white, but the same 45% mix against dark mode's
+     near-black bg would produce a jarring bright gray, so dark mode uses a
+     much smaller mix to stay a subtle lift instead. */
+  --color-card: color-mix(in srgb, white 45%, var(--color-bg));
 }
 
 @theme inline {
   --color-background: var(--color-bg);
   --color-foreground: var(--color-fg);
+  --color-primary: var(--color-primary);
+  --color-on-primary: var(--color-on-primary);
+  --color-accent: var(--color-accent);
+  --color-on-accent: var(--color-on-accent);
   --color-muted: var(--color-muted);
   --color-border: var(--color-border);
-  --color-accent: var(--color-accent);
+  --color-primary-light: var(--color-primary-light);
+  --color-primary-dark: var(--color-primary-dark);
+  --color-surface: var(--color-surface);
+  --color-card: var(--color-card);
 
   /* PLACEHOLDER — confirm with Joyce: type scale (family + sizes) */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-serif: var(--font-serif);
+  /* --text-display and --text-greeting are the hero's central intro — left alone on purpose. */
   --text-display: 3.5rem;
-  --text-h1: 2.5rem;
   --text-greeting: 1.875rem;
-  --text-h2: 1.75rem;
-  --text-body: 1rem;
-  --text-caption: 0.8125rem;
+  --text-h1: 3rem;
+  --text-h2: 2.125rem;
+  --text-body: 1.125rem;
+  --text-caption: 0.9375rem;
+
+  /* gradient-shift is also used on the real hero headline — keep if /playground is deleted. */
+  --animate-gradient-shift: gradient-shift 9s ease infinite;
+  /* Used by /playground demos only — remove when that page is deleted. */
+  --animate-shimmer: shimmer 1.6s ease-in-out infinite;
+  --animate-marquee: marquee 18s linear infinite;
+  --animate-glitch-1: glitch-shift-1 0.3s steps(2) infinite;
+  --animate-glitch-2: glitch-shift-2 0.3s steps(2) infinite;
+  --animate-noise-shift: noise-shift 0.6s steps(10) infinite;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-bg: #0a0a0a;
-    --color-fg: #ededed;
-    --color-muted: #9ca3af;
-    --color-border: #262626;
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  19% {
+    background-position: 68% 50%;
+  }
+  37% {
+    background-position: 22% 50%;
+  }
+  58% {
+    background-position: 91% 50%;
+  }
+  76% {
+    background-position: 45% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
   }
 }
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes glitch-shift-1 {
+  0% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-2px, 1px);
+  }
+  100% {
+    transform: translate(2px, -1px);
+  }
+}
+
+@keyframes glitch-shift-2 {
+  0% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(2px, -1px);
+  }
+  100% {
+    transform: translate(-2px, 1px);
+  }
+}
+
+@keyframes noise-shift {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  10% {
+    transform: translate(-2%, -4%);
+  }
+  20% {
+    transform: translate(3%, 2%);
+  }
+  30% {
+    transform: translate(-4%, 3%);
+  }
+  40% {
+    transform: translate(2%, -3%);
+  }
+  50% {
+    transform: translate(-3%, 1%);
+  }
+  60% {
+    transform: translate(4%, -2%);
+  }
+  70% {
+    transform: translate(-1%, 4%);
+  }
+  80% {
+    transform: translate(3%, -1%);
+  }
+  90% {
+    transform: translate(-2%, 2%);
+  }
+}
+
+/*
+ * Dark mode — temporarily disabled, bring back later.
+ * Dark palette applies by system preference, unless the nav toggle has set
+ * an explicit data-theme (in which case that wins over the OS setting).
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg: #14170f;
+    --color-fg: #f3f4ee;
+    --color-primary: #8fce2e;
+    --color-on-primary: #14170f;
+    --color-accent: #e8c34a;
+    --color-on-accent: #14170f;
+    --color-card: color-mix(in srgb, white 10%, var(--color-bg));
+  }
+}
+
+:root[data-theme="dark"] {
+  --color-bg: #14170f;
+  --color-fg: #f3f4ee;
+  --color-primary: #8fce2e;
+  --color-on-primary: #14170f;
+  --color-accent: #e8c34a;
+  --color-on-accent: #14170f;
+  --color-card: color-mix(in srgb, white 10%, var(--color-bg));
+}
+*/
 
 body {
   background: var(--color-bg);
   color: var(--color-fg);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Scroll still works — just hide the visible scrollbar track/thumb. */
+html {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar {
+  display: none;
+}
+
+/* Same treatment, reusable for any inner horizontally-scrolling element
+   (carousels etc.) — not just the page's own vertical scrollbar. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* About page's default cat cursor stays for plain hovering, but links (and
+   anything else marked .cursor-sparkle — hobby carousel cards, the profile
+   photo) have their own browser-default cursor that wins by specificity
+   over the inherited one — this swaps it to the slanted "hover" cat
+   instead, sized ~1.2x the default so it reads as a highlight, not just a
+   different pointer. */
+.about-cat-cursor a,
+.about-cat-cursor button,
+.about-cat-cursor .cursor-sparkle {
+  cursor:
+    image-set(url(/images/about/hover-cat-1x.png) 1x, url(/images/about/hover-cat-2x.png) 2x)
+      17 17,
+    pointer;
+}
+
+/*
+ * Static film grain over the whole site. Plain feTurbulence renders as a soft
+ * gray haze at low opacity — barely visible. The feColorMatrix below pushes
+ * the noise's alpha channel to the extremes (crushing it toward pure black/
+ * white speckle), and mix-blend-mode: overlay lets that speckle actually cut
+ * into the page colors instead of just sitting on top as a translucent film.
+ */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.18;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch' result='noise'/%3E%3CfeColorMatrix in='noise' type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 9 -4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
