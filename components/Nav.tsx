@@ -67,17 +67,20 @@ export default function Nav() {
           suppressTransition ? "" : "transition-all duration-300"
         } ${
           scrolled
-            ? "mt-2 rounded-full border-[var(--color-border)] bg-[var(--color-bg)]/25 px-8 py-3 shadow-lg backdrop-blur-lg backdrop-saturate-150"
-            : "mt-0 rounded-none border-transparent bg-transparent px-8 py-8 shadow-none backdrop-blur-none"
+            ? "mt-2 rounded-full border-[var(--color-border)] bg-[var(--color-bg)]/25 px-4 py-2.5 shadow-lg backdrop-blur-lg backdrop-saturate-150 sm:px-8 sm:py-3"
+            : "mt-0 rounded-none border-transparent bg-transparent px-4 py-5 shadow-none backdrop-blur-none sm:px-8 sm:py-8"
         }`}
       >
         <Link
           href="/"
-          className="text-2xl font-black uppercase tracking-tight text-[var(--color-primary)]"
+          className="text-xl font-black uppercase tracking-tight text-[var(--color-primary)] sm:text-2xl"
         >
           JZ
         </Link>
-        <ul className="flex gap-20 text-[17px] font-bold" onMouseLeave={() => setHovered(null)}>
+        <ul
+          className="flex gap-4 text-[14px] font-bold sm:gap-20 sm:text-[17px]"
+          onMouseLeave={() => setHovered(null)}
+        >
           {LINKS.map((link) => (
             <li
               key={link.href}

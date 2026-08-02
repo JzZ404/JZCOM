@@ -44,24 +44,33 @@ export default function CaseStudyShell({
       <CaseStudySidebar mode={mode} onModeChange={setMode} tocItems={tocItems} />
 
       <div className="min-w-0 flex-1">
+        {/* Sidebar (with "Back to work") is hidden below lg, so this stands
+            in as the mobile/tablet way back to the work grid. */}
+        <Link
+          href="/#work"
+          className="block px-5 pt-6 text-[15px] font-medium text-[var(--color-muted)] no-underline sm:px-6 lg:hidden"
+        >
+          ← Back to work
+        </Link>
         {/* pt-9 matches the sidebar's py-9, so the title lines up with
             "Back to work" instead of sitting lower than it. */}
-        <div id="overview" className="scroll-mt-28 px-10 pt-9">
+        <div id="overview" className="scroll-mt-28 px-5 pt-4 sm:px-6 lg:px-10 lg:pt-9">
           <div className="mb-5 flex items-center justify-between gap-6">
-            <h1 className="font-serif text-[56px] leading-[1.1] font-bold text-[var(--color-fg)]">
+            <h1 className="font-serif text-[32px] leading-[1.1] font-bold text-[var(--color-fg)] sm:text-[40px] lg:text-[56px]">
               {caseStudy.title}
             </h1>
             {caseStudy.links && <CaseStudyLinkIcons links={caseStudy.links} />}
           </div>
-          <p className="mb-14 w-full text-[24px] leading-relaxed font-semibold text-[var(--color-muted)]">
+          <p className="mb-8 w-full text-[18px] leading-relaxed font-semibold text-[var(--color-muted)] sm:text-[20px] lg:mb-14 lg:text-[24px]">
             {caseStudy.subheading}
           </p>
           {/* grid-cols-4 splits the row into 4 equal columns with a
               consistent gap, instead of a fixed gap that just pushes items
               apart by the same amount regardless of row width — and it
               bounds each item's width so a long value wraps instead of
-              overflowing into the next column. */}
-          <div className="grid grid-cols-4 gap-6 border-b border-[var(--color-border)] pb-7">
+              overflowing into the next column. Collapses to 2 columns below
+              sm so long meta values have room to wrap without overflowing. */}
+          <div className="grid grid-cols-2 gap-4 border-b border-[var(--color-border)] pb-7 sm:grid-cols-4 sm:gap-6">
             {caseStudy.meta.map((item) => (
               <div key={item.label} className="flex min-w-0 flex-col gap-1">
                 <span className="text-[12px] font-semibold tracking-wider text-[var(--color-primary)] uppercase">
@@ -78,7 +87,7 @@ export default function CaseStudyShell({
         {caseStudy.heroVideo ? (
           // overflow-hidden + a slight scale crops out the black stroke
           // baked into the source recording's edges.
-          <div className="mx-10 my-7 w-[calc(100%-5rem)] overflow-hidden rounded-xl">
+          <div className="mx-5 my-7 w-[calc(100%-2.5rem)] overflow-hidden rounded-xl sm:mx-6 sm:w-[calc(100%-3rem)] lg:mx-10 lg:w-[calc(100%-5rem)]">
             <video
               src={caseStudy.heroVideo}
               className="w-full scale-[1.03]"
@@ -92,16 +101,20 @@ export default function CaseStudyShell({
           <img
             src={caseStudy.heroImage}
             alt={caseStudy.heroLabel}
-            className="mx-10 my-7 w-[calc(100%-5rem)] rounded-xl object-cover"
+            className="mx-5 my-7 w-[calc(100%-2.5rem)] rounded-xl object-cover sm:mx-6 sm:w-[calc(100%-3rem)] lg:mx-10 lg:w-[calc(100%-5rem)]"
           />
         ) : (
-          <PlaceholderBlock label={caseStudy.heroLabel} height={360} className="mx-10 my-7" />
+          <PlaceholderBlock
+            label={caseStudy.heroLabel}
+            height={360}
+            className="mx-5 my-7 sm:mx-6 lg:mx-10"
+          />
         )}
 
         {detailed ? (
           children
         ) : (
-          <div className="mx-10 mb-10 rounded-xl bg-[var(--color-surface)] p-7">
+          <div className="mx-5 mb-10 rounded-xl bg-[var(--color-surface)] p-5 sm:mx-6 sm:p-7 lg:mx-10">
             <div className="mb-2 font-mono text-xs font-semibold tracking-wider text-[var(--color-primary)] uppercase">
               TL;DR
             </div>
@@ -113,7 +126,7 @@ export default function CaseStudyShell({
 
         <Link
           href={`/work/${nextProject.slug}`}
-          className="relative block overflow-hidden bg-[var(--color-fg)] px-10 py-14 text-center no-underline"
+          className="relative block overflow-hidden bg-[var(--color-fg)] px-5 py-10 text-center no-underline sm:px-6 lg:px-10 lg:py-14"
         >
           {!coverFailed && (
             <>

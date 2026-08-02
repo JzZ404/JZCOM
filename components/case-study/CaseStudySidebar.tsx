@@ -113,7 +113,7 @@ export default function CaseStudySidebar({
     // the actual space below the fixed nav — a forced min-height taller than
     // the content made position:sticky release early near the very bottom
     // of the page, sliding the sidebar up over the floating nav.
-    <div className="sticky top-28 max-h-[calc(100vh-8rem)] w-59 shrink-0 self-start overflow-y-auto border-r border-[var(--color-border)] px-6.5 py-9">
+    <div className="sticky top-28 hidden max-h-[calc(100vh-8rem)] w-59 shrink-0 self-start overflow-y-auto border-r border-[var(--color-border)] px-6.5 py-9 lg:block">
       <Link
         href="/#work"
         className="mb-4 block text-[16px] font-medium text-[var(--color-muted)] no-underline"

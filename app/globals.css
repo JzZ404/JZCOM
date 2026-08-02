@@ -59,9 +59,12 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-serif: var(--font-serif);
-  /* --text-display and --text-greeting are the hero's central intro — left alone on purpose. */
-  --text-display: 3.5rem;
-  --text-greeting: 1.875rem;
+  /* --text-display and --text-greeting are the hero's central intro — the
+     desktop size (3.5rem / 1.875rem) is left alone on purpose; clamp()
+     only kicks in below that to keep mobile from overflowing/overlapping
+     the wave emoji, it doesn't change anything at desktop widths. */
+  --text-display: clamp(2rem, 7vw, 3.5rem);
+  --text-greeting: clamp(1.25rem, 4vw, 1.875rem);
   --text-h1: 3rem;
   --text-h2: 2.125rem;
   --text-body: 1.125rem;

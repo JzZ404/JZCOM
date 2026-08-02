@@ -74,7 +74,7 @@ export default function HobbyCarousel({ hobbies }: { hobbies: Hobby[] }) {
         whileHover={{ scale: 1.15 }}
         whileTap={{ scale: 0.85 }}
         transition={{ type: "spring", stiffness: 500, damping: 25 }}
-        className="absolute top-1/2 -left-4 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-fg)] shadow-md hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
+        className="absolute top-1/2 -left-4 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-fg)] shadow-md hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] xl:flex"
       >
         ←
       </motion.button>
@@ -85,7 +85,7 @@ export default function HobbyCarousel({ hobbies }: { hobbies: Hobby[] }) {
         whileHover={{ scale: 1.15 }}
         whileTap={{ scale: 0.85 }}
         transition={{ type: "spring", stiffness: 500, damping: 25 }}
-        className="absolute top-1/2 -right-4 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-fg)] shadow-md hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
+        className="absolute top-1/2 -right-4 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-fg)] shadow-md hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] xl:flex"
       >
         →
       </motion.button>
