@@ -456,8 +456,26 @@ export type CaseStudySimple = {
   meta: { label: string; value: string }[];
   links?: CaseStudyLink[];
   liveDemo?: { label: string; href: string };
-  whyWeBuiltThis: { image?: string; story: string[] };
-  technicalStack: { image?: string; items: string[] };
+  // `images` (plural) renders as a scattered photo layout instead of a
+  // single rectangle — 4 photos become an irregular collage (Poopidex's
+  // hiking/wildlife shots), 2 become a tilted side-by-side pair with an
+  // optional `imageCaption` underneath. Falls back to the single `image`
+  // (or a placeholder) otherwise.
+  // Most entries are plain strings (regular muted body paragraph). A
+  // `{ text, emphasis: true }` entry instead renders bold + primary-color
+  // — an explicit opt-in per paragraph rather than always styling
+  // whichever one happens to be last, so it doesn't silently restyle
+  // every other project's story too.
+  whyWeBuiltThis: {
+    image?: string;
+    images?: string[];
+    imageCaption?: string;
+    story: (string | { text: string; emphasis: true })[];
+  };
+  // `categories` (grouped title + items) renders as a grid of labeled
+  // blocks with real text hierarchy. Falls back to a flat bullet `items`
+  // list when a project doesn't have grouped categories yet.
+  technicalStack: { image?: string; items?: string[]; categories?: { title: string; items: string[] }[] };
   whatsNext: string[];
 };
 
@@ -484,12 +502,51 @@ export const poopidexCaseStudy: CaseStudySimple = {
   ],
   liveDemo: { label: "Try Live Demo", href: "https://poopidex.vercel.app/" },
   whyWeBuiltThis: {
-    story: [PLACEHOLDER],
+    images: [
+      "/images/poopidex/deer.jpg",
+      "/images/poopidex/marmot.jpg",
+      "/images/poopidex/seals.jpg",
+      "/images/poopidex/weasel.jpg",
+    ],
+    story: [
+      "I'm always curious about the wildlife I run into on hikes. Sometimes it's something I can spot right away, sometimes it's just tracks or scat left behind, and I'm left wondering what animal was actually there. That curiosity is really where Poopidex started.",
+      "Poopidex turns that into something you can use. Take a photo, get a real ID, start building a collection. There's a bigger point to it too. Enough sightings tracked over time start to look like real data, the kind that's normally hard to collect at any real scale, and could genuinely help with wildlife tracking.",
+    ],
   },
   technicalStack: {
-    items: [PLACEHOLDER],
+    categories: [
+      {
+        title: "Frontend",
+        items: ["Next.js 16", "React 19", "Tailwind v4"],
+      },
+      {
+        title: "Backend",
+        items: ["Next.js API route", "Real-time streaming"],
+      },
+      {
+        title: "AI Models",
+        items: ["Claude Opus 4.7 — decider", "CLIP ViT-B/32 — fine-tuned", "Chain-of-thought reasoning"],
+      },
+      {
+        title: "Training Data",
+        items: ["AnimalClue (Shinoda et al., ICCV 2025)", "Feces-specific subset"],
+      },
+      {
+        title: "Filtering",
+        items: ["Size, habitat, contents", "Hard biological rules"],
+      },
+      {
+        title: "Infrastructure",
+        items: ["Vercel — frontend hosting", "Hugging Face Spaces — CLIP inference", "Local storage — no signup"],
+      },
+    ],
   },
-  whatsNext: [PLACEHOLDER],
+  whatsNext: [
+    "Expand past the initial 20 cataloged species",
+    "Add community-verified sightings to strengthen the model",
+    "Build the conservation map into a full citizen-science tool",
+    "Explore broader indirect evidence types beyond feces — tracks, bones, feathers — since AnimalClue already covers them",
+  ],
 };
 
 export const focusfarmCaseStudy: CaseStudySimple = {
@@ -514,10 +571,38 @@ export const focusfarmCaseStudy: CaseStudySimple = {
   ],
   liveDemo: { label: "Try Live Demo", href: "https://focus-farm-nine.vercel.app/" },
   whyWeBuiltThis: {
-    story: [PLACEHOLDER],
+    images: ["/images/focusfarm/distracted1.jpg", "/images/focusfarm/distracted2.jpg"],
+    imageCaption: "Caught mid-game of Plants vs. Zombies in class — exhibit A for why this app needed to exist.",
+    story: [
+      "I get distracted constantly when I'm supposed to be working, ADHD-adjacent, if not full ADHD. But somehow I can lock in for hours on a farm game where I'm just collecting stuff.",
+      {
+        text: "SO — why can't we just gamify boring work and study, and make it rewarding by the end of the day?",
+        emphasis: true,
+      },
+    ],
   },
   technicalStack: {
-    items: [PLACEHOLDER],
+    categories: [
+      {
+        title: "Frontend & Detection",
+        items: ["React", "Next.js", "MediaPipe / TensorFlow.js", "Webcam-based attention tracking"],
+      },
+      {
+        title: "Data & Progression",
+        items: ["Coin economy", "Pixel farm rendering", "Local storage — MVP", "Supabase/Firebase — planned"],
+      },
+      {
+        title: "Deployment & CI",
+        items: ["Vercel — auto-deploy on push", "GitHub Actions — CI on every PR"],
+      },
+    ],
   },
-  whatsNext: [PLACEHOLDER],
+  whatsNext: [
+    "Unlockable farmland — new plots open up as focus hours accumulate",
+    "Tiered animals and buildings gated behind farm level, not just coins",
+    "A progression system with milestones, not just a flat shop",
+    "Seasonal or rotating decorations to keep long-term use engaging",
+    "Streak-based multipliers that reward consistency, not just single sessions",
+    "A leaderboard, once there's a real progression system worth comparing",
+  ],
 };

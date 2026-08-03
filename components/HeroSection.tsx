@@ -140,7 +140,26 @@ function LetterStaggerGreeting({ name }: { name: string }) {
   );
 }
 
+// Hidden once scrolled (or already landed) past the hero — it's positioned
+// at the hero's bottom edge, so on a short viewport it could otherwise
+// still sit there, fully visible, right at the top of the Work section.
+// Deliberately a plain scroll-position check (same on-mount-then-listen
+// pattern as Nav's own scrolled state) rather than a Framer Motion
+// scroll-linked value: useScroll's scrollY only updates on 'scroll'
+// events, so landing directly on /#work via anchor-jump (no scroll event
+// fires for the initial jump) left it stuck showing at full opacity.
 function ScrollHintArrow() {
+  const [pastHero, setPastHero] = useState(false);
+
+  useEffect(() => {
+    function onScroll() {
+      setPastHero(window.scrollY > 150);
+    }
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
     <Link
       href="/#work"
@@ -148,7 +167,9 @@ function ScrollHintArrow() {
         e.preventDefault();
         document.getElementById("work")?.scrollIntoView({ behavior: "smooth" });
       }}
-      className="group absolute bottom-5 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2 text-base font-medium text-[var(--color-fg)] transition-colors hover:text-[var(--color-primary)]"
+      className={`group absolute bottom-5 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2 text-base font-medium text-[var(--color-fg)] transition-opacity duration-300 hover:text-[var(--color-primary)] ${
+        pastHero ? "pointer-events-none opacity-0" : "opacity-100"
+      }`}
     >
       <span>See the work</span>
       <motion.span

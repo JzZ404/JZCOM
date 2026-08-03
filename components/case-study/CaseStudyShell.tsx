@@ -59,7 +59,10 @@ export default function CaseStudyShell({
         {/* pt-9 matches the sidebar's py-9, so the title lines up with
             "Back to work" instead of sitting lower than it. */}
         <div id="overview" className="scroll-mt-28 px-5 pt-4 sm:px-6 lg:px-10 lg:pt-9">
-          <div className="mb-5 flex items-center justify-between gap-6">
+          {/* flex-col below sm — a title plus the link icons/live-demo
+              button side by side was overflowing the viewport on phone
+              widths (e.g. "FocusFarm" + GitHub icon + "Try Live Demo"). */}
+          <div className="mb-5 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
             <h1 className="font-serif text-[32px] leading-[1.1] font-bold text-[var(--color-fg)] sm:text-[40px] lg:text-[56px]">
               {caseStudy.title}
             </h1>

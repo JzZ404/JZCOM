@@ -20,8 +20,13 @@ const staggerContainerVariants = {
 const staggerViewport = { once: false, margin: "-80px" };
 
 export default function WorkSection({ id = "work" }: { id?: string }) {
+  // scroll-mt-28 offsets anchor-jumps (e.g. clicking "Work" in the nav from
+  // another page, which does a native #work jump rather than the smooth
+  // in-page scroll) so the heading lands below the fixed nav instead of
+  // underneath it — same clearance value used elsewhere (CaseStudySection,
+  // etc.) for the same reason.
   return (
-    <section id={id} className="px-4 py-16">
+    <section id={id} className="scroll-mt-28 px-4 pt-8 pb-16">
       <div className="mx-auto max-w-6xl">
         <h2 className="text-[length:var(--text-h1)] font-semibold tracking-tight">Work</h2>
       </div>

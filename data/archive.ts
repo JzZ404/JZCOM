@@ -1,21 +1,124 @@
-// PLACEHOLDER DATA — Archive is an image-only waterfall wall, no case study
-// pages. Joyce will insert real images later; aspectRatio drives the
-// masonry sizing until then (real images will use their natural ratio).
+// Archive: grouped photo sets for older/miscellaneous projects. Each entry
+// is a full shoot (2-3 photos) for one project, rendered as a single card
+// with a title/caption instead of a flat single-image wall.
 
-export type ArchiveItem = {
+export type ArchiveProjectImage = { src: string; aspectRatio: number };
+
+export type ArchiveProject = {
   id: string;
-  image: string; // path under /public/images/archive/...
-  aspectRatio: number; // width / height, used for placeholder block sizing
+  title: string;
+  caption: string; // one-phrase description
+  // "stack": images shown one above another at full width, each at its own
+  // natural aspect ratio — used for straightforward 2-photo sets.
+  // "featured": first image full-width on top, the rest in a row below
+  // sized proportionally to their own aspect ratios (wide photos get more
+  // width, tall ones less) — used when a set mixes landscape and portrait.
+  layout: "stack" | "featured";
+  images: ArchiveProjectImage[];
+  // Optional demo/process video — plays on hover over the card in place of
+  // the static images, pauses and hides back to the images on mouse-leave
+  // (or on click, while it's playing).
+  video?: string;
+  // Zoom on the foreground (object-contain, uncropped) video — 1 = exact
+  // fit with full letterbox, >1 trims some of the blurred-fill margin by
+  // zooming in slightly. Per-project since it depends on how far the
+  // video's own aspect ratio is from the card's image area.
+  videoScale?: number;
+  // Playful per-card touch, opt-in — right now just "claw" (grab/grabbing
+  // cursor + a press animation on click, nodding at the actual claw
+  // machine in the photos instead of a generic hover state).
+  interactive?: "claw";
 };
 
-export const archiveItems: ArchiveItem[] = [
-  { id: "archive-1", image: "/images/archive/placeholder-1.jpg", aspectRatio: 1 },
-  { id: "archive-2", image: "/images/archive/placeholder-2.jpg", aspectRatio: 0.75 },
-  { id: "archive-3", image: "/images/archive/placeholder-3.jpg", aspectRatio: 1.5 },
-  { id: "archive-4", image: "/images/archive/placeholder-4.jpg", aspectRatio: 0.6 },
-  { id: "archive-5", image: "/images/archive/placeholder-5.jpg", aspectRatio: 1.2 },
-  { id: "archive-6", image: "/images/archive/placeholder-6.jpg", aspectRatio: 0.9 },
-  { id: "archive-7", image: "/images/archive/placeholder-7.jpg", aspectRatio: 1.8 },
-  { id: "archive-8", image: "/images/archive/placeholder-8.jpg", aspectRatio: 0.7 },
-  { id: "archive-9", image: "/images/archive/placeholder-9.jpg", aspectRatio: 1.1 },
+export const archiveProjects: ArchiveProject[] = [
+  {
+    id: "ouroboros",
+    title: "Ouroboros",
+    caption: "",
+    layout: "stack",
+    images: [
+      { src: "/images/archive/ouroborous1.jpg", aspectRatio: 6000 / 4000 },
+      { src: "/images/archive/ouroborous2.jpg", aspectRatio: 5360 / 3644 },
+    ],
+    video: "/images/archive/ourobous.mov",
+    videoScale: 1.3,
+  },
+  {
+    id: "momento",
+    title: "Momento",
+    caption: "",
+    layout: "featured",
+    images: [
+      { src: "/images/archive/momento.jpg", aspectRatio: 6000 / 4000 },
+      { src: "/images/archive/momento2.jpg", aspectRatio: 6000 / 4000 },
+      { src: "/images/archive/momento3.jpg", aspectRatio: 4000 / 6000 },
+    ],
+  },
+  {
+    id: "godzilla",
+    title: "G-Spikes",
+    caption: "",
+    layout: "stack",
+    images: [
+      { src: "/images/archive/godzilla.JPG", aspectRatio: 2811 / 3828 },
+      { src: "/images/archive/godzilla2.JPG", aspectRatio: 4032 / 3024 },
+    ],
+    video: "/images/archive/godzilla-video.mov",
+  },
+  {
+    id: "claw",
+    title: "Claw",
+    caption: "",
+    layout: "stack",
+    images: [
+      { src: "/images/archive/claw1.png", aspectRatio: 1108 / 1446 },
+      { src: "/images/archive/claw2.png", aspectRatio: 1060 / 1474 },
+    ],
+    interactive: "claw",
+  },
+  {
+    id: "branding",
+    title: "Branding",
+    caption: "",
+    layout: "stack",
+    images: [
+      { src: "/images/archive/branding.jpg", aspectRatio: 4032 / 3024 },
+      { src: "/images/archive/branding2.jpg", aspectRatio: 5712 / 4284 },
+    ],
+  },
+  {
+    id: "octodesk",
+    title: "Octopus Desk",
+    caption: "",
+    layout: "stack",
+    images: [{ src: "/images/archive/octodesk.png", aspectRatio: 2380 / 3570 }],
+  },
+  {
+    id: "helport",
+    title: "Helport",
+    caption: "",
+    layout: "stack",
+    images: [{ src: "/images/archive/helport.png", aspectRatio: 1736 / 1068 }],
+  },
+  {
+    id: "safetrack",
+    title: "SafeTrack",
+    caption: "",
+    layout: "stack",
+    images: [{ src: "/images/archive/safetrack-poster.png", aspectRatio: 1728 / 2592 }],
+  },
+  {
+    id: "grubhub",
+    title: "Grubhub Merchant Redesign",
+    caption: "",
+    layout: "stack",
+    images: [{ src: "/images/archive/grubhub.png", aspectRatio: 1924 / 1080 }],
+  },
+  {
+    id: "sticker-ucsd",
+    title: "Branding",
+    caption: "",
+    layout: "stack",
+    images: [{ src: "/images/archive/stickerucsd.png", aspectRatio: 1402 / 1122 }],
+  },
 ];
