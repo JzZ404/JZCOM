@@ -54,7 +54,7 @@ export const projects: Project[] = [
     category: "ai",
     chips: ["Computer Vision", "Next.js", "YOLO + Claude Vision"],
     summary:
-      "A hybrid vision app that identifies wild animal species from scat photos using YOLO, CLIP, and Claude Vision together.",
+      "A vision AI app that turns a scat photo into a species ID and a collectible card, powered by a fine-tuned vision model and Claude Vision.",
     role: "Sole developer (concept co-originated with Aaron).",
     coverImage: "/images/poopidex/cover.png",
     coverPosition: "left center",

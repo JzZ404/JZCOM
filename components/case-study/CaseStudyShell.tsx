@@ -20,6 +20,10 @@ export type CaseStudyShellData = {
   heroImage?: string; // optional static cover image — checked if heroVideo isn't set
   meta: { label: string; value: string }[];
   links?: CaseStudyLink[]; // optional external links (GitHub, Kaggle, etc.), shown top-right of the title
+  // Rendered as a button top-right of the title (next to `links`, if any)
+  // and as a click-through overlay on the hero image — no separate "Live
+  // Demo" pill elsewhere on the page.
+  liveDemo?: { label: string; href: string };
 };
 
 export default function CaseStudyShell({
@@ -59,7 +63,20 @@ export default function CaseStudyShell({
             <h1 className="font-serif text-[32px] leading-[1.1] font-bold text-[var(--color-fg)] sm:text-[40px] lg:text-[56px]">
               {caseStudy.title}
             </h1>
-            {caseStudy.links && <CaseStudyLinkIcons links={caseStudy.links} />}
+            <div className="flex shrink-0 items-center gap-3">
+              {caseStudy.links && <CaseStudyLinkIcons links={caseStudy.links} />}
+              {caseStudy.liveDemo && (
+                <a
+                  href={caseStudy.liveDemo.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-primary)] px-4 py-2 text-[14px] font-semibold whitespace-nowrap text-white no-underline transition-opacity hover:opacity-90 sm:px-5 sm:py-2.5 sm:text-[15px]"
+                >
+                  {caseStudy.liveDemo.label}
+                  <span aria-hidden>↗</span>
+                </a>
+              )}
+            </div>
           </div>
           <p className="mb-8 w-full text-[18px] leading-relaxed font-semibold text-[var(--color-muted)] sm:text-[20px] lg:mb-14 lg:text-[24px]">
             {caseStudy.subheading}
@@ -98,11 +115,31 @@ export default function CaseStudyShell({
             />
           </div>
         ) : caseStudy.heroImage ? (
-          <img
-            src={caseStudy.heroImage}
-            alt={caseStudy.heroLabel}
-            className="mx-5 my-7 w-[calc(100%-2.5rem)] rounded-xl object-cover sm:mx-6 sm:w-[calc(100%-3rem)] lg:mx-10 lg:w-[calc(100%-5rem)]"
-          />
+          caseStudy.liveDemo ? (
+            <a
+              href={caseStudy.liveDemo.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group relative mx-5 my-7 block w-[calc(100%-2.5rem)] overflow-hidden rounded-xl sm:mx-6 sm:w-[calc(100%-3rem)] lg:mx-10 lg:w-[calc(100%-5rem)]"
+            >
+              <img
+                src={caseStudy.heroImage}
+                alt={caseStudy.heroLabel}
+                className="w-full object-cover"
+              />
+              <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                <span className="rounded-full bg-white px-6 py-3 text-[16px] font-semibold text-[var(--color-fg)]">
+                  {caseStudy.liveDemo.label}
+                </span>
+              </div>
+            </a>
+          ) : (
+            <img
+              src={caseStudy.heroImage}
+              alt={caseStudy.heroLabel}
+              className="mx-5 my-7 w-[calc(100%-2.5rem)] rounded-xl object-cover sm:mx-6 sm:w-[calc(100%-3rem)] lg:mx-10 lg:w-[calc(100%-5rem)]"
+            />
+          )
         ) : (
           <PlaceholderBlock
             label={caseStudy.heroLabel}

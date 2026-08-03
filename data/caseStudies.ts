@@ -442,3 +442,82 @@ export const caseStudies: Record<string, CaseStudy> = {
     designSystemImage: "/images/nest/design-system.png",
   },
 };
+
+// A lighter case-study format for smaller/solo projects (Poopidex, FocusFarm)
+// that don't warrant Alio/Nest's full research treatment: overview (handled
+// by CaseStudyShell itself) + Why We Built This + Technical Stack + What's
+// Next. Same shell/section components as Alio/Nest, just fewer of them.
+export type CaseStudySimple = {
+  title: string;
+  subheading: string;
+  tldr: string;
+  heroLabel: string;
+  heroImage?: string;
+  meta: { label: string; value: string }[];
+  links?: CaseStudyLink[];
+  liveDemo?: { label: string; href: string };
+  whyWeBuiltThis: { image?: string; story: string[] };
+  technicalStack: { image?: string; items: string[] };
+  whatsNext: string[];
+};
+
+export const poopidexCaseStudy: CaseStudySimple = {
+  title: "Poopidex",
+  subheading:
+    "A vision AI app that turns a scat photo into a species ID and a collectible card, powered by a fine-tuned vision model and Claude Vision.",
+  tldr: PLACEHOLDER,
+  heroLabel: "hero screenshot — Poopidex",
+  heroImage: "/images/poopidex/cover.png",
+  meta: [
+    { label: "Role", value: "Designer, Developer, and ML Engineer" },
+    { label: "For", value: "Hikers, naturalists, wildlife trackers" },
+    { label: "Team", value: "Solo Developer" },
+    { label: "Timeline", value: "May 2026" },
+  ],
+  links: [
+    {
+      label: "GitHub",
+      tooltip: "View on GitHub",
+      href: "https://github.com/JzZ404/Poopidex",
+      icon: "github",
+    },
+  ],
+  liveDemo: { label: "Try Live Demo", href: "https://poopidex.vercel.app/" },
+  whyWeBuiltThis: {
+    story: [PLACEHOLDER],
+  },
+  technicalStack: {
+    items: [PLACEHOLDER],
+  },
+  whatsNext: [PLACEHOLDER],
+};
+
+export const focusfarmCaseStudy: CaseStudySimple = {
+  title: "FocusFarm",
+  subheading: "A webcam-based focus app that rewards sustained attention with a growing pixel-art farm.",
+  tldr: PLACEHOLDER,
+  heroLabel: "hero screenshot — FocusFarm",
+  heroImage: "/images/focusfarm/cover.png",
+  meta: [
+    { label: "Role", value: "Project Owner and Management" },
+    { label: "For", value: "Students and professionals building focus habits" },
+    { label: "Team", value: "Team of two, PM and Frontend" },
+    { label: "Timeline", value: "June 2026" },
+  ],
+  links: [
+    {
+      label: "GitHub",
+      tooltip: "View on GitHub",
+      href: "https://github.com/JzZ404/FocusFarm",
+      icon: "github",
+    },
+  ],
+  liveDemo: { label: "Try Live Demo", href: "https://focus-farm-nine.vercel.app/" },
+  whyWeBuiltThis: {
+    story: [PLACEHOLDER],
+  },
+  technicalStack: {
+    items: [PLACEHOLDER],
+  },
+  whatsNext: [PLACEHOLDER],
+};

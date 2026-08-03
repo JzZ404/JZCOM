@@ -1,11 +1,23 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { projects } from "@/data/projects";
-import { caseStudies, caseStudySkeletons, alioCaseStudy } from "@/data/caseStudies";
+import {
+  caseStudies,
+  caseStudySkeletons,
+  alioCaseStudy,
+  poopidexCaseStudy,
+  focusfarmCaseStudy,
+} from "@/data/caseStudies";
 import CaseStudyPage from "@/components/case-study/CaseStudyPage";
 import CaseStudySkeletonPage from "@/components/case-study/CaseStudySkeletonPage";
 import AlioCaseStudyPage from "@/components/case-study/AlioCaseStudyPage";
+import SimpleCaseStudyPage from "@/components/case-study/SimpleCaseStudyPage";
 import ProjectFallbackDetail from "@/components/ProjectFallbackDetail";
+
+const simpleCaseStudies: Record<string, typeof poopidexCaseStudy> = {
+  poopidex: poopidexCaseStudy,
+  focusfarm: focusfarmCaseStudy,
+};
 
 export function generateStaticParams() {
   return projects.map((project) => ({ slug: project.slug }));
@@ -41,6 +53,13 @@ export default async function ProjectDetailPage({
     const projectIndex = projects.findIndex((p) => p.slug === slug);
     const nextProject = projects[(projectIndex + 1) % projects.length];
     return <AlioCaseStudyPage caseStudy={alioCaseStudy} nextProject={nextProject} />;
+  }
+
+  const simpleCaseStudy = simpleCaseStudies[slug];
+  if (simpleCaseStudy) {
+    const projectIndex = projects.findIndex((p) => p.slug === slug);
+    const nextProject = projects[(projectIndex + 1) % projects.length];
+    return <SimpleCaseStudyPage caseStudy={simpleCaseStudy} nextProject={nextProject} />;
   }
 
   const skeleton = caseStudySkeletons[slug];
