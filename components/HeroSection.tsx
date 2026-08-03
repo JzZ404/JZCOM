@@ -20,7 +20,7 @@ type Run = { kind: "text"; text: string; className: string; highlight?: boolean 
 
 const TYPE_SPEED_MS = 45;
 const GRADIENT_WORD_CLASS =
-  "animate-gradient-shift bg-[length:200%_auto] bg-[linear-gradient(90deg,var(--color-primary-dark),var(--color-primary),var(--color-primary-light),var(--color-primary))] bg-clip-text font-normal text-transparent";
+  "animate-gradient-shift bg-[length:200%_auto] bg-[linear-gradient(90deg,var(--color-primary-dark),var(--color-primary),var(--color-highlight),var(--color-primary))] bg-clip-text font-normal text-transparent";
 const HIGHLIGHTED_WORDS = ["UX", "AI", "Robotics"];
 
 function useTypewriterProgress(totalLength: number, speed: number) {

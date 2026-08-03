@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Fraunces } from "next/font/google";
+import { Geist, Geist_Mono, Fraunces, Notable } from "next/font/google";
 import Script from "next/script";
 import Nav from "@/components/Nav";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -37,6 +37,13 @@ const fraunces = Fraunces({
   weight: ["400", "700"],
 });
 
+// Just for the "JZ" nav logo — Notable only ships one weight (400).
+const notable = Notable({
+  variable: "--font-notable",
+  subsets: ["latin"],
+  weight: "400",
+});
+
 export const metadata: Metadata = {
   title: "Joyce Zhou",
   description: "Design technologist working across UX/product design, AI, and robotics.",
@@ -53,7 +60,7 @@ export default function RootLayout({
       // theme-init below sets data-theme before hydration on purpose — this
       // silences the expected server/client mismatch warning for it.
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} ${notable.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <Script

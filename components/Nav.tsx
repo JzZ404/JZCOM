@@ -67,18 +67,27 @@ export default function Nav() {
           suppressTransition ? "" : "transition-all duration-300"
         } ${
           scrolled
-            ? "mt-2 rounded-full border-[var(--color-border)] bg-[var(--color-bg)]/25 px-4 py-2.5 shadow-lg backdrop-blur-lg backdrop-saturate-150 sm:px-8 sm:py-3"
+            ? "mt-2 rounded-full border-[var(--color-border)] bg-[var(--color-bg)]/8 px-4 py-2.5 shadow-lg backdrop-blur-lg backdrop-saturate-150 sm:px-8 sm:py-3"
             : "mt-0 rounded-none border-transparent bg-transparent px-4 py-5 shadow-none backdrop-blur-none sm:px-8 sm:py-8"
         }`}
       >
-        <Link
-          href="/"
-          className="text-xl font-black uppercase tracking-tight text-[var(--color-primary)] sm:text-2xl"
-        >
-          JZ
+        {/* cat + "JZ" move as one unit — the -translate-y-0.5 here nudges
+            the whole group up to match the nav links' optical baseline,
+            the +translate-y-0.5 on the cat is a separate, smaller offset
+            just between the icon and the text within the group. */}
+        <Link href="/" className="flex -translate-y-0.5 items-center gap-2">
+          <img
+            src="/images/about/cursor-cat-2x.png"
+            alt=""
+            aria-hidden
+            className="h-5 w-5 translate-y-0.5 object-contain sm:h-6 sm:w-6"
+          />
+          <span className="font-notable text-xl tracking-tight text-[var(--color-primary)] sm:text-2xl">
+            JZ
+          </span>
         </Link>
         <ul
-          className="flex gap-4 text-[14px] font-bold sm:gap-20 sm:text-[17px]"
+          className="flex gap-4 text-[14px] font-bold sm:gap-10 sm:text-[17px]"
           onMouseLeave={() => setHovered(null)}
         >
           {LINKS.map((link) => (
