@@ -7,6 +7,8 @@ import {
   alioCaseStudy,
   poopidexCaseStudy,
   focusfarmCaseStudy,
+  drunkyCaseStudy,
+  pelicanCaseStudy,
 } from "@/data/caseStudies";
 import CaseStudyPage from "@/components/case-study/CaseStudyPage";
 import CaseStudySkeletonPage from "@/components/case-study/CaseStudySkeletonPage";
@@ -17,6 +19,8 @@ import ProjectFallbackDetail from "@/components/ProjectFallbackDetail";
 const simpleCaseStudies: Record<string, typeof poopidexCaseStudy> = {
   poopidex: poopidexCaseStudy,
   focusfarm: focusfarmCaseStudy,
+  drunky: drunkyCaseStudy,
+  pelican: pelicanCaseStudy,
 };
 
 export function generateStaticParams() {

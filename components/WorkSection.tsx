@@ -2,9 +2,15 @@
 
 import { motion } from "framer-motion";
 import ProjectCard from "@/components/ProjectCard";
+import CategoryBackdrop from "@/components/CategoryBackdrop";
 import { projects, type ProjectCategory } from "@/data/projects";
 
 const CATEGORIES: ProjectCategory[] = ["ux", "ai", "robotics"];
+
+// AI (code texture) and Robotics (HUD ring) backdrops — temporarily
+// disabled, bring back later. UX's is still the old blurry-blob placeholder,
+// off for the same reason it always was.
+const CATEGORIES_WITH_BACKDROP: ProjectCategory[] = [];
 
 // once: false replays the reveal every time a row re-enters the viewport,
 // so it plays scrolling down AND scrolling back up, not just the first time.
@@ -30,7 +36,10 @@ export default function WorkSection({ id = "work" }: { id?: string }) {
         {CATEGORIES.map((category) => {
           const categoryProjects = projects.filter((project) => project.category === category);
           return (
-            <div key={category} className="relative py-6">
+            <div key={category} className="relative overflow-hidden py-6">
+              {CATEGORIES_WITH_BACKDROP.includes(category) && (
+                <CategoryBackdrop category={category} />
+              )}
               <div className="relative mx-auto max-w-6xl">
                 <motion.div
                   className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-14"

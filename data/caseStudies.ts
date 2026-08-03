@@ -127,7 +127,7 @@ export type CaseStudyAlio = {
 export const alioCaseStudy: CaseStudyAlio = {
   title: "Alio",
   subheading:
-    "An AI elder care platform connecting seniors, caregivers, and families through visit summaries, medication reminders, and symptom checks.",
+    "On-device AI copilot connecting seniors, caregivers, and families through structured visit reports and symptom triage.",
   tldr: PLACEHOLDER,
   heroLabel: "hero screenshot — Alio",
   heroVideo: "/images/alio/alio-cover.mp4",
@@ -466,7 +466,10 @@ export type CaseStudySimple = {
   // — an explicit opt-in per paragraph rather than always styling
   // whichever one happens to be last, so it doesn't silently restyle
   // every other project's story too.
-  whyWeBuiltThis: {
+  // Both whyWeBuiltThis and technicalStack are optional — a project without
+  // one yet just skips that section (and its sidebar TOC entry) entirely
+  // instead of showing an obvious empty PLACEHOLDER block.
+  whyWeBuiltThis?: {
     image?: string;
     images?: string[];
     imageCaption?: string;
@@ -475,7 +478,7 @@ export type CaseStudySimple = {
   // `categories` (grouped title + items) renders as a grid of labeled
   // blocks with real text hierarchy. Falls back to a flat bullet `items`
   // list when a project doesn't have grouped categories yet.
-  technicalStack: { image?: string; items?: string[]; categories?: { title: string; items: string[] }[] };
+  technicalStack?: { image?: string; items?: string[]; categories?: { title: string; items: string[] }[] };
   whatsNext: string[];
 };
 
@@ -605,4 +608,40 @@ export const focusfarmCaseStudy: CaseStudySimple = {
     "Streak-based multipliers that reward consistency, not just single sessions",
     "A leaderboard, once there's a real progression system worth comparing",
   ],
+};
+
+export const drunkyCaseStudy: CaseStudySimple = {
+  title: "Drunky",
+  subheading:
+    "A dual-arm robot that pours and mixes drinks, trained through imitation learning on 256 teleoperated demonstrations.",
+  tldr: PLACEHOLDER,
+  heroLabel: "hero screenshot — Drunky",
+  heroImage: "/images/drunky/cover.jpg",
+  meta: [
+    { label: "Role", value: "Robotic Manipulation and HRI Design" },
+    { label: "For", value: "Automated bartending and hospitality" },
+    { label: "Team", value: "Team of three robotics students" },
+    { label: "Timeline", value: "June 2026" },
+  ],
+  // No live demo for a physical robot — the repo stands in for it, same
+  // embedded-in-the-hero treatment as Poopidex/FocusFarm's live demo link.
+  liveDemo: { label: "View on GitHub", href: "https://github.com/tonyechen/drunky_ros" },
+  whatsNext: [PLACEHOLDER],
+};
+
+export const pelicanCaseStudy: CaseStudySimple = {
+  title: "PELICAN",
+  subheading:
+    "A pelican-inspired autonomous robot that collects waste using LiDAR-based perception and dual-axis visual servoing.",
+  tldr: PLACEHOLDER,
+  heroLabel: "hero screenshot — PELICAN",
+  heroImage: "/images/pelican/cover.jpg",
+  meta: [
+    { label: "Role", value: "Robot Navigation, 3D Design and CAD" },
+    { label: "For", value: "Autonomous waste collection in public spaces" },
+    { label: "Team", value: "Team of two robotics students" },
+    { label: "Timeline", value: "March 2026" },
+  ],
+  liveDemo: { label: "View on GitHub", href: "https://github.com/JzZ404/The_Pelican" },
+  whatsNext: [PLACEHOLDER],
 };

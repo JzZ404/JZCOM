@@ -32,7 +32,7 @@ export const projects: Project[] = [
     category: "ux",
     chips: ["AI/ML", "Product Strategy", "Healthcare", "Hackathon"],
     summary:
-      "An AI elder care platform connecting seniors, caregivers, and families through visit summaries, medication reminders, and symptom checks.",
+      "On-device AI copilot connecting seniors, caregivers, and families through structured visit reports and symptom triage.",
     role: "Product strategy, frontend, and pipeline coordination — ML fine-tuning by Aaron Yeung.",
     coverImage: "/images/alio/cover.png",
   },

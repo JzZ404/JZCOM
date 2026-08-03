@@ -87,6 +87,10 @@
   --animate-glitch-1: glitch-shift-1 0.3s steps(2) infinite;
   --animate-glitch-2: glitch-shift-2 0.3s steps(2) infinite;
   --animate-noise-shift: noise-shift 0.6s steps(10) infinite;
+  /* Robotics category backdrop's HUD ring (CategoryBackdrop.tsx) — a slow
+     radar-style rotation, not fast enough to be distracting behind the
+     project cards. */
+  --animate-hud-spin: hud-spin 24s linear infinite;
 }
 
 @keyframes gradient-shift {
@@ -125,6 +129,17 @@
   }
   to {
     transform: translateX(-50%);
+  }
+}
+
+/* AI category backdrop's code rows (CategoryBackdrop.tsx) scroll the
+   opposite direction on alternating rows — reverse of the marquee above. */
+@keyframes marquee-reverse {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
   }
 }
 
@@ -183,6 +198,15 @@
   }
   90% {
     transform: translate(-2%, 2%);
+  }
+}
+
+@keyframes hud-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 
