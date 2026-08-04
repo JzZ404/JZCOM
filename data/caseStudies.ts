@@ -632,7 +632,7 @@ export const drunkyCaseStudy: CaseStudySimple = {
 export const pelicanCaseStudy: CaseStudySimple = {
   title: "PELICAN",
   subheading:
-    "A pelican-inspired autonomous robot that collects waste using LiDAR-based perception and dual-axis visual servoing.",
+    "A pelican-inspired autonomous robot that collects waste using LiDAR-based perception and YOLO camera detection.",
   tldr: PLACEHOLDER,
   heroLabel: "hero screenshot — PELICAN",
   heroImage: "/images/pelican/cover.jpg",

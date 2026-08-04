@@ -30,7 +30,7 @@ export const projects: Project[] = [
     title: "Alio: AI Copilot for Elder Care",
     tags: ["AI/ML", "UX/Product"],
     category: "ux",
-    chips: ["AI/ML", "Product Strategy", "Healthcare", "Hackathon"],
+    chips: ["AI/ML", "UX/UI", "Product Strategy", "Hackathon"],
     summary:
       "On-device AI copilot connecting seniors, caregivers, and families through structured visit reports and symptom triage.",
     role: "Product strategy, frontend, and pipeline coordination — ML fine-tuning by Aaron Yeung.",
@@ -38,12 +38,12 @@ export const projects: Project[] = [
   },
   {
     slug: "nest",
-    title: "Nest: A Gamified Habit-Building App for Real Life",
+    title: "Nest: Gamified Habit-Building App for Real Life",
     tags: ["UX/Product"],
     category: "ux",
-    chips: ["UX Research", "Product Design", "Habit Gamification"],
+    chips: ["UX Research", "Interaction Design", "Product Design"],
     summary:
-      "A mobile app that turns small daily movement into a growing companion and social challenges, designed around research showing time scarcity and low follow-through as the two biggest barriers to staying active.",
+      "A gamified movement app that turns daily steps into a growing companion and social challenges, built around research on why people stop working out.",
     role: "UX research and product design.",
     coverImage: "/images/nest/cover.png",
   },
@@ -52,7 +52,7 @@ export const projects: Project[] = [
     title: "Poopidex: AI-Powered Scat Identification",
     tags: ["AI/ML"],
     category: "ai",
-    chips: ["Computer Vision", "Next.js", "YOLO + Claude Vision"],
+    chips: ["Computer Vision", "ML", "Fine-Tuned Vision Model"],
     summary:
       "A vision AI app that turns a scat photo into a species ID and a collectible card, powered by a fine-tuned vision model and Claude Vision.",
     role: "Sole developer (concept co-originated with Aaron).",
@@ -65,7 +65,7 @@ export const projects: Project[] = [
     title: "FocusFarm: Gamified Focus Tracker",
     tags: ["PM", "UX/Product"],
     category: "ai",
-    chips: ["Project Owner", "Product Management"],
+    chips: ["Project Owner", "Product Management", "Attention Detection"],
     summary:
       "A webcam-based focus app that rewards sustained attention with a growing pixel-art farm.",
     role: "Project Owner / PM — directed and defined the product (developed by Murphy Wei).",
@@ -75,10 +75,10 @@ export const projects: Project[] = [
   },
   {
     slug: "drunky",
-    title: "Drunky: A Bimanual Bartending Robot",
+    title: "Drunky: Bimanual Bartending Robot",
     tags: ["Robotics"],
     category: "robotics",
-    chips: ["Imitation Learning", "Bimanual Manipulation"],
+    chips: ["Imitation Learning", "Bimanual Manipulation", "Computer Vision"],
     summary:
       "A dual-arm robot that pours and mixes drinks, trained through imitation learning on 256 teleoperated demonstrations.",
     role: "Imitation learning and bimanual manipulation.",
@@ -89,9 +89,9 @@ export const projects: Project[] = [
     title: "PELICAN: Autonomous Waste Collection Robot",
     tags: ["Robotics"],
     category: "robotics",
-    chips: ["Autonomous Systems", "LiDAR", "Visual Servoing"],
+    chips: ["Autonomous Systems", "Robot Navigation", "Computer Vision"],
     summary:
-      "A pelican-inspired autonomous robot that collects waste using LiDAR-based perception and dual-axis visual servoing.",
+      "A pelican-inspired autonomous robot that collects waste using LiDAR-based perception and YOLO camera detection.",
     role: "Autonomous systems, perception, and controls.",
     coverImage: "/images/pelican/cover.jpg",
   },
