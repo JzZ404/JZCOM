@@ -25,12 +25,19 @@ function splitIntoColumns(projects: ArchiveProject[], columns: number): ArchiveP
   const result: ArchiveProject[][] = Array.from({ length: columns }, () => []);
   const heights = new Array(columns).fill(0);
   for (const project of projects) {
-    let shortest = 0;
-    for (let i = 1; i < columns; i++) {
-      if (heights[i] < heights[shortest]) shortest = i;
-    }
-    result[shortest].push(project);
-    heights[shortest] += estimateHeight(project);
+    // Explicit pin wins outright — lets a specific reading order be locked
+    // in (e.g. "SafeTrack first in column 3") without fighting the
+    // height-balancing heuristic. Unpinned projects still fall back to
+    // whichever column is shortest so far.
+    const target = project.column ?? (() => {
+      let shortest = 0;
+      for (let i = 1; i < columns; i++) {
+        if (heights[i] < heights[shortest]) shortest = i;
+      }
+      return shortest;
+    })();
+    result[target].push(project);
+    heights[target] += estimateHeight(project);
   }
   return result;
 }

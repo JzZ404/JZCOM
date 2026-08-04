@@ -28,6 +28,11 @@ export type ArchiveProject = {
   // cursor + a press animation on click, nodding at the actual claw
   // machine in the photos instead of a generic hover state).
   interactive?: "claw";
+  // Pins this card to a specific desktop masonry column (0-2) instead of
+  // letting the height-balancing algorithm place it — set when Joyce wants
+  // an exact reading order in a column. Leave unset to let a card fall
+  // wherever balances the columns.
+  column?: 0 | 1 | 2;
 };
 
 export const archiveProjects: ArchiveProject[] = [
@@ -42,6 +47,7 @@ export const archiveProjects: ArchiveProject[] = [
     ],
     video: "/images/archive/ourobous.mov",
     videoScale: 1.3,
+    column: 0,
   },
   {
     id: "momento",
@@ -53,17 +59,23 @@ export const archiveProjects: ArchiveProject[] = [
       { src: "/images/archive/momento2.jpg", aspectRatio: 6000 / 4000 },
       { src: "/images/archive/momento3.jpg", aspectRatio: 4000 / 6000 },
     ],
+    column: 1,
   },
   {
-    id: "godzilla",
-    title: "G-Spikes",
+    id: "safetrack",
+    title: "SafeTrack",
     caption: "",
     layout: "stack",
-    images: [
-      { src: "/images/archive/godzilla.JPG", aspectRatio: 2811 / 3828 },
-      { src: "/images/archive/godzilla2.JPG", aspectRatio: 4032 / 3024 },
-    ],
-    video: "/images/archive/godzilla-video.mov",
+    images: [{ src: "/images/archive/safetrack-poster.png", aspectRatio: 1728 / 2592 }],
+    column: 2,
+  },
+  {
+    id: "helport",
+    title: "Helport AI Agent",
+    caption: "",
+    layout: "stack",
+    images: [{ src: "/images/archive/helport.png", aspectRatio: 1736 / 1068 }],
+    column: 0,
   },
   {
     id: "claw",
@@ -75,6 +87,19 @@ export const archiveProjects: ArchiveProject[] = [
       { src: "/images/archive/claw2.png", aspectRatio: 1060 / 1474 },
     ],
     interactive: "claw",
+    column: 1,
+  },
+  {
+    id: "godzilla",
+    title: "G-Spikes",
+    caption: "",
+    layout: "stack",
+    images: [
+      { src: "/images/archive/godzilla.JPG", aspectRatio: 2811 / 3828 },
+      { src: "/images/archive/godzilla2.JPG", aspectRatio: 4032 / 3024 },
+    ],
+    video: "/images/archive/godzilla-video.mov",
+    column: 2,
   },
   {
     id: "branding",
@@ -85,34 +110,7 @@ export const archiveProjects: ArchiveProject[] = [
       { src: "/images/archive/branding.jpg", aspectRatio: 4032 / 3024 },
       { src: "/images/archive/branding2.jpg", aspectRatio: 5712 / 4284 },
     ],
-  },
-  {
-    id: "octodesk",
-    title: "Octopus Desk",
-    caption: "",
-    layout: "stack",
-    images: [{ src: "/images/archive/octodesk.png", aspectRatio: 2380 / 3570 }],
-  },
-  {
-    id: "helport",
-    title: "Helport",
-    caption: "",
-    layout: "stack",
-    images: [{ src: "/images/archive/helport.png", aspectRatio: 1736 / 1068 }],
-  },
-  {
-    id: "safetrack",
-    title: "SafeTrack",
-    caption: "",
-    layout: "stack",
-    images: [{ src: "/images/archive/safetrack-poster.png", aspectRatio: 1728 / 2592 }],
-  },
-  {
-    id: "grubhub",
-    title: "Grubhub Merchant Redesign",
-    caption: "",
-    layout: "stack",
-    images: [{ src: "/images/archive/grubhub.png", aspectRatio: 1924 / 1080 }],
+    column: 0,
   },
   {
     id: "sticker-ucsd",
@@ -120,5 +118,22 @@ export const archiveProjects: ArchiveProject[] = [
     caption: "",
     layout: "stack",
     images: [{ src: "/images/archive/stickerucsd.png", aspectRatio: 1402 / 1122 }],
+    column: 1,
+  },
+  {
+    id: "octodesk",
+    title: "Octopus Desk",
+    caption: "",
+    layout: "stack",
+    images: [{ src: "/images/archive/octodesk.png", aspectRatio: 2380 / 3570 }],
+    column: 2,
+  },
+  {
+    id: "grubhub",
+    title: "Grubhub Merchant Redesign",
+    caption: "",
+    layout: "stack",
+    images: [{ src: "/images/archive/grubhub.png", aspectRatio: 1924 / 1080 }],
+    column: 0,
   },
 ];
