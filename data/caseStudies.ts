@@ -86,7 +86,11 @@ export type CaseStudyAlio = {
   heroVideo?: string;
   meta: { label: string; value: string }[];
   links?: CaseStudyLink[];
-  whyWeBuiltThis: { image: string; story: string[] };
+  // Same union pattern as CaseStudySimple/CaseStudyDrunky — emphasis is an
+  // explicit opt-in per paragraph rather than always the last one, so
+  // adding explanatory copy after the punchy line doesn't silently steal
+  // its bold/color treatment.
+  whyWeBuiltThis: { image: string; story: (string | { text: string; emphasis: true })[] };
   researchResults: {
     stats: { value: string; finding: string }[];
     gapLabel: string;
@@ -161,7 +165,8 @@ export const alioCaseStudy: CaseStudyAlio = {
     image: "/images/alio/grandma.png",
     story: [
       "My grandmother's caregiver messaged my mom with a concern. It got lost in her inbox. A few days later, grandma fell and ended up in the hospital.",
-      "That's the gap Alio was built to close.",
+      { text: "That's the gap Alio was built to close.", emphasis: true },
+      "An AI model can read through daily caregiver notes and surface what actually matters, before it gets buried. Running on-device, that same AI keeps the whole caregiver circle in sync — fast, private, and without anyone waiting on an inbox.",
     ],
   },
   researchResults: {

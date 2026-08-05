@@ -43,21 +43,28 @@ export default function AlioCaseStudyPage({
             alt="Joyce and her grandmother"
             width={2401}
             height={1958}
-            className="aspect-[2401/1958] w-full rounded-xl object-cover"
+            // Scaled down within its own grid column (not the column
+            // itself) — the text column's position stays put either way.
+            className="aspect-[2401/1958] w-5/6 rounded-xl object-cover"
           />
-          <div className="flex flex-col justify-center gap-4">
+          <div className="relative right-[10px] flex flex-col justify-center">
+            {/* Per-paragraph margin instead of a uniform flex gap — the
+                1st-to-2nd gap grew by 8px and the 2nd-to-3rd gap shrank by
+                the same 8px, so paragraph 2 shifts down without changing
+                the block's total height (24+24 → 32+16, still 48px). */}
             {caseStudy.whyWeBuiltThis.story.map((paragraph, i) => {
-              const isLast = i === caseStudy.whyWeBuiltThis.story.length - 1;
+              const isEmphasis = typeof paragraph === "object";
+              const marginTop = i === 0 ? "" : i === 1 ? "mt-8" : "mt-4";
               return (
                 <p
                   key={i}
-                  className={
-                    isLast
-                      ? "text-[18px] leading-relaxed font-semibold text-[var(--color-primary)]"
-                      : "text-[16px] leading-relaxed text-[var(--color-muted)]"
-                  }
+                  className={`${marginTop} ${
+                    isEmphasis
+                      ? "text-[20px] leading-relaxed font-semibold text-[var(--color-primary)]"
+                      : "text-[18px] leading-relaxed text-[var(--color-muted)]"
+                  }`}
                 >
-                  {paragraph}
+                  {isEmphasis ? paragraph.text : paragraph}
                 </p>
               );
             })}
