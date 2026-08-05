@@ -13,13 +13,13 @@ import {
 import CaseStudyPage from "@/components/case-study/CaseStudyPage";
 import CaseStudySkeletonPage from "@/components/case-study/CaseStudySkeletonPage";
 import AlioCaseStudyPage from "@/components/case-study/AlioCaseStudyPage";
+import DrunkyCaseStudyPage from "@/components/case-study/DrunkyCaseStudyPage";
 import SimpleCaseStudyPage from "@/components/case-study/SimpleCaseStudyPage";
 import ProjectFallbackDetail from "@/components/ProjectFallbackDetail";
 
 const simpleCaseStudies: Record<string, typeof poopidexCaseStudy> = {
   poopidex: poopidexCaseStudy,
   focusfarm: focusfarmCaseStudy,
-  drunky: drunkyCaseStudy,
   pelican: pelicanCaseStudy,
 };
 
@@ -57,6 +57,12 @@ export default async function ProjectDetailPage({
     const projectIndex = projects.findIndex((p) => p.slug === slug);
     const nextProject = projects[(projectIndex + 1) % projects.length];
     return <AlioCaseStudyPage caseStudy={alioCaseStudy} nextProject={nextProject} />;
+  }
+
+  if (slug === "drunky") {
+    const projectIndex = projects.findIndex((p) => p.slug === slug);
+    const nextProject = projects[(projectIndex + 1) % projects.length];
+    return <DrunkyCaseStudyPage caseStudy={drunkyCaseStudy} nextProject={nextProject} />;
   }
 
   const simpleCaseStudy = simpleCaseStudies[slug];

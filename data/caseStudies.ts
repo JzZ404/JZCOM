@@ -610,15 +610,70 @@ export const focusfarmCaseStudy: CaseStudySimple = {
   ],
 };
 
-export const drunkyCaseStudy: CaseStudySimple = {
+// Drunky content is transcribed from the team's final presentation deck
+// ("Global Liquor Exchange" — TECHIN 517, June 2026: system architecture,
+// pipeline timing, the V1→V2 pivot, and the 480-trial evaluation) plus the
+// mid-project P2 deck and the drunky_ros GitHub README for corroboration.
+// Supersedes an earlier draft written from an interim deck, which described
+// an imitation-learning (ACT/LeRobot) approach that was ultimately dropped
+// for reliability — see Challenges. The learned policy still exists in the
+// repo history as a proof of concept, but everything shipped runs on the
+// modular YOLO + visual-servo + MoveIt 2 pipeline described below.
+export type CaseStudyDrunky = {
+  title: string;
+  subheading: string;
+  tldr: string;
+  heroLabel: string;
+  heroImage?: string;
+  meta: { label: string; value: string }[];
+  links?: CaseStudyLink[];
+  liveDemo?: { label: string; href: string };
+  whyWeBuiltThis: {
+    image?: string;
+    story: (string | { text: string; emphasis: true })[];
+  };
+  systemArchitecture: {
+    stages: { title: string; body: string; items: string[] }[];
+    flow: string;
+    note: string;
+  };
+  pipeline: {
+    // The full loop, screen-recorded: order placed on the bartender_ui →
+    // sent to the robot → Find/Go to/Align/Grab/Pour per phase below.
+    video?: { src: string; caption: string };
+    phases: { number: number; title: string; body: string; time: string }[];
+    summary: string;
+  };
+  challenges: {
+    pivot: {
+      title: string;
+      before: { title: string; items: string[] };
+      after: { title: string; items: string[] };
+      note: string;
+    };
+    engineering: { title: string; body: string }[];
+  };
+  evaluation: {
+    experiment: { value: string; label: string }[];
+    headline: { value: string; label: string };
+    stats: { value: string; label: string }[];
+    insights: (string | { text: string; emphasis: true })[];
+    failures: { label: string; pct: number }[];
+    failuresNote: string;
+    timing: { value: string; label: string }[];
+    mitigations: string;
+  };
+  whatsNext: { title: string; body: string }[];
+};
+
+export const drunkyCaseStudy: CaseStudyDrunky = {
   title: "Drunky",
-  subheading:
-    "A dual-arm robot that pours and mixes drinks, trained through imitation learning on 256 teleoperated demonstrations.",
+  subheading: "A two-armed robot bartender that takes a drink order and builds the cocktail end-to-end.",
   tldr: PLACEHOLDER,
   heroLabel: "hero screenshot — Drunky",
   heroImage: "/images/drunky/cover.jpg",
   meta: [
-    { label: "Role", value: "Robotic Manipulation and HRI Design" },
+    { label: "Role", value: "Bartender UI, Motion Recording & Data Labeling" },
     { label: "For", value: "Automated bartending and hospitality" },
     { label: "Team", value: "Team of three robotics students" },
     { label: "Timeline", value: "June 2026" },
@@ -626,7 +681,168 @@ export const drunkyCaseStudy: CaseStudySimple = {
   // No live demo for a physical robot — the repo stands in for it, same
   // embedded-in-the-hero treatment as Poopidex/FocusFarm's live demo link.
   liveDemo: { label: "View on GitHub", href: "https://github.com/tonyechen/drunky_ros" },
-  whatsNext: [PLACEHOLDER],
+  whyWeBuiltThis: {
+    image: "/images/drunky/setup.jpg",
+    story: [
+      "Bartending looks simple until you try to automate it — pour a shot without spilling, track what's already in the glass, adapt when a bottle isn't exactly where it was last time. It's a sequential, multi-step manipulation problem, and most robotic bar setups sidestep the hard part with hard-coded routines that break the moment something shifts.",
+      "So we built Global Liquor Exchange: a two-armed bartender with an 8-cocktail, 8-single-liquid menu on one screen. The right arm handles alcohols, the left handles mixers, and the two never share the workspace at the same time — sequential by design, so there's no collision risk.",
+      {
+        text: "Detection, alignment, and motion planning do the real work: overhead and wrist-mounted cameras find and align each bottle, and MoveIt 2 plans a collision-aware path for the grab, pour, and toss.",
+        emphasis: true,
+      },
+    ],
+  },
+  systemArchitecture: {
+    stages: [
+      {
+        title: "Orchestration",
+        body: "bartender_ui (tkinter)",
+        items: ["Menu + camera health", "Owns the 2 wrist YOLOs", "Sequences the two arms"],
+      },
+      {
+        title: "Perception · ML + CV",
+        body: "Find + align the bottle",
+        items: [
+          "Overhead YOLO + depth → 3D pose",
+          "Wrist YOLO + visual-servo loop",
+          "Aligns in image space",
+        ],
+      },
+      {
+        title: "Motion & Control",
+        body: "MoveIt 2 + trajectories",
+        items: ["Per-arm collision-aware plans", "ROS 2 action servers", "Recorded pour / toss replay"],
+      },
+      {
+        title: "Hardware",
+        body: "Bimanual SO-101",
+        items: ["2× 5-DoF arms + grippers", "1× overhead RealSense D435", "2× wrist USB cameras"],
+      },
+    ],
+    flow: "Button press → detect & localize → plan & approach → grab, pour, toss → poured drink",
+    note: "Depth trick: sample the nearest 10% of depth pixels inside each YOLO box, so the table doesn't drag the reported depth back.",
+  },
+  pipeline: {
+    video: {
+      src: "/images/drunky/demo.mp4",
+      caption:
+        "The full loop: a drink order goes in on the bartender_ui, gets sent to the robot, and the arm runs Find → Go to → Align → Grab → Pour.",
+    },
+    phases: [
+      { number: 1, title: "Find", body: "Overhead YOLO + depth pose", time: "~3 s" },
+      { number: 2, title: "Go to", body: "MoveIt plan to a standoff pose", time: "~7 s" },
+      { number: 3, title: "Align", body: "Wrist-cam visual servo (closed loop)", time: "~10 s" },
+      { number: 4, title: "Grab", body: "Lower, level, open, enter, close, lift", time: "~13 s" },
+      { number: 5, title: "Pour", body: "Recorded joint-space trajectory", time: "~18 s" },
+      { number: 6, title: "Toss", body: "Recorded toss + release into glass", time: "~16 s" },
+    ],
+    summary:
+      "One arm, 6 phases ≈ 1 min 7 s. Arms run sequentially (right then left), so a full two-ingredient cocktail — all 12 phases — takes ≈ 2 min 15 s.",
+  },
+  challenges: {
+    pivot: {
+      title: "An unstable LeRobot + Rosetta integration drove the pivot to a modular classical pipeline",
+      before: {
+        title: "V1 — End-to-end imitation learning",
+        items: [
+          "Teleop demos → trained an ACT imitation policy (LeRobot)",
+          "A real proof of concept — it did grab and pour",
+          "But it ran through Rosetta, which applied a constant offset to the SO-101 shoulder joint",
+          "That made the LeRobot + Rosetta integration unstable and unpredictable",
+          "A black box on top of it — hard to inspect a bad run",
+        ],
+      },
+      after: {
+        title: "V2 — Modular classical + ML pipeline",
+        items: [
+          "Every phase is explicit, testable, tunable",
+          "Perception decoupled from control",
+          "Failures attributable to a specific stage",
+          "Enables the failure-mode analysis in Evaluation & Results",
+          "Traded some autonomy for safety + repeatability",
+        ],
+      },
+      note: "The learned policy remains in the repo history as a working proof of concept.",
+    },
+    engineering: [
+      {
+        title: "5-DoF grasp geometry",
+        body: "Level the wrist to the ground (not the forearm) via TF pitch; approach along the gripper axis so it doesn't slide and tip the bottle; lift in joint space (cartesian lifts loop).",
+      },
+      {
+        title: "Wrist-camera plumbing",
+        body: "Two identical USB cams collide on serial — pin each by physical USB port (/dev/v4l/by-path). MJPEG segfaulted, so we stream raw YUYV → RGB.",
+      },
+      {
+        title: "Detection robustness",
+        body: "COCO labels bottles as 'bottle' OR 'vase' by material — accept both, lock onto the largest (closest) box; back off the standoff for a cleaner view.",
+      },
+      {
+        title: "Gravity sag + resilience",
+        body: "Centering loop holds non-pan joints fixed and pre-compensates droop per arm; pour / toss retries a failed pose once and continues.",
+      },
+      {
+        title: "Safe two-arm coordination",
+        body: "Simultaneous planning through the shared workspace fails and is unsafe — we run the arms sequentially: collision-free and reliable.",
+      },
+    ],
+  },
+  evaluation: {
+    experiment: [
+      { value: "480", label: "total trials" },
+      { value: "12", label: "shelf positions" },
+      { value: "10", label: "trials per cell" },
+    ],
+    headline: { value: "62.7%", label: "overall success rate across 480 trials" },
+    stats: [
+      { value: "71.7% vs 53.8%", label: "Top shelf vs. bottom shelf" },
+      { value: "69.2% vs 56.3%", label: "Right arm (alcohols) vs. left arm (mixers)" },
+      { value: "73.3%", label: "Best liquid — vodka" },
+      { value: "48.3%", label: "Worst liquid — coke" },
+    ],
+    insights: [
+      {
+        text: "Occlusion and camera distance drive the gap — lower shelf cells sit farther from the overhead camera and are partly blocked by the shelf above.",
+        emphasis: true,
+      },
+    ],
+    failures: [
+      { label: "Detection / alignment loss", pct: 45 },
+      { label: "Grasp miss / bottle tipped", pct: 30 },
+      { label: "Pour / toss execution miss", pct: 12 },
+      { label: "Camera dropout", pct: 8 },
+      { label: "Other (planning / timeout)", pct: 5 },
+    ],
+    failuresNote: "Share of 179 failures across all 480 trials.",
+    timing: [
+      { value: "68 s", label: "one arm / single liquid, best case (std ≈ 8 s)" },
+      { value: "2 min 15 s", label: "full two-ingredient cocktail (12 phases)" },
+    ],
+    mitigations:
+      "Mitigations: per-shelf lower/forward offsets, retry-then-continue on pour and toss, and a GUI Refresh control that recovers camera dropouts mid-service.",
+  },
+  whatsNext: [
+    {
+      title: "Close the occlusion gap.",
+      body: "Top shelf hits 71.7% success vs. 53.8% on the bottom, and most failures trace back to occluded, distant camera views. A second viewpoint or active sensing is the clear next step.",
+    },
+    {
+      title: "Cut grasp misses.",
+      body: "30% of failures are grasp misses or tipped bottles, the second-largest failure category. Worth digging into gripper geometry and approach angle.",
+    },
+    {
+      title: "Speed up the cycle.",
+      body: "2:15 for a full cocktail, with arms running sequentially for safety. Safer simultaneous coordination could cut that time meaningfully.",
+    },
+    {
+      title: "Revisit imitation learning.",
+      body: "The V1 ACT policy was shelved over a LeRobot + Rosetta integration bug, not a failure of the approach itself. Worth another look, especially on the hardest occluded cases.",
+    },
+    {
+      title: "Automate camera recovery.",
+      body: "Camera dropout causes 8% of failures and currently needs a manual refresh. An automatic reconnect would remove that step.",
+    },
+  ],
 };
 
 export const pelicanCaseStudy: CaseStudySimple = {

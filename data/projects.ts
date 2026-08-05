@@ -78,10 +78,10 @@ export const projects: Project[] = [
     title: "Drunky: Bimanual Bartending Robot",
     tags: ["Robotics"],
     category: "robotics",
-    chips: ["Imitation Learning", "Bimanual Manipulation", "Computer Vision"],
+    chips: ["Computer Vision", "Visual Servoing", "Bimanual Manipulation"],
     summary:
-      "A dual-arm robot that pours and mixes drinks, trained through imitation learning on 256 teleoperated demonstrations.",
-    role: "Imitation learning and bimanual manipulation.",
+      "A two-armed robot bartender that detects, grabs, pours, and tosses drinks end-to-end — YOLO perception, visual servoing, and MoveIt 2 motion planning.",
+    role: "Bartender UI design, pour/toss trajectory recording, and dataset labeling.",
     coverImage: "/images/drunky/cover.jpg",
   },
   {
