@@ -453,6 +453,8 @@ export type CaseStudySimple = {
   tldr: string;
   heroLabel: string;
   heroImage?: string;
+  // CSS object-position — see CaseStudyShellData in CaseStudyShell.tsx.
+  heroImagePosition?: string;
   meta: { label: string; value: string }[];
   links?: CaseStudyLink[];
   liveDemo?: { label: string; href: string };
@@ -558,6 +560,9 @@ export const focusfarmCaseStudy: CaseStudySimple = {
   tldr: PLACEHOLDER,
   heroLabel: "hero screenshot — FocusFarm",
   heroImage: "/images/focusfarm/cover.png",
+  // Same reason as the Work grid card's coverPosition: the "FOCUS FARM"
+  // wordmark sits near the left edge, which a centered 16:9 crop clips.
+  heroImagePosition: "left center",
   meta: [
     { label: "Role", value: "Project Owner and Management" },
     { label: "For", value: "Students and professionals building focus habits" },
@@ -628,9 +633,16 @@ export type CaseStudyDrunky = {
   meta: { label: string; value: string }[];
   links?: CaseStudyLink[];
   liveDemo?: { label: string; href: string };
+  // A single left/right layout (photo left, four short paragraphs right)
+  // reading as one continuous arc — origin, the problem, a rhetorical
+  // pivot, then the technical answer — rather than separately styled
+  // pieces that broke the visual hierarchy.
   whyWeBuiltThis: {
     image?: string;
-    story: (string | { text: string; emphasis: true })[];
+    lead: string;
+    problem: string;
+    question: string;
+    answer: string;
   };
   systemArchitecture: {
     stages: { title: string; body: string; items: string[] }[];
@@ -683,14 +695,13 @@ export const drunkyCaseStudy: CaseStudyDrunky = {
   liveDemo: { label: "View on GitHub", href: "https://github.com/tonyechen/drunky_ros" },
   whyWeBuiltThis: {
     image: "/images/drunky/setup.jpg",
-    story: [
-      "Bartending looks simple until you try to automate it — pour a shot without spilling, track what's already in the glass, adapt when a bottle isn't exactly where it was last time. It's a sequential, multi-step manipulation problem, and most robotic bar setups sidestep the hard part with hard-coded routines that break the moment something shifts.",
-      "So we built Global Liquor Exchange: a two-armed bartender with an 8-cocktail, 8-single-liquid menu on one screen. The right arm handles alcohols, the left handles mixers, and the two never share the workspace at the same time — sequential by design, so there's no collision risk.",
-      {
-        text: "Detection, alignment, and motion planning do the real work: overhead and wrist-mounted cameras find and align each bottle, and MoveIt 2 plans a collision-aware path for the grab, pour, and toss.",
-        emphasis: true,
-      },
-    ],
+    lead: "Honestly, it started because we all just like making cocktails. Bimanual manipulation needed a real task to test itself against, and this felt like a genuinely fun one to build around.",
+    problem:
+      "Digging in, we realized most bartending robots have a blind spot: move a bottle, and they have no idea where it went. Most systems on the market work off fixed positions, calibrated once and expected to stay that way.",
+    question:
+      "Could we build something that actually saw the bottle, instead of just remembering where it used to be?",
+    answer:
+      "Using YOLO-based detection, the answer was yes — the robot could find and grab the right bottle no matter where it sat on the shelf.",
   },
   systemArchitecture: {
     stages: [
@@ -726,7 +737,7 @@ export const drunkyCaseStudy: CaseStudyDrunky = {
     video: {
       src: "/images/drunky/demo.mp4",
       caption:
-        "The full loop: a drink order goes in on the bartender_ui, gets sent to the robot, and the arm runs Find → Go to → Align → Grab → Pour.",
+        "The full loop: an order placed on the bartender UI dispatches to the arm, which executes five phases in sequence — Find → Go to → Align → Grab → Pour — to complete the drink.",
     },
     phases: [
       { number: 1, title: "Find", body: "Overhead YOLO + depth pose", time: "~3 s" },
@@ -737,7 +748,7 @@ export const drunkyCaseStudy: CaseStudyDrunky = {
       { number: 6, title: "Toss", body: "Recorded toss + release into glass", time: "~16 s" },
     ],
     summary:
-      "One arm, 6 phases ≈ 1 min 7 s. Arms run sequentially (right then left), so a full two-ingredient cocktail — all 12 phases — takes ≈ 2 min 15 s.",
+      "One arm takes about 1 min 7 s for 6 phases — sequential arms make a full two-ingredient cocktail in about 2 min 15 s.",
   },
   challenges: {
     pivot: {
@@ -793,7 +804,9 @@ export const drunkyCaseStudy: CaseStudyDrunky = {
       { value: "12", label: "shelf positions" },
       { value: "10", label: "trials per cell" },
     ],
-    headline: { value: "62.7%", label: "overall success rate across 480 trials" },
+    // Shorter now that it sits in the same row as "480 total trials" —
+    // repeating "across 480 trials" here was redundant once they're adjacent.
+    headline: { value: "62.7%", label: "overall success rate" },
     stats: [
       { value: "71.7% vs 53.8%", label: "Top shelf vs. bottom shelf" },
       { value: "69.2% vs 56.3%", label: "Right arm (alcohols) vs. left arm (mixers)" },

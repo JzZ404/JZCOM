@@ -18,6 +18,10 @@ export type CaseStudyShellData = {
   heroLabel: string;
   heroVideo?: string; // optional cover video shown in place of the hero placeholder
   heroImage?: string; // optional static cover image — checked if heroVideo isn't set
+  // CSS object-position — for covers whose focal point isn't centered, same
+  // convention as Project.coverPosition on the Work grid cards. Needed now
+  // that the hero is a fixed 16:9 crop instead of the raw image's own ratio.
+  heroImagePosition?: string;
   meta: { label: string; value: string }[];
   links?: CaseStudyLink[]; // optional external links (GitHub, Kaggle, etc.), shown top-right of the title
   // Rendered as a button top-right of the title (next to `links`, if any)
@@ -128,7 +132,8 @@ export default function CaseStudyShell({
               <img
                 src={caseStudy.heroImage}
                 alt={caseStudy.heroLabel}
-                className="w-full object-cover"
+                style={{ objectPosition: caseStudy.heroImagePosition }}
+                className="aspect-[16/9] w-full object-cover"
               />
               <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
                 <span className="rounded-full bg-white px-6 py-3 text-[16px] font-semibold text-[var(--color-fg)]">
@@ -140,7 +145,12 @@ export default function CaseStudyShell({
             <img
               src={caseStudy.heroImage}
               alt={caseStudy.heroLabel}
-              className="mx-5 my-7 w-[calc(100%-2.5rem)] rounded-xl object-cover sm:mx-6 sm:w-[calc(100%-3rem)] lg:mx-10 lg:w-[calc(100%-5rem)]"
+              style={{ objectPosition: caseStudy.heroImagePosition }}
+              // Fixed 16:9 so every project's hero reads the same height —
+              // without it, each project's own cover photo aspect ratio
+              // drove the box height directly, so a squarer source photo
+              // (Drunky, Pelican) rendered visibly taller than the rest.
+              className="mx-5 my-7 aspect-[16/9] w-[calc(100%-2.5rem)] rounded-xl object-cover sm:mx-6 sm:w-[calc(100%-3rem)] lg:mx-10 lg:w-[calc(100%-5rem)]"
             />
           )
         ) : (

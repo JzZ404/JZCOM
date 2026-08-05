@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import type { Project } from "@/data/projects";
 import type { CaseStudyDrunky } from "@/data/caseStudies";
 import CaseStudyShell from "./CaseStudyShell";
@@ -152,6 +152,25 @@ export default function DrunkyCaseStudyPage({
   caseStudy: CaseStudyDrunky;
   nextProject: Project;
 }) {
+  // Grid/flex auto-sizing can only ever grow a row to fit its tallest
+  // item — there's no pure-CSS way to shrink the photo down to match the
+  // (shorter) text column instead. So measure the text column's actual
+  // rendered height and apply it to the image directly. Desktop only
+  // (via the --why-img-h var, read by a sm:-scoped class) — mobile stacks
+  // the two and should keep the photo at its own natural aspect ratio.
+  const whyTextRef = useRef<HTMLDivElement>(null);
+  const [whyImgHeight, setWhyImgHeight] = useState<number | null>(null);
+
+  useEffect(() => {
+    const el = whyTextRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(([entry]) => {
+      setWhyImgHeight(entry.contentRect.height);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <CaseStudyShell caseStudy={caseStudy} tocItems={DRUNKY_TOC_ITEMS} nextProject={nextProject}>
       <CaseStudySection
@@ -160,33 +179,50 @@ export default function DrunkyCaseStudyPage({
         title="Why We Built This"
         icon={SECTION_ICONS.why}
       >
-        <div className="mb-11 grid grid-cols-1 gap-8 sm:grid-cols-2">
+        {/* Photo left (scaled down, no longer filling the column — it was
+            competing too hard with the text), one continuous four-beat
+            read on the right. Same 16px size throughout (no hierarchy
+            jump), but each beat gets its own color/font treatment so the
+            voice visibly shifts: neutral scene-setting → direct problem →
+            serif-italic pivot → bold payoff in the brand color. */}
+        {/* grid-cols-[2fr_3fr] instead of an even split + w-4/5 on the
+            image — that earlier approach left the image's own column 20%
+            wider than the image itself, so reducing `gap` barely moved
+            the text (it was closing the 12px gap, not the ~94px of dead
+            column space next to it). Sizing the column to match the image
+            directly means `gap` is now the only space between them. */}
+        <div className="mb-11 grid grid-cols-1 gap-5 sm:grid-cols-[2fr_3fr] sm:gap-[40px]">
           {caseStudy.whyWeBuiltThis.image && (
             <img
               src={caseStudy.whyWeBuiltThis.image}
               alt="Drunky bar setup — mini bottles and printed cocktail menus"
-              // Source photo is a tall vertical shot (3213×5712) — capped to
-              // a normal portrait ratio instead of running the full height,
-              // which was dwarfing the story text next to it.
-              className="aspect-[4/5] w-full rounded-xl object-cover"
+              // aspect-[4/5] is the mobile fallback (natural sizing when
+              // stacked). At sm+ only, an explicit pixel height measured
+              // from the text column overrides it via a CSS var — a plain
+              // inline height would apply on mobile too, where the photo
+              // should keep its own aspect ratio instead of matching a
+              // full-width single-column text block. object-bottom crops
+              // off the top of the photo rather than the menus lower in
+              // frame.
+              className="aspect-[4/5] w-full rounded-xl object-cover object-bottom sm:aspect-auto sm:h-[var(--why-img-h)]"
+              style={whyImgHeight ? ({ "--why-img-h": `${whyImgHeight}px` } as React.CSSProperties) : undefined}
             />
           )}
-          <div className="flex flex-col justify-center gap-4">
-            {caseStudy.whyWeBuiltThis.story.map((paragraph, i) => {
-              const isEmphasis = typeof paragraph === "object";
-              return (
-                <p
-                  key={i}
-                  className={
-                    isEmphasis
-                      ? "text-[18px] leading-relaxed font-bold text-[var(--color-primary)]"
-                      : "text-[16px] leading-relaxed text-[var(--color-muted)]"
-                  }
-                >
-                  {isEmphasis ? paragraph.text : paragraph}
-                </p>
-              );
-            })}
+          <div ref={whyTextRef} className="flex flex-col justify-start gap-5 self-start">
+            <p className="text-[17px] leading-relaxed text-[var(--color-muted)]">
+              {caseStudy.whyWeBuiltThis.lead}
+            </p>
+            <p className="text-[17px] leading-relaxed text-[var(--color-muted)]">
+              {caseStudy.whyWeBuiltThis.problem}
+            </p>
+            {/* Extra breathing room before the pivot line — the rest of
+                the stack shares a tighter gap-5. */}
+            <p className="mt-4 font-serif text-[18px] leading-relaxed text-[var(--color-primary)] italic">
+              {caseStudy.whyWeBuiltThis.question}
+            </p>
+            <p className="text-[17px] leading-relaxed font-semibold text-[var(--color-primary-dark)]">
+              {caseStudy.whyWeBuiltThis.answer}
+            </p>
           </div>
         </div>
       </CaseStudySection>
@@ -245,30 +281,30 @@ export default function DrunkyCaseStudyPage({
         title="The Pipeline"
         icon={SECTION_ICONS.pipeline}
       >
-        {/* items-stretch (grid's default) makes both columns match the
-            taller one's height — the video wrapper fills that with
-            h-full + object-contain, so it grows/shrinks to match the step
-            list instead of sitting at its own fixed aspect ratio. */}
-        <div className="mb-6 grid grid-cols-1 gap-8 sm:grid-cols-2">
+        {caseStudy.pipeline.video && (
+          <p className="mb-5 text-[14px] leading-relaxed text-[var(--color-muted)] italic">
+            {caseStudy.pipeline.video.caption}
+          </p>
+        )}
+        {/* Fixed aspect-ratio (not h-full/min-h) so the video's box always
+            exactly matches its own content — forcing extra box height
+            beyond that (min-h, tried earlier) just left dead space above
+            the picture, which read as a stray gap with square corners
+            floating inside the real rounded box. Sizing up now comes from
+            a wider column (3fr vs 2fr) instead, which grows the video with
+            zero letterboxing since width and height stay locked together. */}
+        <div className="mb-6 grid grid-cols-1 items-center gap-8 sm:grid-cols-[3fr_2fr]">
           {caseStudy.pipeline.video && (
-            <div className="flex flex-col">
-              <video
-                src={caseStudy.pipeline.video.src}
-                // object-contain (not cover) so the full frame still shows
-                // uncropped — any extra height just letterboxes instead of
-                // cutting off the UI, same fix as before.
-                className="min-h-0 flex-1 rounded-xl object-contain"
-                autoPlay
-                muted
-                loop
-                playsInline
-              />
-              <p className="mt-3 text-[14px] leading-relaxed text-[var(--color-muted)] italic">
-                {caseStudy.pipeline.video.caption}
-              </p>
-            </div>
+            <video
+              src={caseStudy.pipeline.video.src}
+              className="aspect-[1720/1080] w-full rounded-2xl object-contain"
+              autoPlay
+              muted
+              loop
+              playsInline
+            />
           )}
-          <div className="flex flex-col justify-center gap-4">
+          <div className="flex flex-col gap-4">
             {caseStudy.pipeline.phases.map((phase, i) => (
               <Reveal key={phase.title} delay={i * 0.06} className="flex items-start gap-3">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary)] font-serif text-[15px] font-bold text-[var(--color-on-primary)]">
@@ -353,24 +389,33 @@ export default function DrunkyCaseStudyPage({
         title="Evaluation & Results"
         icon={SECTION_ICONS.evaluation}
       >
-        <div className="mb-8 grid grid-cols-3 gap-4">
+        {/* One row, four numbers — the trial-design stats plus the overall
+            result, instead of a separate oversized green block for 62.7%
+            that made a middling number look like the headline stat. Same
+            row, same scale, just the last cell gets the green highlight. */}
+        <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
           {caseStudy.evaluation.experiment.map((stat, i) => (
-            <Reveal key={stat.label} delay={i * 0.06} className="text-center">
+            // Same py-3 as the highlighted tile below, even though these
+            // three have no visible box — otherwise the tile's own padding
+            // pushes its number/label down and the row reads misaligned.
+            <Reveal key={stat.label} delay={i * 0.06} className="py-3 text-center">
               <div className="font-serif text-[2rem] leading-none font-bold text-[var(--color-fg)] sm:text-[2.5rem]">
                 {stat.value}
               </div>
               <p className="mt-1.5 text-[13px] leading-snug text-[var(--color-muted)]">{stat.label}</p>
             </Reveal>
           ))}
-        </div>
-
-        <div className="mb-8 rounded-xl bg-[var(--color-primary)] p-8 text-center">
-          <div className="font-serif text-[3.5rem] leading-none font-bold text-[var(--color-on-primary)]">
-            {caseStudy.evaluation.headline.value}
-          </div>
-          <p className="mt-2 text-[15px] leading-snug text-[var(--color-on-primary)] opacity-90">
-            {caseStudy.evaluation.headline.label}
-          </p>
+          <Reveal
+            delay={caseStudy.evaluation.experiment.length * 0.06}
+            className="rounded-xl bg-[var(--color-primary)] py-3 text-center"
+          >
+            <div className="font-serif text-[2rem] leading-none font-bold text-[var(--color-on-primary)] sm:text-[2.5rem]">
+              {caseStudy.evaluation.headline.value}
+            </div>
+            <p className="mt-1.5 text-[13px] leading-snug text-[var(--color-on-primary)] opacity-90">
+              {caseStudy.evaluation.headline.label}
+            </p>
+          </Reveal>
         </div>
 
         <div className="mb-5 grid grid-cols-1 gap-5 sm:grid-cols-2">
