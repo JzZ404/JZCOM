@@ -863,7 +863,48 @@ export const drunkyCaseStudy: CaseStudyDrunky = {
   ],
 };
 
-export const pelicanCaseStudy: CaseStudySimple = {
+// PELICAN content is transcribed from the team's final presentation deck
+// (8 slides) and the The_Pelican GitHub README, which has real
+// architecture/behavior detail the deck doesn't (the Pi/desktop split, the
+// full WANDER/TRACK/AIM state machine, tunable params, real limitations).
+// Unlike Drunky, neither source has any quantitative trial/success-rate
+// data — no Evaluation & Results section here, rather than inventing one.
+export type CaseStudyPelican = {
+  title: string;
+  subheading: string;
+  tldr: string;
+  heroLabel: string;
+  heroImage?: string;
+  meta: { label: string; value: string }[];
+  links?: CaseStudyLink[];
+  liveDemo?: { label: string; href: string };
+  whyWeBuiltThis: {
+    // Fanned-out photo trio instead of a single image — the concept
+    // illustration, a real pelican with a bottle in its beak (the actual
+    // namesake inspiration), and the robot itself.
+    images: { src: string; alt: string }[];
+    story: (string | { text: string; emphasis: true })[];
+  };
+  systemArchitecture: {
+    stages: { title: string; body: string; items: string[] }[];
+    hardware: string[];
+    note: string;
+  };
+  designProcess: {
+    image: string;
+    caption: string;
+  };
+  pipeline: {
+    states: { title: string; body: string }[];
+    interrupt: { title: string; body: string };
+    videos: { src: string; caption: string }[];
+    summary: string;
+  };
+  challenges: { title: string; body: string }[];
+  whatsNext: { title: string; body: string }[];
+};
+
+export const pelicanCaseStudy: CaseStudyPelican = {
   title: "PELICAN",
   subheading:
     "A pelican-inspired autonomous robot that collects waste using LiDAR-based perception and YOLO camera detection.",
@@ -877,5 +918,134 @@ export const pelicanCaseStudy: CaseStudySimple = {
     { label: "Timeline", value: "March 2026" },
   ],
   liveDemo: { label: "View on GitHub", href: "https://github.com/JzZ404/The_Pelican" },
-  whatsNext: [PLACEHOLDER],
+  whyWeBuiltThis: {
+    images: [
+      { src: "/images/pelican/pollution-illustration.png", alt: "Please Don't Pollute illustration" },
+      { src: "/images/pelican/pollution-photo.jpg", alt: "A real pelican with a plastic bottle caught in its beak" },
+      { src: "/images/pelican/lab-photo.jpg", alt: "PELICAN in the lab with a bottle in its open lid" },
+    ],
+    story: [
+      "Most cleaning robots wait for trash to be placed in them, or need someone to drive them to it. PELICAN flips that around — instead of waiting, it wanders indoor spaces on its own, watches for litter with an onboard camera, and comes to the trash instead of the other way around.",
+      "When the camera spots something — a bottle, a cup, a can — the robot switches out of its default wandering behavior, tracks the object, and moves to align it in the center of its view.",
+      {
+        text: "Once it's in position, it opens its lid — like a pelican's beak — to receive the trash. That's where the name comes from.",
+        emphasis: true,
+      },
+    ],
+  },
+  systemArchitecture: {
+    stages: [
+      {
+        title: "Perception",
+        body: "Camera + LiDAR",
+        items: [
+          "RGB/USB camera + YOLOv8 — detects trash in real time",
+          "360° LiDAR (LDS-01) — maps the space for SLAM + obstacle avoidance",
+          "5 Hz update rate, 0.12–3.5 m range",
+        ],
+      },
+      {
+        title: "Compute",
+        body: "Split across two nodes",
+        items: [
+          "Raspberry Pi 3B+ — hardware drivers, motor control, LiDAR",
+          "Desktop PC — YOLOv8 inference + tracking logic",
+          "Coordinated over a shared ROS Domain ID",
+        ],
+      },
+      {
+        title: "Control",
+        body: "PID tracking + lid actuation",
+        items: [
+          "Custom PID node — angular + linear alignment",
+          "Publishes to /cmd_vel to approach the target",
+          "Dynamixel lid motor triggers once aligned",
+        ],
+      },
+    ],
+    hardware: [
+      "TurtleBot3 Waffle base",
+      "LDS-01 360° LiDAR",
+      "RGB/USB camera",
+      "Dynamixel motors ×2 (wheels) + ×1 (lid)",
+      "OpenCR microcontroller",
+      "Raspberry Pi 3B+",
+    ],
+    note: "Detection runs off-robot: the desktop handles YOLOv8 inference and sends tracking commands back to the Pi over the network.",
+  },
+  designProcess: {
+    image: "/images/pelican/process-work.png",
+    caption:
+      "Sketch → CAD model → cardboard mockup → 3D-printed shell → painted final assembly — then straight to live testing with a bottle and the detection feed running.",
+  },
+  pipeline: {
+    states: [
+      {
+        title: "Wander",
+        body: "Explores at a steady 0.12 m/s, using LiDAR to avoid obstacles while the camera scans for trash.",
+      },
+      {
+        title: "Track",
+        body: "Once YOLO detects an object, PID control steers toward it — up to 0.25 m/s forward, 0.8 rad/s turning, aligning within a 20px deadband.",
+      },
+      {
+        title: "Aim",
+        body: "Fine positioning once the robot is close and aligned, right before the lid actuates.",
+      },
+      {
+        title: "Deposit",
+        body: "The lid motor opens (45°–145°) to receive the item, then the robot goes back to wandering.",
+      },
+    ],
+    interrupt: {
+      title: "Interrupts",
+      body: "If something's within 0.5 m, PELICAN backs up and turns regardless of its current state — and if nothing's detected for 7 seconds while tracking, it gives up and returns to wandering.",
+    },
+    videos: [
+      { src: "/images/pelican/rover1.mp4", caption: "Wandering and obstacle avoidance" },
+      { src: "/images/pelican/detect1.mp4", caption: "YOLO detection and tracking" },
+    ],
+    summary:
+      "Detection, tracking, and disposal all run in one continuous loop — no human steps in unless something goes wrong.",
+  },
+  challenges: [
+    {
+      title: "Remapping visual space to motor space.",
+      body: "Our camera sits at a 45-degree upward tilt, breaking the standard assumption that object position in frame maps directly to heading and distance. We built a custom correction model to translate what the camera saw into the correct motor response.",
+    },
+    {
+      title: "Tuning PID against a live camera feed.",
+      body: "Detection noise and lighting changes injected error into tracking, wrong gains meant the robot either oscillated around the target or drifted too slowly to catch it.",
+    },
+    {
+      title: "Balancing search and safety.",
+      body: "The robot had to wander for trash, interrupt itself for obstacles, and still catch a valid detection mid-interrupt, prioritizing either one too heavily broke the other.",
+    },
+    {
+      title: "DDS discovery across two machines.",
+      body: "Detection runs off-robot on a desktop PC, so ROS_DOMAIN_ID had to match exactly between the Pi and desktop. Discovery state doesn't persist across reboots, so a mismatch meant nodes ran clean with zero errors, just no data flowing.",
+    },
+  ],
+  whatsNext: [
+    {
+      title: "Increase capacity.",
+      body: "Enable the system to carry and manage a larger volume of waste.",
+    },
+    {
+      title: "Add audio feedback.",
+      body: "Sound or voice cues to make the robot's behavior clearer to people nearby.",
+    },
+    {
+      title: "Extend perception range.",
+      body: "Detect trash beyond the current camera view with wide-angle lenses or a multi-camera setup.",
+    },
+    {
+      title: "Improve detection accuracy.",
+      body: "Expand training data to recognize more object types more reliably.",
+    },
+    {
+      title: "Speed up response time.",
+      body: "Optimize navigation and control for quicker movement and less latency.",
+    },
+  ],
 };

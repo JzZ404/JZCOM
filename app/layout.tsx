@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Fraunces, Notable } from "next/font/google";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import Nav from "@/components/Nav";
+import Footer from "@/components/Footer";
 import ThemeToggle from "@/components/ThemeToggle";
 import "./globals.css";
 
@@ -71,6 +72,7 @@ export default function RootLayout({
         />
         <Nav />
         <main className="flex-1 pt-28">{children}</main>
+        <Footer />
         {/* Dark mode temporarily disabled — bring the toggle back with it. */}
         {/* <ThemeToggle /> */}
         <Analytics />
