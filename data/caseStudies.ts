@@ -582,7 +582,7 @@ export const focusfarmCaseStudy: CaseStudySimple = {
       icon: "github",
     },
   ],
-  liveDemo: { label: "Try Live Demo", href: "https://focus-farm-nine.vercel.app/" },
+  liveDemo: { label: "Try Live Demo", href: "https://focus-farm-five.vercel.app/" },
   whyWeBuiltThis: {
     images: ["/images/focusfarm/distracted1.jpg", "/images/focusfarm/distracted2.jpg"],
     imageCaption: "Caught mid-game of Plants vs. Zombies in class — exhibit A for why this app needed to exist.",
