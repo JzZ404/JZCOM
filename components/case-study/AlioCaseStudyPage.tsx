@@ -228,9 +228,9 @@ export default function AlioCaseStudyPage({
         <img
           src={caseStudy.designSystemImage}
           alt="Alio design system — color palette, type scale, radii, and component sticker sheet"
-          width={3548}
-          height={1615}
-          className="mb-11 aspect-[3548/1615] w-full rounded-xl object-contain"
+          width={3429}
+          height={1558}
+          className="mb-11 aspect-[3429/1558] w-full rounded-xl object-contain"
         />
       </CaseStudySection>
 
