@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import type { Project } from "@/data/projects";
 import type { CaseStudyAlio } from "@/data/caseStudies";
 import CaseStudyShell from "./CaseStudyShell";
@@ -18,11 +17,6 @@ export default function AlioCaseStudyPage({
   caseStudy: CaseStudyAlio;
   nextProject: Project;
 }) {
-  // Falls back to a labeled placeholder if the file at designSystemImage
-  // hasn't been dropped into /public/images/alio/ yet — same pattern as
-  // ProjectCard's cover image and CaseStudyShell's "next project" preview.
-  const [designSystemFailed, setDesignSystemFailed] = useState(false);
-
   const tocItems = [
     { id: "overview", label: "Overview" },
     { id: "why", label: "Research" },
@@ -231,16 +225,13 @@ export default function AlioCaseStudyPage({
       </CaseStudySection>
 
       <CaseStudySection id="design-system" number="07 — Design System" title="Built to scale">
-        {!designSystemFailed ? (
-          <img
-            src={caseStudy.designSystemImage}
-            alt="Alio design system"
-            onError={() => setDesignSystemFailed(true)}
-            className="mb-11 w-full rounded-xl object-contain"
-          />
-        ) : (
-          <PlaceholderBlock label="design system" height={280} className="mb-11" />
-        )}
+        <img
+          src={caseStudy.designSystemImage}
+          alt="Alio design system — color palette, type scale, radii, and component sticker sheet"
+          width={3548}
+          height={1615}
+          className="mb-11 aspect-[3548/1615] w-full rounded-xl object-contain"
+        />
       </CaseStudySection>
 
       <CaseStudySection

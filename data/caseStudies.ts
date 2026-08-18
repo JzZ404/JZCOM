@@ -237,8 +237,6 @@ export const alioCaseStudy: CaseStudyAlio = {
       },
     ],
   },
-  // Joyce is dropping this in later — AlioCaseStudyPage falls back to a
-  // labeled placeholder until a real file exists at this path.
   designSystemImage: "/images/alio/design-system.png",
   businessModel: {
     topRow: [
