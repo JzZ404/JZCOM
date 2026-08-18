@@ -112,6 +112,7 @@ export type CaseStudyAlio = {
   prototypeDemo: {
     features: { title: string; body: string; media?: string[] }[];
   };
+  designSystemImage: string;
   businessModel: {
     // Each entry in topRow is one of the 5 canvas columns — either a single
     // tall block, or two stacked blocks (Key Activities/Resources,
@@ -236,6 +237,9 @@ export const alioCaseStudy: CaseStudyAlio = {
       },
     ],
   },
+  // Joyce is dropping this in later — AlioCaseStudyPage falls back to a
+  // labeled placeholder until a real file exists at this path.
+  designSystemImage: "/images/alio/design-system.png",
   businessModel: {
     topRow: [
       [
