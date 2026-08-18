@@ -237,9 +237,9 @@ export default function CaseStudyPage({
         <img
           src={caseStudy.designSystemImage}
           alt="Design system"
-          width={912}
-          height={601}
-          className="aspect-[912/601] w-full rounded-xl"
+          width={1312}
+          height={687}
+          className="aspect-[1312/687] w-full rounded-xl"
         />
       </CaseStudySection>
     </CaseStudyShell>
