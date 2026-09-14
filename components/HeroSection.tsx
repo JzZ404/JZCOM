@@ -195,7 +195,7 @@ export default function HeroSection({
   const textY = useTransform(scrollY, [0, 300], [-24, -50]);
 
   return (
-    <section className="relative mx-auto flex h-full min-h-[600px] max-w-6xl flex-col items-center justify-center px-4 text-center">
+    <section className="relative mx-auto flex h-full min-h-[600px] max-w-6xl flex-col items-center justify-center px-3 text-center">
       <motion.div style={{ opacity: textOpacity, y: textY }}>
         <LetterStaggerGreeting name={name} />
         <h1 className="mt-4 min-h-[2.3em] font-serif text-[length:var(--text-display)] leading-[1.15] tracking-tight text-[var(--color-fg)]">

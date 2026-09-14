@@ -1,5 +1,6 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import { motion } from "framer-motion";
 
 // Scroll-reveal for individual items within a section (stat cards, photo
@@ -11,10 +12,12 @@ export default function Reveal({
   children,
   delay = 0,
   className,
+  style,
 }: {
   children: React.ReactNode;
   delay?: number;
   className?: string;
+  style?: CSSProperties;
 }) {
   return (
     <motion.div
@@ -23,6 +26,7 @@ export default function Reveal({
       viewport={{ once: false, margin: "-60px" }}
       transition={{ duration: 0.45, ease: "easeOut", delay }}
       className={className}
+      style={style}
     >
       {children}
     </motion.div>

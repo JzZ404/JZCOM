@@ -6,5 +6,5 @@ export const metadata: Metadata = {
 };
 
 export default function WorkPage() {
-  return <WorkSection />;
+  return <WorkSection headingLevel="h1" />;
 }

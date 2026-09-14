@@ -14,7 +14,7 @@ import CatKeyboardMash from "@/components/CatKeyboardMash";
 // scrolling.
 export default function NotFound() {
   return (
-    <section className="mx-auto flex min-h-[calc(100vh-14rem)] max-w-3xl flex-col items-center justify-center px-4 text-center sm:min-h-[calc(100vh-12rem)]">
+    <section className="mx-auto flex min-h-[calc(100vh-14rem)] max-w-3xl flex-col items-center justify-center px-3 text-center sm:min-h-[calc(100vh-12rem)]">
       <span className="font-serif text-[80px] leading-none font-bold text-[var(--color-primary)] sm:text-[120px]">
         404
       </span>

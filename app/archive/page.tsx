@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function ArchivePage() {
   return (
-    <section className="px-4 pt-8 pb-16">
+    <section className="px-3 pt-8 pb-16">
       {/* mx-auto max-w-6xl on this inner div (not the section) matches the
           Work page's pattern — px-4 stays a mobile-safety fallback on the
           outer section instead of stacking with the max-width, which was

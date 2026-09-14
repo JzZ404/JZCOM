@@ -13,7 +13,7 @@ export default function CaseStudySection({
   title,
   icon,
   children,
-  className = "mb-11",
+  className = "mb-16 sm:mb-20",
 }: {
   id: string;
   number: string;

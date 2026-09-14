@@ -110,7 +110,7 @@ export default function AboutPageContent({ about }: { about: AboutData }) {
         cursor:
           "image-set(url(/images/about/cursor-cat-1x.png) 1x, url(/images/about/cursor-cat-2x.png) 2x) 14 14, auto",
       }}
-      className="about-cat-cursor mx-auto max-w-6xl px-4 pt-6 pb-20"
+      className="about-cat-cursor mx-auto max-w-6xl px-3 pt-6 pb-20"
     >
       <BoldReveal className="mb-14 grid grid-cols-1 gap-10 sm:grid-cols-[420px_1fr] sm:items-center">
         <img

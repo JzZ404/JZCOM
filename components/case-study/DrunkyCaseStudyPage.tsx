@@ -120,16 +120,18 @@ function FailureLegend({ failures }: { failures: { label: string; pct: number }[
   return (
     <ul className="flex flex-1 flex-col gap-2.5">
       {failures.map((failure, i) => (
-        <Reveal key={failure.label} delay={i * 0.05} className="flex items-center gap-2.5">
-          <span
-            className="h-3 w-3 shrink-0 rounded-sm"
-            style={{ background: PIE_COLORS[i % PIE_COLORS.length] }}
-          />
-          <span className="text-[14px] text-[var(--color-fg)]">{failure.label}</span>
-          <span className="ml-auto font-mono text-[13px] font-semibold text-[var(--color-muted)]">
-            {failure.pct}%
-          </span>
-        </Reveal>
+        <li key={failure.label}>
+          <Reveal delay={i * 0.05} className="flex items-center gap-2.5">
+            <span
+              className="h-3 w-3 shrink-0 rounded-sm"
+              style={{ background: PIE_COLORS[i % PIE_COLORS.length] }}
+            />
+            <span className="text-[14px] text-[var(--color-fg)]">{failure.label}</span>
+            <span className="ml-auto font-mono text-[13px] font-semibold text-[var(--color-muted)]">
+              {failure.pct}%
+            </span>
+          </Reveal>
+        </li>
       ))}
     </ul>
   );
@@ -487,11 +489,13 @@ export default function DrunkyCaseStudyPage({
       >
         <ul className="flex flex-col gap-4">
           {caseStudy.whatsNext.map((item, i) => (
-            <Reveal key={item.title} delay={i * 0.06}>
-              <p className="text-[16px] leading-relaxed text-[var(--color-fg)]">
-                <span className="font-bold">{item.title}</span> {item.body}
-              </p>
-            </Reveal>
+            <li key={item.title}>
+              <Reveal delay={i * 0.06}>
+                <p className="text-[16px] leading-relaxed text-[var(--color-fg)]">
+                  <span className="font-bold">{item.title}</span> {item.body}
+                </p>
+              </Reveal>
+            </li>
           ))}
         </ul>
       </CaseStudySection>

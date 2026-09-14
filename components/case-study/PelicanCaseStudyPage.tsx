@@ -189,11 +189,13 @@ export default function PelicanCaseStudyPage({
       <CaseStudySection id="whats-next" number="06 — What's Next" title="What's Next" className="mb-20">
         <ul className="flex flex-col gap-4">
           {caseStudy.whatsNext.map((item, i) => (
-            <Reveal key={item.title} delay={i * 0.06}>
-              <p className="text-[16px] leading-relaxed text-[var(--color-fg)]">
-                <span className="font-bold">{item.title}</span> {item.body}
-              </p>
-            </Reveal>
+            <li key={item.title}>
+              <Reveal delay={i * 0.06}>
+                <p className="text-[16px] leading-relaxed text-[var(--color-fg)]">
+                  <span className="font-bold">{item.title}</span> {item.body}
+                </p>
+              </Reveal>
+            </li>
           ))}
         </ul>
       </CaseStudySection>

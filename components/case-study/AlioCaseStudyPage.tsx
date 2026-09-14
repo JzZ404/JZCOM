@@ -10,6 +10,36 @@ import BusinessModelCanvas from "./BusinessModelCanvas";
 import ResponsibleAiTable from "./ResponsibleAiTable";
 import Reveal from "./Reveal";
 
+const ALIO_PROBLEM_HIGHLIGHTS = [
+  "constant, valuable information",
+  "clinically useful",
+  "unstructured",
+  "raw caregiver input",
+  "actionable",
+  "interpreted labs, triage, structured logs, and visit reports",
+];
+
+function HighlightedAlioProblem({ text }: { text: string }) {
+  const pattern = new RegExp(
+    `(${ALIO_PROBLEM_HIGHLIGHTS.map((phrase) => phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})`,
+    "g",
+  );
+
+  return (
+    <>
+      {text.split(pattern).map((part, i) =>
+        ALIO_PROBLEM_HIGHLIGHTS.includes(part) ? (
+          <strong key={i} className="font-bold text-[#3730A3]">
+            {part}
+          </strong>
+        ) : (
+          <span key={i}>{part}</span>
+        ),
+      )}
+    </>
+  );
+}
+
 export default function AlioCaseStudyPage({
   caseStudy,
   nextProject,
@@ -105,10 +135,12 @@ export default function AlioCaseStudyPage({
         {/* Editorial pull-quote treatment instead of a bordered info-card —
             matches the "Why We Built This" quote styling elsewhere on the
             page, reads as a statement rather than a templated callout box. */}
-        <div className="mb-11 w-full">
-          <div className="font-serif text-[3rem] leading-none text-[var(--color-border)]">“</div>
-          <p className="-mt-5 font-serif text-[22px] leading-relaxed text-[var(--color-fg)]">
-            {caseStudy.problem}
+        <div className="relative mb-11 w-full pl-8 sm:pl-12">
+          <div className="absolute top-0 left-0 font-serif text-[5.5rem] leading-none text-[var(--color-border)]">
+            “
+          </div>
+          <p className="pt-7 font-serif text-[22px] leading-relaxed text-[var(--color-fg)]">
+            <HighlightedAlioProblem text={caseStudy.problem} />
           </p>
         </div>
       </CaseStudySection>

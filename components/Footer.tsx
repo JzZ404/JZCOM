@@ -20,7 +20,7 @@ export default function Footer() {
   if (pathname === "/about") return null;
 
   return (
-    <footer className="border-t border-[var(--color-border)] px-4 py-6 sm:px-8">
+    <footer className="border-t border-[var(--color-border)] px-3 py-6 sm:px-8">
       {/* flex-row unconditionally (no sm: breakpoint split) — logo and
           links share one line at every width instead of stacking on
           mobile, with gap/text size trimmed down so 3 links + arrows

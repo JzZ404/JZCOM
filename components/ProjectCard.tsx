@@ -26,7 +26,18 @@ const imageVariants = {
   hover: { scale: 1.05 },
 };
 
-export default function ProjectCard({ project }: { project: Project }) {
+export default function ProjectCard({
+  project,
+  // Defaults to h3 for the common case (embedded under WorkSection's h2 on
+  // the homepage). WorkSection passes h2 here when it's rendering as the
+  // whole /work page, so the card title stays one level under whatever
+  // heading is actually above it instead of hardcoding a skip.
+  titleLevel = "h3",
+}: {
+  project: Project;
+  titleLevel?: "h2" | "h3";
+}) {
+  const Title = titleLevel;
   const router = useRouter();
   const [sprinkles, setSprinkles] = useState<Sprinkle[]>([]);
   // Falls back to the plain placeholder block if a project's cover image
@@ -61,20 +72,15 @@ export default function ProjectCard({ project }: { project: Project }) {
     // in WorkSection, which is what makes the cards in a row reveal one
     // after another instead of all at once.
     <motion.div
-      className="h-full"
       variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }}
       transition={{ duration: 0.5, ease: "easeOut" }}
     >
-      <Link
-        href={`/work/${project.slug}`}
-        onClick={handleClick}
-        className="group relative block h-full"
-      >
+      <Link href={`/work/${project.slug}`} onClick={handleClick} className="group relative block">
         {/* Two-layer key+ambient shadows follow Material Design 3's elevation
             tokens (rest ≈ M3 level 1, hover ≈ level 3) rather than a single
             flat drop-shadow — that's what gives real M3 elevation its depth. */}
         <motion.div
-          className="flex h-full flex-col overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] shadow-[0px_1px_1px_0px_rgba(0,0,0,0.12),0px_1px_2px_0px_rgba(0,0,0,0.08)] transition-shadow duration-300 group-hover:shadow-[0px_1px_3px_0px_rgba(0,0,0,0.30),0px_4px_8px_3px_rgba(0,0,0,0.15),0_0_45px_color-mix(in_srgb,color-mix(in_srgb,var(--color-primary)_35%,var(--color-bg)_65%)_50%,transparent)]"
+          className="flex flex-col overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] shadow-[0px_1px_1px_0px_rgba(0,0,0,0.12),0px_1px_2px_0px_rgba(0,0,0,0.08)] transition-shadow duration-300 group-hover:shadow-[0px_1px_3px_0px_rgba(0,0,0,0.30),0px_4px_8px_3px_rgba(0,0,0,0.15),0_0_45px_color-mix(in_srgb,color-mix(in_srgb,var(--color-primary)_35%,var(--color-bg)_65%)_50%,transparent)]"
           initial="rest"
           whileHover="hover"
           animate="rest"
@@ -82,10 +88,22 @@ export default function ProjectCard({ project }: { project: Project }) {
           transition={{ duration: 0.25, ease: "easeOut" }}
         >
           <div className="aspect-[16/9] w-full shrink-0 overflow-hidden bg-[var(--color-border)]">
-            {!coverFailed ? (
+            {project.video ? (
+              <motion.video
+                src={project.video}
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="h-full w-full object-cover"
+                variants={imageVariants}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+              />
+            ) : !coverFailed ? (
               <motion.img
                 src={project.coverImage}
                 alt=""
+                aria-hidden
                 onError={() => setCoverFailed(true)}
                 style={project.coverPosition ? { objectPosition: project.coverPosition } : undefined}
                 className="h-full w-full object-cover"
@@ -101,12 +119,16 @@ export default function ProjectCard({ project }: { project: Project }) {
               />
             )}
           </div>
-          {/* Fixed-height title/chips slots + line-clamped description keep every
-              card the same overall height regardless of copy length. */}
-          <div className="flex flex-1 flex-col p-5">
-            <h3 className="line-clamp-2 min-h-[2.6em] text-[2rem] leading-tight font-bold text-[var(--color-fg)]">
+          {/* Title/description height hugs its own content now — a short title
+              (1 line vs. 2) no longer reserves dead space before the chips, and
+              the description no longer stretches to fill leftover row height.
+              That's what makes card height track title/copy length instead of
+              every card matching its tallest row-mate (see WorkSection's
+              items-start on the grid, which is the other half of this). */}
+          <div className="flex flex-col p-5">
+            <Title className="line-clamp-2 text-[2rem] leading-tight font-bold text-[var(--color-fg)]">
               {project.title}
-            </h3>
+            </Title>
             <ul className="mt-2 flex flex-wrap content-start gap-1.5">
               {project.chips.map((chip) => (
                 <li
@@ -117,7 +139,7 @@ export default function ProjectCard({ project }: { project: Project }) {
                 </li>
               ))}
             </ul>
-            <p className="mt-3 line-clamp-3 flex-1 text-[0.9375rem] leading-snug font-normal text-[var(--color-muted)]">
+            <p className="mt-3 line-clamp-3 text-[0.9375rem] leading-snug font-normal text-[var(--color-muted)]">
               {project.summary}
             </p>
           </div>

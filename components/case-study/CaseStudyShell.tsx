@@ -183,6 +183,7 @@ export default function CaseStudyShell({
               <img
                 src={nextProject.coverImage}
                 alt=""
+                aria-hidden
                 onError={() => setCoverFailed(true)}
                 className="absolute inset-0 h-full w-full scale-110 object-cover blur-sm"
               />

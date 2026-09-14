@@ -11,19 +11,23 @@ export default function ProjectFallbackDetail({ project }: { project: Project })
   const galleryPlaceholderCount = 3;
 
   return (
-    <article className="mx-auto max-w-6xl px-4 py-16">
-      <p className="text-[length:var(--text-caption)] text-[var(--color-muted)]">
-        {project.tags.join(" · ")}
-      </p>
+    <article className="mx-auto max-w-6xl px-3 py-16">
+      {project.tags.length > 0 && (
+        <p className="text-[length:var(--text-caption)] text-[var(--color-muted)]">
+          {project.tags.join(" · ")}
+        </p>
+      )}
       <h1 className="mt-2 text-[length:var(--text-h1)] font-semibold tracking-tight">
         {project.title}
       </h1>
       <p className="mt-4 max-w-2xl text-[length:var(--text-body)] text-[var(--color-fg)]">
         {project.summary}
       </p>
-      <p className="mt-2 max-w-2xl text-[length:var(--text-caption)] text-[var(--color-muted)]">
-        Role: {project.role}
-      </p>
+      {project.role && (
+        <p className="mt-2 max-w-2xl text-[length:var(--text-caption)] text-[var(--color-muted)]">
+          Role: {project.role}
+        </p>
+      )}
 
       {project.links && project.links.length > 0 && (
         <div className="mt-6 flex flex-wrap gap-3">

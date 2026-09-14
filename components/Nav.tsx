@@ -61,8 +61,9 @@ export default function Nav() {
   }
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 px-4">
+    <header className="fixed inset-x-0 top-0 z-50 px-3">
       <nav
+        aria-label="Primary"
         className={`mx-auto flex max-w-6xl items-center justify-between border ${
           suppressTransition ? "" : "transition-all duration-300"
         } ${

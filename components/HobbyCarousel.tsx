@@ -38,6 +38,9 @@ export default function HobbyCarousel({ hobbies }: { hobbies: Hobby[] }) {
       <div
         ref={trackRef}
         style={EDGE_FADE}
+        tabIndex={0}
+        role="region"
+        aria-label="Hobbies"
         className="no-scrollbar flex snap-x snap-mandatory gap-6 overflow-x-auto px-2 py-12"
       >
         {hobbies.map((hobby, i) => (

@@ -188,7 +188,7 @@ export default function ArchiveProjectCard({
         */}
       </div>
       <div className="p-5">
-        <h3 className="font-serif text-[19px] font-bold text-[var(--color-fg)]">{project.title}</h3>
+        <h2 className="font-serif text-[19px] font-bold text-[var(--color-fg)]">{project.title}</h2>
         {project.caption && (
           <p className="mt-1 text-[14px] text-[var(--color-muted)]">{project.caption}</p>
         )}

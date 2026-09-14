@@ -124,9 +124,11 @@ export default function SimpleCaseStudyPage({
               )}
               <ul className="flex flex-col gap-3">
                 {(caseStudy.technicalStack.items ?? []).map((item, i) => (
-                  <Reveal key={i} delay={i * 0.06}>
-                    <p className="text-[16px] leading-relaxed text-[var(--color-fg)]">• {item}</p>
-                  </Reveal>
+                  <li key={i}>
+                    <Reveal delay={i * 0.06}>
+                      <p className="text-[16px] leading-relaxed text-[var(--color-fg)]">• {item}</p>
+                    </Reveal>
+                  </li>
                 ))}
               </ul>
             </>
@@ -147,9 +149,11 @@ export default function SimpleCaseStudyPage({
         ) : (
           <ul className="flex flex-col gap-3">
             {caseStudy.whatsNext.map((item, i) => (
-              <Reveal key={i} delay={i * 0.06}>
-                <p className="text-[16px] leading-relaxed text-[var(--color-fg)]">• {item}</p>
-              </Reveal>
+              <li key={i}>
+                <Reveal delay={i * 0.06}>
+                  <p className="text-[16px] leading-relaxed text-[var(--color-fg)]">• {item}</p>
+                </Reveal>
+              </li>
             ))}
           </ul>
         )}

@@ -146,7 +146,7 @@ export default function CaseStudySidebar({
       */}
 
       {detailed && (
-        <div className="flex flex-col gap-0.5">
+        <nav aria-label="Case study sections" className="flex flex-col gap-0.5">
           {tocItems.map((item) => (
             <a
               key={item.id}
@@ -168,7 +168,7 @@ export default function CaseStudySidebar({
               {item.label}
             </a>
           ))}
-        </div>
+        </nav>
       )}
     </div>
   );

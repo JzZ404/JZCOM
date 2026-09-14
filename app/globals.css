@@ -263,15 +263,18 @@ html::-webkit-scrollbar {
 /* About page's default cat cursor stays for plain hovering, but links (and
    anything else marked .cursor-sparkle — hobby carousel cards, the profile
    photo) have their own browser-default cursor that wins by specificity
-   over the inherited one — this swaps it to the slanted "hover" cat
-   instead, sized ~1.2x the default so it reads as a highlight, not just a
-   different pointer. */
+   over the inherited one. This was meant to swap in a distinct "hover" cat
+   (slanted, ~1.2x size) here, but hover-cat-1x/2x.png were never actually
+   added to public/images/about/ — every crossing onto a link/card/photo
+   404'd and fell back to a plain pointer mid-hover, which read as the
+   cursor glitching. Reusing the default cat here as a stopgap until real
+   hover art exists — swap the url()s back to hover-cat-1x/2x.png then. */
 .about-cat-cursor a,
 .about-cat-cursor button,
 .about-cat-cursor .cursor-sparkle {
   cursor:
-    image-set(url(/images/about/hover-cat-1x.png) 1x, url(/images/about/hover-cat-2x.png) 2x)
-      17 17,
+    image-set(url(/images/about/cursor-cat-1x.png) 1x, url(/images/about/cursor-cat-2x.png) 2x)
+      14 14,
     pointer;
 }
 
