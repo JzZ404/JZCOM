@@ -385,6 +385,517 @@ export const alioCaseStudy: CaseStudyAlio = {
   sections: [],
 };
 
+// Transcribed directly from Joyce's Helport pitch deck (team: Resilient
+// Raccoons — Shreya Sudan, Jiaqi Wang, Luis Sánchez de la Vega, Joyce Zhou).
+// Numbers/quotes/table rows below are verbatim from the deck's Statistics,
+// Problem Statement, Solution, User Persona, UC SHIP Case Study Demo,
+// Competitor Analysis, Market Plan, and Quantitative Outcomes slides.
+// Teammates are credited by role only (not name/photo) in `meta`, same
+// convention as Alio's "Team: 4 — Designers, AI Engineer, PM" — matches
+// how the rest of the site handles team credit without individual profiles.
+// tldr and Timeline stay PLACEHOLDER — the deck doesn't date the project or
+// include Joyce's own one-line summary of it.
+export type CaseStudyHelport = {
+  title: string;
+  subheading: string;
+  tldr: string;
+  heroLabel: string;
+  heroImage?: string;
+  heroVideo?: string;
+  meta: { label: string; value: string }[];
+  links?: CaseStudyLink[];
+  research: {
+    intro: string;
+    stats: { value: string; finding: string }[];
+    gapLabel: string;
+    gap: string;
+  };
+  painPoints: {
+    pillars: { title: string; body: string; image?: string }[];
+  };
+  // The classic user/need/insight problem statement — distinct from the
+  // pain-point pillars above, which are the broader symptoms, not the
+  // single scoped problem the product targets. Segmented (not a plain
+  // string) so a few load-bearing phrases can render highlighted inline —
+  // same union-segment idiom as Alio's whyWeBuiltThis.story, just rendered
+  // as inline spans within one paragraph instead of separate paragraphs.
+  problemStatement: (string | { text: string; highlight: true })[];
+  solution: {
+    intro: string;
+    features: { title: string; body: string }[];
+  };
+  demoIterations: {
+    videos: { title: string; src: string }[];
+    iterations: { title: string; image: string }[];
+  };
+  personas: {
+    name: string;
+    role: string;
+    quote: string;
+    // Label/value pairs (Age, Sex, Experience/Education, Location) instead
+    // of a flattened joined line, and bold-lead-in objectives/frustrations
+    // instead of full flowing sentences — matches the deck's own persona
+    // slide structure and Joyce's persona-card mockup.
+    meta: { label: string; value: string }[];
+    objectives: { label: string; detail: string }[];
+    frustrations: { label: string; detail: string }[];
+    image?: string;
+  }[];
+  demo: {
+    // Human call stages on top (arrow-connected, sequential), the co-pilot
+    // layer below — one system per stage, paired 1:1 by column position and
+    // joined with a dotted connector — each with its own small caption
+    // describing what that system does during that step. Per Joyce's
+    // second flow revision.
+    coPilotLabel: string;
+    coPilotSystems: { label: string; caption: string }[];
+    flow: { title: string }[];
+    summary: string;
+  };
+  competitive: {
+    // Use Case / Pros / Cons grid, one column per real competitor — pros
+    // and cons are the same "X, but Y" sentence each competitor already
+    // had, split at its own "but" clause rather than newly written, so
+    // nothing here is invented beyond the original analysis.
+    competitors: { name: string; logo: string; useCase: string; pros: string[]; cons: string[] }[];
+    // A 2x2 positioning chart — axis choice and point placement are my own
+    // reading of the pros/cons above (Rigid/Adaptive from how each vendor
+    // handles policy changes, Specialist/Full-Service from how narrow or
+    // broad their actual capability is), not sourced external research —
+    // Joyce should treat the exact coordinates as adjustable, not verified.
+    perceptualMap: {
+      title: string;
+      xAxis: [string, string];
+      yAxis: [string, string];
+      points: { name: string; logo?: string; x: number; y: number; isHelport?: boolean }[];
+    };
+    conclusion: string;
+  };
+  marketPlan: {
+    // One card, split light/dark — each half gets its own headline stat
+    // (was one shared headline above both) plus a receipt-style row list
+    // (label left, monospace value right, dotted dividers). Per Joyce's
+    // second pricing mockup.
+    pricing: {
+      whatTheyPay: {
+        title: string;
+        headline: string;
+        headlineDetail: string;
+        rows: { label: string; value: string }[];
+      };
+      whatTheyGetBack: {
+        title: string;
+        headline: string;
+        headlineDetail: string;
+        rows: { label: string; value: string; highlight?: boolean }[];
+      };
+    };
+    // A phased go-to-market — Start Here / Expand To / Then — each phase
+    // its own reasoning bullets and the specific value it unlocks, plus
+    // supporting Market Size / Why Now context. Per Joyce's target-market
+    // mockup — supersedes the earlier flat Primary/Secondary/Early-Adopter
+    // tier list. No title/subtitle here — the section's own "06 — Target
+    // Market" heading already covers that, same reasoning as Pricing.
+    targetMarket: {
+      phases: { step: string; stepLabel: string; heading: string; bullets: string[] }[];
+      marketSize: { label: string; bullets: string[] };
+      whyNow: { label: string; bullets: string[] };
+    };
+  };
+  outcomes: {
+    external: { source: string; useCase: string; result: string }[];
+    impact: { value: string; label: string; detail: string }[];
+  };
+  sections: CaseStudySkeletonSection[];
+};
+
+export const helportCaseStudy: CaseStudyHelport = {
+  title: "Helport: AI Copilot for Live Calls",
+  subheading:
+    "An AI co-pilot that guides health insurance agents through live calls with real-time, policy-aware answers, built-in compliance safeguards, and automated call summaries.",
+  tldr: PLACEHOLDER,
+  heroLabel: "hero screenshot — Helport",
+  heroImage: "/images/helport/cover2.png",
+  meta: [
+    { label: "Role", value: "Product Experience Designer" },
+    { label: "For", value: "U.S. health insurance agents and members" },
+    { label: "Team", value: "4 — Software Eng, Backend Eng, Business Strategist, Product Designer" },
+    { label: "Timeline", value: PLACEHOLDER },
+  ],
+  research: {
+    intro:
+      "Health insurance support in the U.S. is breaking down at scale — for the members trying to use their coverage and the agents trying to help them.",
+    stats: [
+      {
+        value: "58%",
+        finding: "of insured adults report at least one issue with their health insurance coverage every year",
+      },
+      { value: "1 in 6", finding: "say they were unable to receive recommended care due to insurance hurdles" },
+      {
+        value: "~30%",
+        finding: "annual attrition among the ~70,000 customer service reps at health and medical insurance carriers",
+      },
+    ],
+    gapLabel: "The Gap",
+    gap: "U.S. health insurers collectively cover around 300 million Americans, and the industry is already signaling it's ready for AI — CVS Health kicked off a multiyear $2B cost-cutting effort, and UnitedHealth's CTO has said AI investment is core to fixing a health care system that needs it.",
+  },
+  painPoints: {
+    pillars: [
+      {
+        title: "Member Confusion",
+        body: "Members can't tell what's covered, get inconsistent answers, and face delays that affect their health.",
+        image: "/images/helport/member confusion.png",
+      },
+      {
+        title: "Agent Overload",
+        body: "Agents juggle fragmented systems and complex policies, driving long calls, escalations, and compliance risk.",
+        image: "/images/helport/agent overload.png",
+      },
+      {
+        title: "Systemic Inefficiency",
+        body: "Outdated tools drive slow, error-prone support: repeated calls, higher costs, preventable violations.",
+        image: "/images/helport/systemic inefficy.png",
+      },
+    ],
+  },
+  problemStatement: [
+    "A frontline health insurance agent taking back-to-back calls needs to give an ",
+    { text: "accurate, plan-specific answer", highlight: true },
+    " while the member is still on the line, because the answer is ",
+    { text: "scattered across portals and policy PDFs", highlight: true },
+    " that vary by campus, and getting it wrong means a ",
+    { text: "compliance violation or a delay in someone's care", highlight: true },
+    ".",
+  ],
+  solution: {
+    intro:
+      "We turn overwhelmed insurance calls into confident conversations — cutting through confusion with instant answers, clear guidance, and seamless follow-up.",
+    features: [
+      {
+        title: "Realtime Policy-Aware Guidance",
+        body: "Empowers agents with instant, plan-specific answers triggered by live call transcription.",
+      },
+      {
+        title: "Streamlined, Scripted Workflows",
+        body: "Uses guided speech navigation to walk agents through complex, multi-step processes.",
+      },
+      {
+        title: "Built-In Compliance Safeguards",
+        body: "Detects and flags HIPAA/CMS risks during live calls, providing real-time corrective prompts to avoid legal violations and protect star ratings.",
+      },
+      {
+        title: "Automated Call Summaries",
+        body: "Generates post-call summaries outlining key issues, coverage info, and next steps.",
+      },
+    ],
+  },
+  demoIterations: {
+    videos: [{ title: "Demo Video", src: "/images/helport/demo video for cover.mp4" }],
+    iterations: [{ title: "Design Iteration", image: "/images/helport/flow.png" }],
+  },
+  personas: [
+    {
+      name: "Marcus",
+      role: "Frontline Health Insurance Agent",
+      quote:
+        "I take back-to-back calls every shift. When members are stressed or confused, I have to find clear answers — fast.",
+      meta: [
+        { label: "Age", value: "32" },
+        { label: "Sex", value: "Male" },
+        { label: "Experience", value: "3 years in customer service" },
+        { label: "Location", value: "Phoenix, AZ" },
+      ],
+      objectives: [
+        {
+          label: "Accurate, Fast Responses",
+          detail: "Provide clear answers about coverage, referrals, and billing without flipping through PDFs.",
+        },
+        {
+          label: "Policy Confidence",
+          detail: "Feel assured I'm sharing compliant, plan-specific information on every call.",
+        },
+        {
+          label: "Reduce Escalations",
+          detail: "Resolve more issues on the first call by surfacing the right info in real time.",
+        },
+        {
+          label: "Empathetic Support",
+          detail: "Navigate emotionally charged calls with prompts that help me stay calm, clear, and caring.",
+        },
+      ],
+      frustrations: [
+        {
+          label: "Information Overload",
+          detail: "Juggling multiple portals, guidelines, and policy PDFs slows me down.",
+        },
+        {
+          label: "Policy Ambiguity",
+          detail: "Not all plan documents are clear, and campus-level variations make it worse.",
+        },
+        {
+          label: "High Stakes, Low Support",
+          detail: "One mistake could mean a compliance issue or patient care delay.",
+        },
+        {
+          label: "Burnout from Complexity",
+          detail: "It's draining to search for answers under pressure — especially during back-to-back calls.",
+        },
+      ],
+      image: "/images/helport/person1.png",
+    },
+    {
+      name: "Jasmine",
+      role: "International Student on UC SHIP",
+      quote: "I just want to focus on school. Figuring out insurance shouldn't feel like solving a puzzle.",
+      meta: [
+        { label: "Age", value: "26" },
+        { label: "Sex", value: "Female" },
+        { label: "Education", value: "Master's in Marine Biology" },
+        { label: "Location", value: "UC Berkeley (Originally from overseas)" },
+      ],
+      objectives: [
+        {
+          label: "Understand UC SHIP Coverage",
+          detail: "Learn what is covered and what's not — especially for urgent care, off-campus visits, and mental health.",
+        },
+        {
+          label: "Avoid Financial Surprises",
+          detail: "Know upfront what she'll have to pay (copays, deductibles, referrals).",
+        },
+        {
+          label: "Get Help in Simple Language",
+          detail: "Receive support without jargon, in terms she can actually understand.",
+        },
+        {
+          label: "Minimize Time Spent on Insurance",
+          detail: "Resolve issues in one call — so she can get back to her studies.",
+        },
+      ],
+      frustrations: [
+        {
+          label: "Complex, Inconsistent Information",
+          detail: "Gets different answers depending on who she talks to; policies vary by UC campus.",
+        },
+        {
+          label: "Hard-to-Understand Language",
+          detail: 'Insurance terms like "pre-authorization" or "out-of-network" feel confusing and stressful.',
+        },
+        {
+          label: "Slow, Repetitive Service",
+          detail: "Has to explain herself multiple times or wait long just to get basic clarity.",
+        },
+        {
+          label: "Fear of Making Mistakes",
+          detail: "Worries about doing something wrong and getting denied care.",
+        },
+      ],
+      image: "/images/helport/persona2.png",
+    },
+  ],
+  demo: {
+    coPilotLabel: "Co-pilot layer, running for the whole call",
+    coPilotSystems: [
+      { label: "Speech navigation", caption: "Advances the script as the call moves" },
+      { label: "Intelligent labeling", caption: "Identifies who's calling and why" },
+      { label: "Knowledge base", caption: "Pulls the right plan's answer" },
+      { label: "Call summaries", caption: "Writes the wrap-up note" },
+    ],
+    flow: [
+      { title: "Greeting & HIPAA check" },
+      { title: "Reason for the call" },
+      { title: "Discuss & guide" },
+      { title: "Wrap-up & next steps" },
+    ],
+    summary:
+      "Demoed against UC SHIP, the University of California student health plan — a natural fit since 58% of insured adults report a coverage issue every year, and international students hit that confusion without a support system they already know.",
+  },
+  competitive: {
+    competitors: [
+      {
+        name: "Hyro",
+        logo: "/images/helport/image (6).png",
+        useCase: "Customer self-service & call automation",
+        pros: [
+          "Call automation & smart routing",
+          "Self-service & SMS deflection",
+          "Healthcare-specific workflows",
+        ],
+        cons: ["Primarily customer-facing", "Optimized for deflection/routing"],
+      },
+      {
+        name: "Uniphore",
+        logo: "/images/helport/image (5).png",
+        useCase: "Real-time agent assistance",
+        pros: [
+          "Real-time guidance",
+          "Knowledge assist & next-best actions",
+          "Automated summaries",
+          "Conversation intelligence",
+        ],
+        cons: ["Broad enterprise platform", "More capabilities than a focused workflow requires"],
+      },
+      {
+        name: "Verint",
+        logo: "/images/helport/image (7).png",
+        useCase: "Enterprise CX automation",
+        pros: [
+          "Broad CX platform",
+          "Agent copilots",
+          "QA, analytics & WFM",
+          "Enterprise integrations",
+        ],
+        cons: ["Very broad platform", "Focus extends beyond individual agent workflow"],
+      },
+    ],
+    perceptualMap: {
+      title: "Perceptual Map of Service Positioning",
+      xAxis: ["Focused solution", "Broad CX platform"],
+      yAxis: ["Customer-facing automation", "Agent-facing assistance"],
+      points: [
+        { name: "Hyro", logo: "/images/helport/image (6).png", x: 65, y: 35 },
+        { name: "Uniphore", logo: "/images/helport/image (5).png", x: 76, y: 82 },
+        { name: "Verint", logo: "/images/helport/image (7).png", x: 90, y: 68 },
+        { name: "Helport", logo: "/images/helport/helport logo.png", x: 28, y: 84, isHelport: true },
+      ],
+    },
+    conclusion:
+      "Helport AI fills the gap with focused real-time agent guidance, compliance support, and workflow automation, making it a strong fit for complex, policy-driven interactions like the UC SHIP demo.",
+  },
+  marketPlan: {
+    pricing: {
+      whatTheyPay: {
+        title: "What they pay",
+        headline: "$130 per agent, per month",
+        headlineDetail: "Core platform plus compliance",
+        rows: [
+          { label: "Core", value: "$100 per seat" },
+          { label: "Compliance", value: "$30 per seat" },
+          { label: "Incentive tiers", value: "+$10 to $20" },
+          { label: "Minimum", value: "12 months" },
+          { label: "Pilot", value: "90 days, 50 seats" },
+        ],
+      },
+      whatTheyGetBack: {
+        title: "What they get back",
+        headline: "Over 5x return",
+        headlineDetail: "One customer profile: 500 agents, 700K calls",
+        rows: [
+          { label: "Cost", value: "$65K per month" },
+          { label: "Saved", value: "$343K per month", highlight: true },
+          { label: "Also", value: "HIPAA exposure avoided" },
+        ],
+      },
+    },
+    targetMarket: {
+      phases: [
+        {
+          step: "01",
+          stepLabel: "Start Here (already built)",
+          heading: "Self-funded commercial and student plans",
+          bullets: [
+            "UC SHIP is self-funded by the University of California, with medical claims administered by Anthem Blue Cross",
+            "Anthem is who runs the member services line, so Anthem is who buys",
+          ],
+        },
+        {
+          step: "02",
+          stepLabel: "Expand To",
+          heading: "Contact center BPOs",
+          bullets: [
+            "Alorica and Teleperformance staff outsourced insurance support and are measured directly on handle time",
+            "Shortest procurement cycle of any segment",
+          ],
+        },
+        {
+          step: "03",
+          stepLabel: "Then",
+          heading: "Medicare Advantage carriers",
+          bullets: [
+            "Plans like SCAN Health Plan, a Long Beach nonprofit MA plan",
+            "Value here includes CMS Star Ratings and CAHPS, which commercial plans don't have",
+          ],
+        },
+      ],
+      marketSize: {
+        label: "Market Size",
+        bullets: [
+          "Roughly 70,000 customer service reps work for health and medical insurance carriers (BLS)",
+          "At $130 per seat per month, about $109M annually, before counting BPO agents",
+        ],
+      },
+      whyNow: {
+        label: "Why Now",
+        bullets: [
+          "Roughly 30% annual agent attrition means constant retraining",
+          "Margin pressure across the sector is pushing spend toward cost per call",
+        ],
+      },
+    },
+  },
+  outcomes: {
+    external: [
+      {
+        source: "National Bureau of Economic Research",
+        useCase: "Real-time AI guidance for 5,000+ agents in a Fortune 500 software company",
+        result: "+14% agent productivity, reduced AHT, better retention, and improved CSAT",
+      },
+      {
+        source: "SIA Partners",
+        useCase: "AI support for casualty insurance service calls",
+        result: "Reduced average call duration from 4.6 to 4.2 minutes",
+      },
+      {
+        source: "TTEC",
+        useCase: "AI tools for government sales process integration",
+        result: "80% reduction in sales process time, 26% increase in units booked",
+      },
+      {
+        source: "McKinsey (Energy Sector)",
+        useCase: "AI voice assistant in billing workflows",
+        result: "20% drop in billing call volume, up to 60 seconds trimmed from authentication",
+      },
+      {
+        source: "McKinsey (Telecom)",
+        useCase: "Generative AI to redesign customer journeys",
+        result: ">25% AHT reduction, 10–20% boost in FCR",
+      },
+      {
+        source: "AuxoAI",
+        useCase: "AI co-pilot for U.S. healthcare contact center",
+        result: "30% lower AHT, 10% higher FCR, 20% shorter agent training time",
+      },
+      {
+        source: "IBM",
+        useCase: "AI integration in customer service",
+        result: "18% increase in CSAT, 20% improvement in call efficiency",
+      },
+    ],
+    impact: [
+      {
+        value: "10–20%",
+        label: "drop in average handle time",
+        detail: "Saves up to 2,200 labor hours/month in a 100K-call operation",
+      },
+      {
+        value: "10–15%",
+        label: "increase in first contact resolution",
+        detail: "Fewer callbacks, escalations, and member frustration",
+      },
+      {
+        value: "$4.90",
+        label: "industry cost per call",
+        detail: "Even small time savings translate into hundreds of thousands in annual savings",
+      },
+      {
+        value: "$2.13M",
+        label: "potential reduction in HIPAA violation fees",
+        detail: "Real-time QA and intelligent labeling help prevent costly HIPAA/CMS violations",
+      },
+    ],
+  },
+  sections: [],
+};
+
 export const caseStudies: Record<string, CaseStudy> = {
   nest: {
     title: "Nest",
@@ -394,7 +905,7 @@ export const caseStudies: Record<string, CaseStudy> = {
     heroLabel: "hero screenshot — Nest app",
     heroImage: "/images/nest/cover.png",
     meta: [
-      { label: "Role", value: "UX Researcher, UI Designer" },
+      { label: "Role", value: "UX Researcher and UI Designer" },
       { label: "For", value: "Urban, early-career professionals" },
       { label: "Team", value: "6 — Designers, Engineer, PM" },
       { label: "Timeline", value: "October 2025" },
@@ -571,9 +1082,9 @@ export const focusfarmCaseStudy: CaseStudySimple = {
   // wordmark sits near the left edge, which a centered 16:9 crop clips.
   heroImagePosition: "left center",
   meta: [
-    { label: "Role", value: "Project Owner and Management" },
+    { label: "Role", value: "Project Owner and Manager" },
     { label: "For", value: "Students and professionals building focus habits" },
-    { label: "Team", value: "Team of two, PM and Frontend" },
+    { label: "Team", value: "2 — PM, Frontend" },
     { label: "Timeline", value: "June 2026" },
   ],
   links: [
@@ -694,7 +1205,7 @@ export const drunkyCaseStudy: CaseStudyDrunky = {
   meta: [
     { label: "Role", value: "Bartender UI, Motion Recording & Data Labeling" },
     { label: "For", value: "Automated bartending and hospitality" },
-    { label: "Team", value: "Team of three robotics students" },
+    { label: "Team", value: "3 — Robotics Students" },
     { label: "Timeline", value: "June 2026" },
   ],
   // No live demo for a physical robot — the repo stands in for it, same
@@ -914,9 +1425,9 @@ export const pelicanCaseStudy: CaseStudyPelican = {
   heroLabel: "hero screenshot — PELICAN",
   heroImage: "/images/pelican/cover.jpg",
   meta: [
-    { label: "Role", value: "Robot Navigation, 3D Design and CAD" },
+    { label: "Role", value: "Robot Navigation, 3D Design, and CAD" },
     { label: "For", value: "Autonomous waste collection in public spaces" },
-    { label: "Team", value: "Team of two robotics students" },
+    { label: "Team", value: "2 — Robotics Students" },
     { label: "Timeline", value: "March 2026" },
   ],
   liveDemo: { label: "View on GitHub", href: "https://github.com/JzZ404/The_Pelican" },

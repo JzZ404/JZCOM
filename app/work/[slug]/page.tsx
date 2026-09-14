@@ -5,6 +5,7 @@ import {
   caseStudies,
   caseStudySkeletons,
   alioCaseStudy,
+  helportCaseStudy,
   poopidexCaseStudy,
   focusfarmCaseStudy,
   drunkyCaseStudy,
@@ -13,6 +14,7 @@ import {
 import CaseStudyPage from "@/components/case-study/CaseStudyPage";
 import CaseStudySkeletonPage from "@/components/case-study/CaseStudySkeletonPage";
 import AlioCaseStudyPage from "@/components/case-study/AlioCaseStudyPage";
+import HelportCaseStudyPage from "@/components/case-study/HelportCaseStudyPage";
 import DrunkyCaseStudyPage from "@/components/case-study/DrunkyCaseStudyPage";
 import PelicanCaseStudyPage from "@/components/case-study/PelicanCaseStudyPage";
 import SimpleCaseStudyPage from "@/components/case-study/SimpleCaseStudyPage";
@@ -57,6 +59,12 @@ export default async function ProjectDetailPage({
     const projectIndex = projects.findIndex((p) => p.slug === slug);
     const nextProject = projects[(projectIndex + 1) % projects.length];
     return <AlioCaseStudyPage caseStudy={alioCaseStudy} nextProject={nextProject} />;
+  }
+
+  if (slug === "helport") {
+    const projectIndex = projects.findIndex((p) => p.slug === slug);
+    const nextProject = projects[(projectIndex + 1) % projects.length];
+    return <HelportCaseStudyPage caseStudy={helportCaseStudy} nextProject={nextProject} />;
   }
 
   if (slug === "drunky") {

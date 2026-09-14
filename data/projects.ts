@@ -21,6 +21,10 @@ export type Project = {
   role: string; // what Joyce actually did — see CLAUDE.md attribution rules
   coverImage: string; // path under /public/images/...
   coverPosition?: string; // CSS object-position — for covers whose focal point isn't centered
+  // Autoplay/muted/loop video shown in place of coverImage on the Work
+  // grid card specifically — coverImage stays as the fallback (case-study
+  // hero, onError, etc.), video is opt-in per project.
+  video?: string;
   links?: { label: string; href: string }[];
 };
 
@@ -46,6 +50,18 @@ export const projects: Project[] = [
       "A gamified movement app that turns daily steps into a growing companion and social challenges, built around research on why people stop working out.",
     role: "UX research and product design.",
     coverImage: "/images/nest/cover.png",
+  },
+  {
+    slug: "helport",
+    title: "Helport: AI Copilot for Live Calls",
+    tags: ["AI/ML", "UX/Product"],
+    category: "ux",
+    chips: ["UX/UI", "AI/ML", "Front-End", "Client Work"],
+    summary:
+      "A real-time AI dashboard that guides health insurance agents mid-call, pairing a domain knowledge base with live conversational prompts for better handoffs between the agent and the AI.",
+    role: "Product Experience Designer — UX/UI and front-end development.",
+    coverImage: "/images/helport/cover.png",
+    video: "/images/helport/demo video for cover.mp4",
   },
   {
     slug: "poopidex",
