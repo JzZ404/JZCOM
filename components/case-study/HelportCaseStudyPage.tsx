@@ -130,7 +130,7 @@ function PricingHalf({
 
 function PricingCard({ pricing }: { pricing: CaseStudyHelport["marketPlan"]["pricing"] }) {
   return (
-    <Reveal className="mb-11 grid grid-cols-1 overflow-hidden rounded-xl sm:grid-cols-2">
+    <Reveal variant="scale" className="mb-11 grid grid-cols-1 overflow-hidden rounded-xl sm:grid-cols-2">
       <PricingHalf data={pricing.whatTheyPay} />
       <PricingHalf data={pricing.whatTheyGetBack} dark />
     </Reveal>
@@ -148,6 +148,7 @@ function TargetMarketCard({ targetMarket }: { targetMarket: CaseStudyHelport["ma
   return (
     <div className="flex flex-col gap-6">
       <Reveal
+        variant="scale"
         className="rounded-xl border p-6 shadow-[0px_1px_2px_rgba(0,0,0,0.08),0px_6px_18px_rgba(0,0,0,0.06)] sm:p-8"
         style={HELPORT_PANEL_STYLE}
       >
@@ -201,6 +202,7 @@ function TargetMarketCard({ targetMarket }: { targetMarket: CaseStudyHelport["ma
           <Reveal
             key={block.label}
             delay={i * 0.08}
+            variant={i === 0 ? "left" : "right"}
             className="rounded-xl border bg-white p-6 shadow-[0px_1px_2px_rgba(0,0,0,0.06),0px_4px_14px_rgba(0,0,0,0.05)]"
             style={{ borderColor: HELPORT_CARD_BORDER }}
           >
@@ -222,54 +224,143 @@ function TargetMarketCard({ targetMarket }: { targetMarket: CaseStudyHelport["ma
   );
 }
 
+// Each iteration alternates sides — image left/text right for the first,
+// image right/text left for the second — same left/right alternation Alio's
+// prototypeDemo features use (sm:order-2 on whichever side needs to flip).
+// Only order-2 needs setting: an un-ordered flex/grid item defaults to
+// order 0, which already sorts before order-2 without needing its own
+// override. Final-prototype demo clips render below the iterations, after
+// Iteration 2 — stacked vertically (not a grid) with space reserved under
+// each clip for Joyce's own written explanation, rather than side by side.
 function DemoIterations({
   demoIterations,
 }: {
   demoIterations: CaseStudyHelport["demoIterations"];
 }) {
   return (
-    <div className="mb-11 grid grid-cols-1 gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-      {demoIterations.videos.map((demo, i) => (
-        <Reveal
-          key={demo.src}
-          delay={i * 0.08}
-          className="overflow-hidden rounded-xl border bg-white"
-          style={{ borderColor: HELPORT_CARD_BORDER, boxShadow: HELPORT_SOFT_SHADOW }}
-        >
-          <video
-            src={demo.src}
-            controls
-            muted
-            playsInline
-            className="aspect-video w-full bg-black object-cover"
-          />
-          <div className="p-5">
-            <div className="font-mono text-[11px] font-bold tracking-wider text-[#00774D] uppercase">
-              {demo.title}
+    <div className="mb-11 flex flex-col gap-16">
+      <div className="flex flex-col gap-16">
+        {demoIterations.iterations.map((iteration, i) => (
+          <Reveal
+            key={iteration.image}
+            delay={i * 0.08}
+            variant={i % 2 === 0 ? "left" : "right"}
+            // Both iterations show their image in full rather than cropped to
+            // fill the row (object-contain, not object-cover). Iteration 2's
+            // column also gets more of the row's width — the text box next
+            // to it goes narrower (2fr) instead of splitting evenly.
+            className={`grid grid-cols-1 gap-6 sm:items-stretch ${
+              i === 1 ? "sm:grid-cols-[2fr_3fr]" : "sm:grid-cols-2"
+            }`}
+          >
+            <div className={i % 2 === 1 ? "sm:order-2" : ""}>
+              <img
+                src={iteration.image}
+                alt={iteration.title}
+                className="h-full w-full rounded-xl object-contain"
+              />
             </div>
-          </div>
-        </Reveal>
-      ))}
+            {/* Same mint-bordered white card treatment as TitleBodyCard/
+                PillarCard elsewhere on this page, per Joyce. */}
+            <div
+              className="flex flex-col rounded-xl border bg-white p-6"
+              style={{ borderColor: HELPORT_CARD_BORDER, boxShadow: HELPORT_SOFT_SHADOW }}
+            >
+              {i !== 1 && (
+                <div className="mb-2 flex items-baseline gap-2">
+                  <span className="font-mono text-[11px] font-bold tracking-wider text-[var(--color-muted)] uppercase">
+                    {iteration.title}
+                  </span>
+                  {iteration.stage && (
+                    <span className="rounded-full bg-[var(--color-border)] px-2 py-0.5 text-[10px] font-semibold text-[var(--color-muted)] uppercase">
+                      {iteration.stage}
+                    </span>
+                  )}
+                </div>
+              )}
+              {/* No fallback line when feedback is empty — the box just goes
+                  straight to its Design Outcome below. Every iteration uses
+                  the same header+body pattern (no bullets) — each label is
+                  its own heading line, the detail its own paragraph below. */}
+              {iteration.feedback.length > 0 && (
+                <>
+                  {iteration.feedbackLabel && (
+                    <div className="mb-2 font-mono text-[11px] font-bold tracking-wider text-[var(--color-muted)] uppercase">
+                      {iteration.feedbackLabel}
+                    </div>
+                  )}
+                  <div className="flex flex-col gap-4">
+                    {iteration.feedback.map((item, j) => (
+                      <div key={j}>
+                        <h4 className="text-[14px] font-semibold text-[var(--color-fg)]">{item.label}</h4>
+                        <p className="mt-0.5 text-[14px] leading-relaxed text-[var(--color-muted)]">
+                          {item.detail}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+              {iteration.outcome && (
+                <div className="mt-4 border-t pt-4" style={{ borderColor: HELPORT_CARD_BORDER }}>
+                  <span className="font-mono text-[11px] font-bold tracking-wider text-[var(--color-muted)] uppercase">
+                    Design Outcome
+                  </span>
+                  <p className="mt-1.5 text-[14px] leading-relaxed text-[var(--color-fg)]">
+                    {iteration.outcome.map((segment, k) =>
+                      typeof segment === "string" ? (
+                        <Fragment key={k}>{segment}</Fragment>
+                      ) : (
+                        <strong key={k} className="font-bold">
+                          {segment.text}
+                        </strong>
+                      ),
+                    )}
+                  </p>
+                </div>
+              )}
+            </div>
+          </Reveal>
+        ))}
+      </div>
 
-      {demoIterations.iterations.map((iteration, i) => (
-        <Reveal
-          key={iteration.image}
-          delay={(demoIterations.videos.length + i) * 0.08}
-          className="overflow-hidden rounded-xl border bg-white"
-          style={{ borderColor: HELPORT_CARD_BORDER, boxShadow: HELPORT_SOFT_SHADOW }}
-        >
-          <img
-            src={iteration.image}
-            alt={iteration.title}
-            className="aspect-video w-full object-cover"
-          />
-          <div className="p-5">
-            <div className="font-mono text-[11px] font-bold tracking-wider text-[#00774D] uppercase">
-              {iteration.title}
-            </div>
+      {demoIterations.videos.length > 0 && (
+        <div className="flex flex-col gap-7">
+          <span className="self-center text-center font-mono text-[11px] font-bold tracking-wider text-[var(--color-muted)] uppercase">
+            Final Prototype
+          </span>
+          <div className="flex flex-col gap-20">
+            {demoIterations.videos.map((video) => (
+              <Reveal key={video.src} variant="scale" className="flex flex-col gap-5">
+                <div className="mx-auto w-full max-w-[900px] text-center">
+                  <div className="font-mono text-[12px] font-bold tracking-wider text-[#0AD48C] uppercase">
+                    {video.title}
+                  </div>
+                  <h3 className="mt-2 font-serif text-[22px] leading-tight font-bold whitespace-nowrap text-[var(--color-fg)] sm:text-[30px] lg:text-[34px]">
+                    {video.subtitle}
+                  </h3>
+                </div>
+                <video
+                  src={video.src}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  // No controls — these are silent looping demo clips, not a
+                  // player. controlsList/disablePictureInPicture just belt-
+                  // and-suspenders against the browser offering its own UI.
+                  controlsList="nodownload noplaybackrate"
+                  disablePictureInPicture
+                  className="mx-auto w-full max-w-2xl rounded-xl border border-[var(--color-border)] object-cover"
+                />
+                <p className="mx-auto w-full max-w-2xl text-[16px] leading-relaxed text-[var(--color-fg)]">
+                  {video.explanation}
+                </p>
+              </Reveal>
+            ))}
           </div>
-        </Reveal>
-      ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -389,80 +480,138 @@ function PersonaCard({
 // with a dotted connector and a small caption describing what that system
 // does during the step.
 function DemoFlowDiagram({
-  coPilotLabel,
   coPilotSystems,
   flow,
 }: {
-  coPilotLabel: string;
   coPilotSystems: CaseStudyHelport["demo"]["coPilotSystems"];
   flow: CaseStudyHelport["demo"]["flow"];
 }) {
   return (
     <Reveal
+      variant="soft"
       className="mb-6 rounded-xl border p-6 shadow-[0px_1px_2px_rgba(0,0,0,0.08),0px_6px_18px_rgba(0,0,0,0.06)] sm:p-8"
       style={{
         ...HELPORT_PANEL_STYLE,
       }}
     >
-      <p className="mb-5 font-mono text-[11px] font-bold tracking-wider text-[#00774D] uppercase">
-        {coPilotLabel}
-      </p>
+      {/* Mobile-only compact legend — at this width there's no room for the
+          side gutter the sm+ layout uses below, so the two layers are named
+          once up top instead. */}
+      <div className="mb-5 flex items-center gap-3 text-[10px] font-bold tracking-wider uppercase sm:hidden">
+        <span
+          className="rounded-2xl border bg-white px-3 py-1.5 text-center leading-tight text-[var(--color-fg)]"
+          style={{ borderColor: HELPORT_CARD_BORDER }}
+        >
+          Human
+          <br />
+          Layer
+        </span>
+        <span
+          className="rounded-2xl border px-3 py-1.5 text-center leading-tight"
+          style={{
+            backgroundColor: `color-mix(in srgb, ${HELPORT_MINT} 16%, white)`,
+            borderColor: `color-mix(in srgb, ${HELPORT_MINT} 42%, white)`,
+            color: HELPORT_DARK,
+          }}
+        >
+          Co-Pilot
+          <br />
+          Layer
+        </span>
+      </div>
 
-      {/* Same 1fr/auto interleaved grid Drunky's pipeline stages use for
-          arrow-connected boxes — arrows only from sm up, phone width can't
-          fit 4 stages plus arrows without wrapping ugly. The arrow glyph
-          sits at pt-6 (not vertically centered) so it lines up with the
-          stage row specifically, not the middle of the whole 4-item stack
-          each column now holds (stage → connector → co-pilot → caption). */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] sm:items-stretch">
-        {flow.map((step, i) => {
-          const system = coPilotSystems[i];
-          return (
-            <Fragment key={step.title}>
-              <div className="flex h-full flex-col items-center gap-2">
-                <div
-                  className="flex min-h-[72px] w-full items-center justify-center rounded-xl border bg-white px-4 py-4 text-center text-[14px] leading-snug font-bold text-[var(--color-fg)] shadow-[0px_1px_2px_rgba(0,0,0,0.06),0px_4px_14px_rgba(0,0,0,0.05)]"
-                  style={{ borderColor: HELPORT_CARD_BORDER, boxShadow: "0px 1px 2px rgba(0,0,0,0.06), 0px 4px 14px rgba(0,0,0,0.05)" }}
-                >
-                  {step.title}
+      <div className="flex flex-col gap-5 sm:flex-row">
+        {/* Corner labels for the sm+ layout — each vertically centered on
+            its own band and colored to match that band's own boxes (white/
+            bordered for Human, mint for Co-Pilot) instead of a shared
+            legend. Two lines each (word / "Layer") instead of one nowrap
+            line. The min-h-[72px] zones and h-5 spacer below mirror the
+            stage/co-pilot box height and connector height so each label
+            centers against the band it names. */}
+        <div className="hidden shrink-0 flex-col gap-2 sm:flex">
+          <div className="flex min-h-[72px] items-center">
+            <span
+              className="rounded-2xl border bg-white px-3 py-2 text-center text-[10px] leading-tight font-bold tracking-wider text-[var(--color-fg)] uppercase"
+              style={{ borderColor: HELPORT_CARD_BORDER }}
+            >
+              Human
+              <br />
+              Layer
+            </span>
+          </div>
+          <div className="h-5" aria-hidden />
+          <div className="flex min-h-[72px] items-center">
+            <span
+              className="rounded-2xl border px-3 py-2 text-center text-[10px] leading-tight font-bold tracking-wider uppercase"
+              style={{
+                backgroundColor: `color-mix(in srgb, ${HELPORT_MINT} 16%, white)`,
+                borderColor: `color-mix(in srgb, ${HELPORT_MINT} 42%, white)`,
+                color: HELPORT_DARK,
+              }}
+            >
+              Co-Pilot
+              <br />
+              Layer
+            </span>
+          </div>
+        </div>
+
+        {/* Same 1fr/auto interleaved grid Drunky's pipeline stages use for
+            arrow-connected boxes — arrows only from sm up, phone width can't
+            fit 4 stages plus arrows without wrapping ugly. The arrow glyph
+            sits at pt-6 (not vertically centered) so it lines up with the
+            stage row specifically, not the middle of the whole 4-item stack
+            each column now holds (stage → connector → co-pilot → caption). */}
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] sm:flex-1 sm:items-stretch">
+          {flow.map((step, i) => {
+            const system = coPilotSystems[i];
+            return (
+              <Fragment key={step.title}>
+                <div className="flex h-full flex-col items-center gap-2">
+                  <div
+                    className="flex min-h-[72px] w-full items-center justify-center rounded-xl border bg-white px-4 py-4 text-center text-[14px] leading-snug font-bold text-[var(--color-fg)] shadow-[0px_1px_2px_rgba(0,0,0,0.06),0px_4px_14px_rgba(0,0,0,0.05)]"
+                    style={{ borderColor: HELPORT_CARD_BORDER, boxShadow: "0px 1px 2px rgba(0,0,0,0.06), 0px 4px 14px rgba(0,0,0,0.05)" }}
+                  >
+                    {step.title}
+                  </div>
+                  {system && (
+                    <>
+                      <div
+                        className="h-5 w-1 rounded-full"
+                        style={{
+                          backgroundImage: `radial-gradient(circle, ${HELPORT_MINT} 1.5px, transparent 1.8px)`,
+                          backgroundSize: "4px 8px",
+                          backgroundRepeat: "repeat-y",
+                        }}
+                      />
+                      <div
+                        className="flex min-h-[72px] w-full items-center justify-center rounded-xl border px-4 py-3 text-center text-[14px] leading-snug font-bold"
+                        style={{
+                          backgroundColor: `color-mix(in srgb, ${HELPORT_MINT} 16%, white)`,
+                          borderColor: `color-mix(in srgb, ${HELPORT_MINT} 42%, white)`,
+                          color: HELPORT_DARK,
+                        }}
+                      >
+                        {system.label}
+                      </div>
+                      <div className="w-full rounded-md bg-white/70 p-2.5 text-center text-[13px] leading-snug text-[var(--color-fg)]">
+                        {system.caption}
+                      </div>
+                    </>
+                  )}
                 </div>
-                {system && (
-                  <>
-                    <div
-                      className="h-5 w-1 rounded-full"
-                      style={{
-                        backgroundImage: `radial-gradient(circle, ${HELPORT_MINT} 1.5px, transparent 1.8px)`,
-                        backgroundSize: "4px 8px",
-                        backgroundRepeat: "repeat-y",
-                      }}
-                    />
-                    <div
-                      className="w-full rounded-xl border px-4 py-3 text-center text-[14px] leading-snug font-bold"
-                      style={{
-                        backgroundColor: `color-mix(in srgb, ${HELPORT_MINT} 16%, white)`,
-                        borderColor: `color-mix(in srgb, ${HELPORT_MINT} 42%, white)`,
-                        color: HELPORT_DARK,
-                      }}
-                    >
-                      {system.label}
-                    </div>
-                    <div className="w-full rounded-md bg-white/70 p-2.5 text-center text-[13px] leading-snug text-[var(--color-fg)]">
-                      {system.caption}
-                    </div>
-                  </>
+                {i < flow.length - 1 && (
+                  <div
+                    aria-hidden
+                    className="hidden items-start justify-center pt-6 text-[18px] font-bold text-[#00774D] sm:flex"
+                  >
+                    →
+                  </div>
                 )}
-              </div>
-              {i < flow.length - 1 && (
-                <div
-                  aria-hidden
-                  className="hidden items-start justify-center pt-6 text-[18px] font-bold text-[#00774D] sm:flex"
-                >
-                  →
-                </div>
-              )}
-            </Fragment>
-          );
-        })}
+              </Fragment>
+            );
+          })}
+        </div>
       </div>
     </Reveal>
   );
@@ -718,7 +867,7 @@ export default function HelportCaseStudyPage({
     { id: "personas", label: "User Personas" },
     { id: "target-market", label: "Target Market" },
     { id: "demo", label: "Service Blueprint" },
-    // { id: "demo-iterations", label: "Design Process" }, — section commented out below
+    { id: "demo-iterations", label: "Design Process" },
     { id: "competitive", label: "Competitor Analysis" },
     { id: "pricing", label: "Pricing Model" },
     { id: "outcomes", label: "Quantitative Outcomes" },
@@ -733,6 +882,7 @@ export default function HelportCaseStudyPage({
             <Reveal
               key={i}
               delay={i * 0.08}
+              variant="scale"
               className="flex h-full flex-col rounded-xl border bg-white p-6"
               style={{ borderColor: HELPORT_CARD_BORDER, boxShadow: HELPORT_SOFT_SHADOW }}
             >
@@ -764,7 +914,7 @@ export default function HelportCaseStudyPage({
             between the heading and the icons, reading as crowded. */}
         <div className="mt-14 mb-11 grid grid-cols-1 gap-6 sm:grid-cols-3">
           {caseStudy.painPoints.pillars.map((pillar, i) => (
-            <Reveal key={i} delay={i * 0.08}>
+            <Reveal key={i} delay={i * 0.08} variant="scale">
               <PillarCard pillar={pillar} />
             </Reveal>
           ))}
@@ -802,7 +952,7 @@ export default function HelportCaseStudyPage({
         </p>
         <div className="mt-3 mb-11 grid grid-cols-1 items-stretch gap-x-6 gap-y-10 sm:grid-cols-2">
           {caseStudy.solution.features.map((feature, i) => (
-            <Reveal key={i} delay={i * 0.08} className="h-full">
+            <Reveal key={i} delay={i * 0.08} variant={i % 2 === 0 ? "left" : "right"} className="h-full">
               <TitleBodyCard title={feature.title} body={feature.body} index={i} />
             </Reveal>
           ))}
@@ -825,7 +975,7 @@ export default function HelportCaseStudyPage({
         */}
         <div className="mb-11 grid grid-cols-1 gap-6 sm:grid-cols-2">
           {caseStudy.personas.map((persona, i) => (
-            <Reveal key={persona.name} delay={i * 0.1}>
+            <Reveal key={persona.name} delay={i * 0.1} variant={i === 0 ? "left" : "right"}>
               <img
                 src={persona.image}
                 alt={persona.name}
@@ -844,38 +994,39 @@ export default function HelportCaseStudyPage({
 
       <CaseStudySection id="demo" number="07 — Service Blueprint" title="Inside a call">
         <DemoFlowDiagram
-          coPilotLabel={caseStudy.demo.coPilotLabel}
           coPilotSystems={caseStudy.demo.coPilotSystems}
           flow={caseStudy.demo.flow}
         />
         <p className="mb-11 text-[16px] leading-relaxed text-[var(--color-fg)]">{caseStudy.demo.summary}</p>
       </CaseStudySection>
 
-      {/* Design Process — commented out for now, numbering below pushed up
-          to fill the gap (was 09/10/11). Uncomment to bring it back.
       <CaseStudySection id="demo-iterations" number="08 — Design Process" title="Design Process">
         <DemoIterations demoIterations={caseStudy.demoIterations} />
       </CaseStudySection>
-      */}
 
-      <CaseStudySection id="competitive" number="08 — Competitor Analysis" title="Where Helport fits">
+      <CaseStudySection id="competitive" number="09 — Competitor Analysis" title="Where Helport fits">
         <div className="mb-6 grid grid-cols-1 items-stretch gap-5 lg:grid-cols-[1.9fr_0.85fr]">
-          <CompetitorAuditGrid competitors={caseStudy.competitive.competitors} />
-          <PerceptualMap perceptualMap={caseStudy.competitive.perceptualMap} />
+          <Reveal variant="left" className="h-full">
+            <CompetitorAuditGrid competitors={caseStudy.competitive.competitors} />
+          </Reveal>
+          <Reveal variant="right" className="h-full">
+            <PerceptualMap perceptualMap={caseStudy.competitive.perceptualMap} />
+          </Reveal>
         </div>
         <CompetitiveConclusionCallout conclusion={caseStudy.competitive.conclusion} />
       </CaseStudySection>
 
-      <CaseStudySection id="pricing" number="09 — Pricing Model" title="Who pays, and how">
+      <CaseStudySection id="pricing" number="10 — Pricing Model" title="Who pays, and how">
         <PricingCard pricing={caseStudy.marketPlan.pricing} />
       </CaseStudySection>
 
-      <CaseStudySection id="outcomes" number="10 — Quantitative Outcomes" title="The numbers">
+      <CaseStudySection id="outcomes" number="11 — Quantitative Outcomes" title="The numbers">
         <div className="mb-11 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {caseStudy.outcomes.impact.map((stat, i) => (
             <Reveal
               key={i}
               delay={i * 0.08}
+              variant="scale"
               className="rounded-xl border bg-white p-6"
               style={{ borderColor: HELPORT_CARD_BORDER, boxShadow: HELPORT_SOFT_SHADOW }}
             >

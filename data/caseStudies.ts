@@ -425,8 +425,29 @@ export type CaseStudyHelport = {
     features: { title: string; body: string }[];
   };
   demoIterations: {
-    videos: { title: string; src: string }[];
-    iterations: { title: string; image: string }[];
+    // Final-prototype demo clips, rendered after the last iteration —
+    // autoplay/muted/loop, no player controls. explanation is Joyce's own
+    // write-up under each clip; undefined shows a PLACEHOLDER line instead.
+    videos: { title: string; subtitle: string; src: string; explanation: string }[];
+    // feedback is empty for an iteration that hasn't been critiqued yet
+    // (the box then shows a PLACEHOLDER line instead of an empty list).
+    // outcome is an optional closing summary rendered below the feedback
+    // list (e.g. Iteration 2's "Design Outcome" wrap-up) — omitted entirely
+    // when there isn't one, rather than forcing every iteration to have it.
+    iterations: {
+      title: string;
+      stage?: string;
+      image: string;
+      // feedbackLabel is an optional heading above the bullet list (e.g.
+      // Iteration 2's "What I improved") — omitted when the list speaks for
+      // itself, like Iteration 1's issues list.
+      feedbackLabel?: string;
+      feedback: { label: string; detail: string }[];
+      // Segmented like problemStatement below, but with a plain bold flag
+      // instead of highlight — this section has no Helport-mint treatment,
+      // so the emphasized phrases stay the body's own color, just bolded.
+      outcome?: (string | { text: string; bold: true })[];
+    }[];
   };
   personas: {
     name: string;
@@ -590,8 +611,92 @@ export const helportCaseStudy: CaseStudyHelport = {
     ],
   },
   demoIterations: {
-    videos: [{ title: "Demo Video", src: "/images/helport/demo video for cover.mp4" }],
-    iterations: [{ title: "Design Iteration", image: "/images/helport/flow.png" }],
+    videos: [
+      {
+        title: "01 · Dynamic Task Guidance",
+        subtitle: "Stay on track throughout the call",
+        src: "/images/helport/demo1.mov",
+        explanation:
+          "A real-time task list adapts to the call purpose and conversation, automatically updating completed and remaining actions so agents always know what to do next.",
+      },
+      {
+        title: "02 · Automated Member Verification",
+        subtitle: "Verify members without manual lookup",
+        src: "/images/helport/demo2.mov",
+        explanation:
+          "The system identifies the member using their ID and existing records, then surfaces relevant profile and plan information for verification, reducing repetitive searches and saving time at the start of each call.",
+      },
+      {
+        title: "03 · Real-Time Knowledge Assistance",
+        subtitle: "Get the right information at the right moment",
+        src: "/images/helport/demo3.mov",
+        explanation:
+          "When a member asks a specific question, AI retrieves relevant information from the knowledge base and presents it directly in the conversation, helping agents respond accurately without memorizing policies or searching through documentation.",
+      },
+      {
+        title: "04 · Automated Post-Call Summary",
+        subtitle: "Turn every conversation into actionable documentation",
+        src: "/images/helport/demo4.mov",
+        explanation:
+          "After each call, AI automatically organizes the interaction into a call summary, key notes, follow-up actions, transcript, and recording, reducing manual documentation and making the conversation easier to review later.",
+      },
+    ],
+    iterations: [
+      {
+        title: "Iteration 1",
+        stage: "Mid-Fi",
+        image: "/images/helport/iteration1.png",
+        feedback: [
+          {
+            label: "Weak visual hierarchy",
+            detail: "Scripts, messages, workflow steps, and summaries competed for attention.",
+          },
+          {
+            label: "High information density",
+            detail:
+              "Nested sections and long text blocks increased the amount of information agents had to process during a call.",
+          },
+          {
+            label: "Unclear AI guidance",
+            detail:
+              "AI recommendations blended into the conversation, making them harder to distinguish from customer and agent messages.",
+          },
+          {
+            label: "Disconnected call controls",
+            detail: "Recording relied on a separate modal, interrupting the live workflow.",
+          },
+          {
+            label: "Buried next steps",
+            detail:
+              "Agents could see the workflow, but completed and pending actions were not immediately clear.",
+          },
+        ],
+      },
+      {
+        title: "Iteration 2",
+        image: "/images/helport/iteration2.png",
+        feedbackLabel: "Iteration 2 - Design Outcome",
+        feedback: [
+          {
+            label: "Clear AI guidance",
+            detail: "Separated AI recommendations from agent and customer dialogue.",
+          },
+          {
+            label: "Actionable task tracking",
+            detail: "Simplified workflows into clear, easy-to-follow steps.",
+          },
+          {
+            label: "Integrated call controls",
+            detail: "Kept essential call actions accessible without interrupting the workflow.",
+          },
+          {
+            label: "Stronger visual hierarchy",
+            detail:
+              "Reduced distractions and made it easier to identify what to say, what to do, and what comes next.",
+          },
+        ],
+      },
+    ],
   },
   personas: [
     {
