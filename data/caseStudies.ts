@@ -402,6 +402,7 @@ export type CaseStudyHelport = {
   heroLabel: string;
   heroImage?: string;
   heroVideo?: string;
+  heroMediaLayout?: "default" | "compactLower";
   meta: { label: string; value: string }[];
   links?: CaseStudyLink[];
   research: {
@@ -537,6 +538,7 @@ export const helportCaseStudy: CaseStudyHelport = {
   tldr: PLACEHOLDER,
   heroLabel: "hero screenshot — Helport",
   heroImage: "/images/helport/cover2.png",
+  heroMediaLayout: "compactLower",
   meta: [
     { label: "Role", value: "Product Experience Designer" },
     { label: "For", value: "U.S. health insurance agents and members" },

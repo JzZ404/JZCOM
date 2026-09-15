@@ -18,6 +18,7 @@ export type CaseStudyShellData = {
   heroLabel: string;
   heroVideo?: string; // optional cover video shown in place of the hero placeholder
   heroImage?: string; // optional static cover image — checked if heroVideo isn't set
+  heroMediaLayout?: "default" | "compactLower";
   // CSS object-position — for covers whose focal point isn't centered, same
   // convention as Project.coverPosition on the Work grid cards. Needed now
   // that the hero is a fixed 16:9 crop instead of the raw image's own ratio.
@@ -46,6 +47,14 @@ export default function CaseStudyShell({
   // Falls back to a plain solid background if the next project doesn't
   // have a cover image yet (see ProjectCard for the same pattern).
   const [coverFailed, setCoverFailed] = useState(false);
+  const heroMediaClassName =
+    caseStudy.heroMediaLayout === "compactLower"
+      ? "mx-auto mt-10 mb-9 aspect-[16/9] w-[calc(100%-3rem)] max-w-[980px] rounded-xl object-cover sm:mt-12 sm:mb-10 sm:w-[calc(100%-5rem)] lg:mt-14 lg:mb-12"
+      : "mx-5 my-7 aspect-[16/9] w-[calc(100%-2.5rem)] rounded-xl object-cover sm:mx-6 sm:w-[calc(100%-3rem)] lg:mx-10 lg:w-[calc(100%-5rem)]";
+  const heroLinkClassName =
+    caseStudy.heroMediaLayout === "compactLower"
+      ? "group relative mx-auto mt-10 mb-9 block w-[calc(100%-3rem)] max-w-[980px] overflow-hidden rounded-xl sm:mt-12 sm:mb-10 sm:w-[calc(100%-5rem)] lg:mt-14 lg:mb-12"
+      : "group relative mx-5 my-7 block w-[calc(100%-2.5rem)] overflow-hidden rounded-xl sm:mx-6 sm:w-[calc(100%-3rem)] lg:mx-10 lg:w-[calc(100%-5rem)]";
 
   return (
     <div className="mx-auto flex max-w-[1280px]">
@@ -127,7 +136,7 @@ export default function CaseStudyShell({
               href={caseStudy.liveDemo.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative mx-5 my-7 block w-[calc(100%-2.5rem)] overflow-hidden rounded-xl sm:mx-6 sm:w-[calc(100%-3rem)] lg:mx-10 lg:w-[calc(100%-5rem)]"
+              className={heroLinkClassName}
             >
               <img
                 src={caseStudy.heroImage}
@@ -150,7 +159,7 @@ export default function CaseStudyShell({
               // without it, each project's own cover photo aspect ratio
               // drove the box height directly, so a squarer source photo
               // (Drunky, Pelican) rendered visibly taller than the rest.
-              className="mx-5 my-7 aspect-[16/9] w-[calc(100%-2.5rem)] rounded-xl object-cover sm:mx-6 sm:w-[calc(100%-3rem)] lg:mx-10 lg:w-[calc(100%-5rem)]"
+              className={heroMediaClassName}
             />
           )
         ) : (
