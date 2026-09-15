@@ -87,6 +87,7 @@ export const projects: Project[] = [
     role: "Project Owner / PM — directed and defined the product (developed by Murphy Wei).",
     coverImage: "/images/focusfarm/cover.png",
     coverPosition: "left center",
+    video: "/images/focusfarm/cover video.mov",
     links: [{ label: "Live Demo", href: "https://focus-farm-five.vercel.app/" }],
   },
   {

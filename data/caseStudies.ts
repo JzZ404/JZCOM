@@ -1078,6 +1078,7 @@ export type CaseStudySimple = {
   tldr: string;
   heroLabel: string;
   heroImage?: string;
+  heroVideo?: string;
   // CSS object-position — see CaseStudyShellData in CaseStudyShell.tsx.
   heroImagePosition?: string;
   meta: { label: string; value: string }[];
