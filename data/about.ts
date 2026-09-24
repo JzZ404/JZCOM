@@ -49,10 +49,10 @@ export const about: AboutData = {
   ],
   experience: [
     {
-      role: "Design Technologist",
-      org: "Aithreus",
-      timeframe: "Jun 2026 – Sep 2026",
-      location: "Las Vegas",
+      role: "Design Technologist (Contract)",
+      org: "DLAB Scientific Inc.",
+      timeframe: "Nov 2025 – Feb 2026",
+      location: "Riverside, CA",
     },
     {
       role: "UI/UX Intern",
