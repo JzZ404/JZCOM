@@ -1,8 +1,9 @@
 "use client";
 
+import { Fragment, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import type { AboutData } from "@/data/about";
-import HobbyCarousel from "@/components/HobbyCarousel";
+import GradientCarousel from "@/components/GradientCarousel";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -31,6 +32,38 @@ function Entry({ title, subtitle }: { title: React.ReactNode; subtitle: React.Re
   );
 }
 
+// Education-specific row: a school logo slot alongside the text, plus its
+// own divider control instead of EntryList's blanket divide-y — consecutive
+// entries from the same school (the three UCSD degrees/minor) share one
+// shown logo and read as one group with no rule between them, while the
+// logo's slot still reserves its width on every row so the text column
+// keeps lining up whether or not that row shows a mark.
+function EducationEntry({
+  degree,
+  subtitle,
+  logo,
+  divider,
+}: {
+  degree: React.ReactNode;
+  subtitle: React.ReactNode;
+  logo?: string;
+  divider: boolean;
+}) {
+  return (
+    <div
+      className={`flex items-start gap-3 py-3 first:pt-0 last:pb-0 ${divider ? "border-t border-[var(--color-border)]" : ""}`}
+    >
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center">
+        {logo && <img src={logo} alt="" className="h-8 w-8 object-contain" />}
+      </div>
+      <div>
+        <div className="font-semibold text-[var(--color-fg)]">{degree}</div>
+        <div className="text-[14px] text-[var(--color-muted)]">{subtitle}</div>
+      </div>
+    </div>
+  );
+}
+
 // Colors + bolds each highlight phrase where it appears in `text` — same
 // "call out the key terms" treatment as the hero headline's UX/AI/Robotics
 // bolding, plus a hover shift so the keywords read as a little interactive.
@@ -51,6 +84,193 @@ function HighlightedText({ text, highlights }: { text: string; highlights: strin
           <span key={i}>{part}</span>
         ),
       )}
+    </>
+  );
+}
+
+// Final pick, per Joyce: "design technologist" and "3+ years" share the
+// same gentleWave style now (previously "3+ years" had its own taller
+// boldWave) — the only difference between the two is however many wave
+// repeats fit each phrase's own length, same as any other pair of
+// differently-sized gentleWave phrases. UX/product design/AI/robotics
+// settled on doubleWave (which robotics already had) since they read as
+// one grouped list in the sentence rather than individually distinct
+// terms.
+//
+// Styles are parametric (baseline/amplitude/half-wave-length in real
+// pixels), not a fixed path string stretched 0-100 — a fixed path
+// stretched to fit whatever width a phrase happens to render at made
+// short phrases' waves look "shrunk" (same wave count, squeezed into
+// less space) instead of just showing fewer waves at the same size. See
+// buildWavePath below, which repeats a fixed-size wave exactly as many
+// times as fits the phrase's own measured width.
+type UnderlineStyle = { baseline: number; amplitude: number; halfWave: number; offset?: number; viewBoxHeight: number };
+
+const UNDERLINE_STYLES = {
+  gentleWave: { baseline: 7, amplitude: 5, halfWave: 11, viewBoxHeight: 14 },
+  doubleWave: { baseline: 6, amplitude: 4, halfWave: 11, offset: 7, viewBoxHeight: 18 },
+} satisfies Record<string, UnderlineStyle>;
+
+// Explicit phrase -> style map, not a cycling index — this is the settled
+// pick, not the exploration round's "show a different one per phrase so
+// they're all visible at once." Phrases not listed here fall back to
+// gentleWave, though in practice every highlighted phrase has an entry.
+const STYLE_FOR_PHRASE: Record<string, UnderlineStyle> = {
+  "design technologist": UNDERLINE_STYLES.gentleWave,
+  "3+ years": UNDERLINE_STYLES.gentleWave,
+  UX: UNDERLINE_STYLES.doubleWave,
+  "product design": UNDERLINE_STYLES.doubleWave,
+  AI: UNDERLINE_STYLES.doubleWave,
+  robotics: UNDERLINE_STYLES.doubleWave,
+};
+
+// The "grouped list" phrases each get their own cursor emoji on hover —
+// "design technologist" and "3+ years" don't, since Joyce only called
+// out the four that read as one list in the sentence.
+const CURSOR_EMOJI_FOR_PHRASE: Record<string, string> = {
+  UX: "💭",
+  "product design": "🎨",
+  AI: "🪄",
+  robotics: "🤖",
+};
+
+// Encodes `emoji` as an inline SVG and uses it as the CSS cursor image —
+// same image-cursor technique the About page's cat cursor already uses
+// (see .about-cat-cursor in globals.css), just built from a live emoji
+// character instead of a PNG file. 16 16 centers the hotspot on the glyph.
+function emojiCursor(emoji: string): string {
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'><text x='16' y='23' font-size='26' text-anchor='middle'>${emoji}</text></svg>`;
+  return `url("data:image/svg+xml,${encodeURIComponent(svg)}") 16 16, pointer`;
+}
+
+// Builds a smooth wave spanning exactly `width` px, baseline at `baseline`,
+// swinging `amplitude` px either side, repeating roughly every `targetHalfWave`
+// px — rounded to a whole number of half-waves so the pattern always ends
+// cleanly at the right edge instead of cutting off mid-curve.
+function buildWavePath(width: number, baseline: number, amplitude: number, targetHalfWave: number): string {
+  const segments = Math.max(2, Math.round(width / targetHalfWave));
+  const halfWave = width / segments;
+  let d = `M0,${baseline} Q${halfWave / 2},${baseline - amplitude} ${halfWave},${baseline}`;
+  for (let i = 2; i <= segments; i++) {
+    d += ` T${halfWave * i},${baseline}`;
+  }
+  return d;
+}
+
+// One highlighted phrase — its own ref/measured-width state, since the
+// wave path has to be rebuilt in real pixels once we know how wide the
+// phrase actually rendered (see buildWavePath above).
+function HighlightedPhrase({
+  text,
+  style,
+  cursorEmoji,
+}: {
+  text: string;
+  style: UnderlineStyle;
+  cursorEmoji?: string;
+}) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [width, setWidth] = useState(0);
+
+  useEffect(() => {
+    function measure() {
+      if (ref.current) setWidth(ref.current.offsetWidth);
+    }
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
+
+  return (
+    // group + whileHover/initial on the parent, variants (not their own
+    // whileHover) on the paths below — Framer propagates the active
+    // variant name down to descendant motion components, so hovering
+    // this span is what drives the squiggle's draw-on, with no
+    // scale/zoom on the text itself. The color change is plain CSS
+    // (group-hover), not a Framer-animated value, since Framer can't
+    // tween between two var(--color-*) references. cursorEmoji (an
+    // inline style, not a class) overrides cursor-default below only
+    // for the phrases that have one.
+    <motion.span
+      ref={ref}
+      initial="rest"
+      whileHover="draw"
+      style={cursorEmoji ? { cursor: emojiCursor(cursorEmoji) } : undefined}
+      className="group relative inline-block cursor-default"
+    >
+      <span className="text-[var(--color-fg)] transition-colors duration-200 group-hover:text-[var(--color-primary-dark)]">
+        {text}
+      </span>
+      {/* Phrases with a custom cursor emoji skip the squiggle entirely —
+          the emoji cursor is the hover feedback for those, not a second
+          decoration stacked on top of it. */}
+      {width > 0 && !cursorEmoji && (
+        <svg
+          width={width}
+          height={style.viewBoxHeight}
+          viewBox={`0 0 ${width} ${style.viewBoxHeight}`}
+          aria-hidden
+          // calc(100% - 4px), not top-full — top-full sat right at the
+          // text line-box's own bottom edge, which left a visible gap
+          // under the actual glyphs once leading-relaxed widened that
+          // line-box. Pulling it up tucks it right under the letters.
+          className="absolute left-0 text-[var(--color-primary)]"
+          style={{ top: "calc(100% - 4px)" }}
+        >
+          <motion.path
+            d={buildWavePath(width, style.baseline, style.amplitude, style.halfWave)}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2.5}
+            strokeLinecap="round"
+            variants={{ rest: { pathLength: 0 }, draw: { pathLength: 1 } }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          />
+          {style.offset != null && (
+            <motion.path
+              d={buildWavePath(width, style.baseline + style.offset, style.amplitude, style.halfWave)}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2.5}
+              strokeLinecap="round"
+              variants={{ rest: { pathLength: 0 }, draw: { pathLength: 1 } }}
+              transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
+            />
+          )}
+        </svg>
+      )}
+    </motion.span>
+  );
+}
+
+// Same phrase-matching idea as HighlightedText above, but for the big
+// display header rather than running body copy — each match gets a
+// hand-drawn-style squiggle underneath instead of bold/color, and the
+// squiggle draws itself on left-to-right (Framer's pathLength) on hover,
+// not on scroll-into-view. A plain CSS color shift is the rest of the
+// "highlight it" effect — no scale/zoom, per Joyce.
+function SquiggleHighlight({ lines, highlights }: { lines: string[]; highlights: string[] }) {
+  const pattern = new RegExp(`(${highlights.map((h) => h.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})`, "g");
+
+  return (
+    <>
+      {lines.map((line, lineIndex) => (
+        <Fragment key={lineIndex}>
+          {lineIndex > 0 && <br />}
+          {line.split(pattern).map((part, i) =>
+            highlights.includes(part) ? (
+              <HighlightedPhrase
+                key={i}
+                text={part}
+                style={STYLE_FOR_PHRASE[part] ?? UNDERLINE_STYLES.gentleWave}
+                cursorEmoji={CURSOR_EMOJI_FOR_PHRASE[part]}
+              />
+            ) : (
+              <span key={i}>{part}</span>
+            ),
+          )}
+        </Fragment>
+      ))}
     </>
   );
 }
@@ -105,49 +325,64 @@ const SOCIAL_ICONS: Record<string, React.ReactNode> = {
 
 export default function AboutPageContent({ about }: { about: AboutData }) {
   return (
-    <section
-      style={{
-        cursor:
-          "image-set(url(/images/about/cursor-cat-1x.png) 1x, url(/images/about/cursor-cat-2x.png) 2x) 14 14, auto",
-      }}
-      className="about-cat-cursor mx-auto max-w-6xl px-3 pt-6 pb-20"
-    >
-      <BoldReveal className="mb-14 grid grid-cols-1 gap-10 sm:grid-cols-[420px_1fr] sm:items-center">
-        <img
-          src={about.photo}
-          alt="Joyce Zhou"
-          width={600}
-          height={900}
-          style={{ borderRadius: "63% 37% 54% 46% / 43% 37% 63% 57%" }}
-          className="cursor-sparkle aspect-[4/5] w-full object-cover"
-        />
-        <div>
-          <h1 className="mb-8 font-serif text-[32px] leading-tight font-bold text-[var(--color-fg)]">
-            {about.introHeader}
-          </h1>
-          <p className="text-[20px] leading-relaxed text-[var(--color-fg)]">
-            <HighlightedText text={about.introBody} highlights={about.introHighlights} />
-          </p>
-        </div>
+    // Cat cursor retired per Joyce — back to the system default. The
+    // .about-cat-cursor rule itself (and .cursor-sparkle on individual
+    // elements below) is left in globals.css/HobbyCarousel.tsx rather
+    // than deleted; dropping this className is what actually turns it
+    // off, since nothing else applies that class.
+    <section className="mx-auto max-w-6xl px-3 pt-2 pb-20">
+      {/* Gallery leads the page now — Joyce's headshot sits in it as the
+          middle/default-active card (see about.ts), so this does double
+          duty as both the hobby gallery and the page's lead visual. No
+          "Outside of Work" label here; that heading made sense further
+          down the page, not as the very first thing before any intro. */}
+      <BoldReveal className="mb-4 drop-shadow-[0px_14px_28px_rgba(0,0,0,0.14)]">
+        <GradientCarousel hobbies={about.hobbies} />
+      </BoldReveal>
+
+      <BoldReveal className="mx-auto mb-14 text-center" delay={0.1}>
+        {/* Wider than the body paragraph below on purpose — stretched out
+            so this wraps to three lines instead of four or five, per
+            Joyce, rather than matching the body's narrower reading width.
+            leading-relaxed (not leading-tight) gives the now-3-line
+            header more breathing room between lines. */}
+        <h1 className="mx-auto mb-6 max-w-6xl font-serif text-[32px] leading-relaxed font-bold text-[var(--color-fg)]">
+          <SquiggleHighlight lines={about.introHeaderLines} highlights={about.introHeaderHighlights} />
+        </h1>
+        {/* max-w-[823px] isn't an arbitrary round number — it's the
+            measured width of the header's own third line ("moving
+            across UX, product design, AI, and robotics.") at a standard
+            desktop viewport, so this paragraph's own edges line up with
+            that line's, not just share the same vague "narrower" idea
+            max-w-2xl (672px) gave it before. */}
+        <p className="mx-auto max-w-[823px] text-[20px] leading-relaxed text-[var(--color-fg)]">
+          <HighlightedText text={about.introBody} highlights={about.introHighlights} />
+        </p>
       </BoldReveal>
 
       <div className="mb-14 grid grid-cols-1 gap-x-12 gap-y-14 sm:grid-cols-2">
         <BoldReveal>
           <Section title="Education">
-            <EntryList>
-              {about.education.map((item, i) => (
-                <Entry
-                  key={i}
-                  title={item.degree}
-                  subtitle={
-                    <>
-                      {item.school}
-                      {item.timeframe && <> · {item.timeframe}</>}
-                    </>
-                  }
-                />
-              ))}
-            </EntryList>
+            <div>
+              {about.education.map((item, i) => {
+                const prev = about.education[i - 1];
+                const sameGroup = i > 0 && prev.school === item.school;
+                return (
+                  <EducationEntry
+                    key={i}
+                    degree={item.degree}
+                    subtitle={
+                      <>
+                        {item.school}
+                        {item.timeframe && <> · {item.timeframe}</>}
+                      </>
+                    }
+                    logo={sameGroup ? undefined : item.logo}
+                    divider={i > 0 && !sameGroup}
+                  />
+                );
+              })}
+            </div>
           </Section>
         </BoldReveal>
 
@@ -168,7 +403,7 @@ export default function AboutPageContent({ about }: { about: AboutData }) {
 
       <div className="mb-14 grid grid-cols-1 gap-x-12 gap-y-14 sm:grid-cols-2">
         <BoldReveal>
-          <Section title="Competitions & Hackathons">
+          <Section title="Hackathons">
             <EntryList>
               {about.competitions.map((item, i) => (
                 <Entry
@@ -179,14 +414,22 @@ export default function AboutPageContent({ about }: { about: AboutData }) {
                       {item.result && <> — {item.result}</>}
                     </>
                   }
-                  subtitle={`${item.role} · ${item.host} · ${item.timeframe}`}
+                  // host · timeframe, matching Experience's own
+                  // location-then-date subtitle pattern (host standing
+                  // in for location here, since competitions don't have
+                  // a separate location field) — role no longer shown
+                  // on this line, though it stays in the data.
+                  subtitle={`${item.host} · ${item.timeframe}`}
                 />
               ))}
             </EntryList>
           </Section>
         </BoldReveal>
 
-        <BoldReveal delay={0.1} className="flex flex-col gap-14">
+        {/* gap-[25.5px], not gap-14 (56px) — tightened by exactly the
+            measured overshoot so Certifications' own bottom edge lines
+            up with Competitions' bottom edge in the column beside it. */}
+        <BoldReveal delay={0.1} className="flex flex-col gap-[25.5px]">
           <Section title="Leadership">
             <EntryList>
               {about.leadership.map((item, i) => (
@@ -206,12 +449,6 @@ export default function AboutPageContent({ about }: { about: AboutData }) {
           </Section>
         </BoldReveal>
       </div>
-
-      <BoldReveal className="mb-14">
-        <Section title="Outside of Work">
-          <HobbyCarousel hobbies={about.hobbies} />
-        </Section>
-      </BoldReveal>
 
       <BoldReveal>
         <Section title="Connect">

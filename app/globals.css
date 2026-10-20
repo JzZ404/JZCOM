@@ -278,6 +278,15 @@ html::-webkit-scrollbar {
     pointer;
 }
 
+/* UserCursor's pill targets (hero headline terms, project cards) — these
+   plain <span>s would otherwise show the text-selection I-beam by default,
+   which reads as "editable text," not "hover for more." A pointer signals
+   the same "something will happen here" affordance a real link gives,
+   even though most of these spans aren't links themselves. */
+[data-cursor-pill] {
+  cursor: pointer;
+}
+
 /*
  * Static film grain over the whole site. Plain feTurbulence renders as a soft
  * gray haze at low opacity — barely visible. The feColorMatrix below pushes

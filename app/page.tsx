@@ -6,15 +6,17 @@ export default function Home() {
     <>
       <HeroSection
         name="Joyce Zhou"
+        namePill="Yes, It's Me, Welcome!"
         leadWord="A"
         headlineLine1="Design Technologist"
+        headlineLine1Pill="Design → Prototype → Code"
         headlineLine2={[
           { text: "working across " },
-          { text: "UX" },
+          { text: "UX", cursorPill: "From User Insight To Interface" },
           { text: ", " },
-          { text: "AI" },
+          { text: "AI", cursorPill: "Designing With + For AI" },
           { text: ", and " },
-          { text: "Robotics" },
+          { text: "Robotics", cursorPill: "Human-Robot Interaction" },
           { text: "." },
         ]}
       />

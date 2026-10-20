@@ -75,7 +75,12 @@ export default function ProjectCard({
       variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }}
       transition={{ duration: 0.5, ease: "easeOut" }}
     >
-      <Link href={`/work/${project.slug}`} onClick={handleClick} className="group relative block">
+      <Link
+        href={`/work/${project.slug}`}
+        onClick={handleClick}
+        data-cursor-pill="View Project"
+        className="group relative block"
+      >
         {/* Two-layer key+ambient shadows follow Material Design 3's elevation
             tokens (rest ≈ M3 level 1, hover ≈ level 3) rather than a single
             flat drop-shadow — that's what gives real M3 elevation its depth. */}

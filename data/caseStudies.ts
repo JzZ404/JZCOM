@@ -393,8 +393,8 @@ export const alioCaseStudy: CaseStudyAlio = {
 // Teammates are credited by role only (not name/photo) in `meta`, same
 // convention as Alio's "Team: 4 — Designers, AI Engineer, PM" — matches
 // how the rest of the site handles team credit without individual profiles.
-// tldr and Timeline stay PLACEHOLDER — the deck doesn't date the project or
-// include Joyce's own one-line summary of it.
+// tldr stays PLACEHOLDER — Joyce hasn't given a one-line summary of the
+// project yet. Timeline is confirmed: Mar 2025 – Jun 2025.
 export type CaseStudyHelport = {
   title: string;
   subheading: string;
@@ -543,7 +543,7 @@ export const helportCaseStudy: CaseStudyHelport = {
     { label: "Role", value: "Product Experience Designer" },
     { label: "For", value: "U.S. health insurance agents and members" },
     { label: "Team", value: "4 — Software Eng, Backend Eng, Business Strategist, Product Designer" },
-    { label: "Timeline", value: PLACEHOLDER },
+    { label: "Timeline", value: "Mar 2025 – Jun 2025" },
   ],
   research: {
     intro:

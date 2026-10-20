@@ -7,16 +7,24 @@ import { motion, useScroll, useTransform } from "framer-motion";
 type HeadlineSegment = {
   text: string;
   bold?: boolean;
+  // Text shown in UserCursor's trailing pill while hovering this specific
+  // word/phrase — e.g. "UX" shows "user researcher + interaction designer".
+  // Undefined means this segment isn't one of the hoverable terms.
+  cursorPill?: string;
 };
 
 type HeroSectionProps = {
   name: string;
+  namePill?: string; // cursor-pill text for hovering the name itself
   leadWord: string; // regular-weight lead-in, e.g. "A"
   headlineLine1: string; // bold, continues leadWord on the same visual line
+  headlineLine1Pill?: string; // cursor-pill text for hovering headlineLine1
   headlineLine2: HeadlineSegment[]; // mixed weight, forced onto its own line
 };
 
-type Run = { kind: "text"; text: string; className: string; highlight?: boolean } | { kind: "break" };
+type Run =
+  | { kind: "text"; text: string; className: string; highlight?: boolean; cursorPill?: string }
+  | { kind: "break" };
 
 const TYPE_SPEED_MS = 45;
 const GRADIENT_WORD_CLASS =
@@ -36,11 +44,12 @@ function useTypewriterProgress(totalLength: number, speed: number) {
 function buildHeadlineRuns(
   leadWord: string,
   headlineLine1: string,
+  headlineLine1Pill: string | undefined,
   headlineLine2: HeadlineSegment[],
 ): Run[] {
   return [
     { kind: "text", text: `${leadWord} `, className: "font-normal" },
-    { kind: "text", text: headlineLine1, className: GRADIENT_WORD_CLASS },
+    { kind: "text", text: headlineLine1, className: GRADIENT_WORD_CLASS, cursorPill: headlineLine1Pill },
     { kind: "break" },
     ...headlineLine2.map(
       (segment): Run => ({
@@ -48,6 +57,7 @@ function buildHeadlineRuns(
         text: segment.text,
         className: segment.bold ? "font-bold" : "font-normal",
         highlight: HIGHLIGHTED_WORDS.includes(segment.text),
+        cursorPill: segment.cursorPill,
       }),
     ),
   ];
@@ -56,9 +66,10 @@ function buildHeadlineRuns(
 function TypewriterHeadline({
   leadWord,
   headlineLine1,
+  headlineLine1Pill,
   headlineLine2,
-}: Pick<HeroSectionProps, "leadWord" | "headlineLine1" | "headlineLine2">) {
-  const runs = buildHeadlineRuns(leadWord, headlineLine1, headlineLine2);
+}: Pick<HeroSectionProps, "leadWord" | "headlineLine1" | "headlineLine1Pill" | "headlineLine2">) {
+  const runs = buildHeadlineRuns(leadWord, headlineLine1, headlineLine1Pill, headlineLine2);
   const totalLength = runs.reduce((sum, r) => (r.kind === "text" ? sum + r.text.length : sum), 0);
   const revealed = useTypewriterProgress(totalLength, TYPE_SPEED_MS);
 
@@ -84,7 +95,7 @@ function TypewriterHeadline({
 
     nodes.push(
       run.highlight ? (
-        <span key={i} className="relative inline-block">
+        <span key={i} data-cursor-pill={run.cursorPill} className="relative inline-block">
           <span className={`relative z-10 ${run.className}`}>{content}</span>
           <motion.span
             initial={false}
@@ -94,7 +105,7 @@ function TypewriterHeadline({
           />
         </span>
       ) : (
-        <span key={i} className={run.className}>
+        <span key={i} data-cursor-pill={run.cursorPill} className={run.className}>
           {content}
         </span>
       ),
@@ -117,8 +128,9 @@ function TypewriterHeadline({
   );
 }
 
-function LetterStaggerGreeting({ name }: { name: string }) {
-  const chars = Array.from(`Hi! I’m ${name}`);
+function LetterStaggerGreeting({ name, namePill }: { name: string; namePill?: string }) {
+  const prefixChars = Array.from("Hi! I’m ");
+  const nameChars = Array.from(name);
   return (
     <motion.p
       initial="hidden"
@@ -126,15 +138,26 @@ function LetterStaggerGreeting({ name }: { name: string }) {
       variants={{ hidden: {}, show: { transition: { staggerChildren: 0.035 } } }}
       className="font-serif text-[length:var(--text-greeting)] text-[var(--color-fg)]"
     >
-      {chars.map((char, i) => (
+      {prefixChars.map((char, i) => (
         <motion.span
-          key={i}
+          key={`prefix-${i}`}
           variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
           className="inline-block"
         >
           {char === " " ? " " : char}
         </motion.span>
       ))}
+      <span data-cursor-pill={namePill}>
+        {nameChars.map((char, i) => (
+          <motion.span
+            key={`name-${i}`}
+            variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
+            className="inline-block"
+          >
+            {char === " " ? " " : char}
+          </motion.span>
+        ))}
+      </span>
       <span aria-hidden>👋</span>
     </motion.p>
   );
@@ -186,8 +209,10 @@ function ScrollHintArrow() {
 
 export default function HeroSection({
   name,
+  namePill,
   leadWord,
   headlineLine1,
+  headlineLine1Pill,
   headlineLine2,
 }: HeroSectionProps) {
   const { scrollY } = useScroll();
@@ -197,11 +222,12 @@ export default function HeroSection({
   return (
     <section className="relative mx-auto flex h-full min-h-[600px] max-w-6xl flex-col items-center justify-center px-3 text-center">
       <motion.div style={{ opacity: textOpacity, y: textY }}>
-        <LetterStaggerGreeting name={name} />
+        <LetterStaggerGreeting name={name} namePill={namePill} />
         <h1 className="mt-4 min-h-[2.3em] font-serif text-[length:var(--text-display)] leading-[1.15] tracking-tight text-[var(--color-fg)]">
           <TypewriterHeadline
             leadWord={leadWord}
             headlineLine1={headlineLine1}
+            headlineLine1Pill={headlineLine1Pill}
             headlineLine2={headlineLine2}
           />
         </h1>

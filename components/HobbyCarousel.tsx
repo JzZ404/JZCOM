@@ -4,7 +4,10 @@ import { useRef } from "react";
 import { motion } from "framer-motion";
 import PlaceholderBlock from "./case-study/PlaceholderBlock";
 
-export type Hobby = { label: string; image?: string; zoom?: number };
+// objectPosition is CSS object-position verbatim — for a photo whose
+// focal point isn't dead center (e.g. a headshot that gets top-cropped at
+// a square aspect ratio), same convention as Project.coverPosition.
+export type Hobby = { label: string; image?: string; zoom?: number; objectPosition?: string };
 
 // Slight alternating tilt per card, same "pinned photo" playfulness as the
 // case-study sticky notes, rather than a flat uniform grid.

@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/next";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import ThemeToggle from "@/components/ThemeToggle";
+import UserCursor from "@/components/UserCursor";
 import "./globals.css";
 
 // Runs before hydration so an explicit saved theme applies with no flash.
@@ -75,6 +76,7 @@ export default function RootLayout({
         <Footer />
         {/* Dark mode temporarily disabled — bring the toggle back with it. */}
         {/* <ThemeToggle /> */}
+        <UserCursor />
         <Analytics />
       </body>
     </html>
