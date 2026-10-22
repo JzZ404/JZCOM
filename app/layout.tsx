@@ -6,6 +6,7 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import ThemeToggle from "@/components/ThemeToggle";
 import UserCursor from "@/components/UserCursor";
+import Nomi from "@/components/nomi/Nomi";
 import "./globals.css";
 
 // Runs before hydration so an explicit saved theme applies with no flash.
@@ -77,6 +78,7 @@ export default function RootLayout({
         {/* Dark mode temporarily disabled — bring the toggle back with it. */}
         {/* <ThemeToggle /> */}
         <UserCursor />
+        <Nomi />
         <Analytics />
       </body>
     </html>

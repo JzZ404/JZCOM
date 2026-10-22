@@ -139,6 +139,19 @@
   }
 }
 
+/* components/nomi/NomiSprite.tsx — start/end come from the measured viewport width, passed
+   in as --walk-from / --walk-to. A CSS transform animation (not Framer) so
+   the walk keeps a steady pace on the compositor even when the main thread
+   is busy. */
+@keyframes cat-walk-in {
+  from {
+    transform: translateX(var(--walk-from));
+  }
+  to {
+    transform: translateX(var(--walk-to));
+  }
+}
+
 @keyframes glitch-shift-1 {
   0% {
     transform: translate(0, 0);
