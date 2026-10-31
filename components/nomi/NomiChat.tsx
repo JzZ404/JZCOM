@@ -128,7 +128,7 @@ export default function NomiChat({ open, onClose }: { open: boolean; onClose: ()
             {/* Conversation. flex column so the empty-state prompts can take
                 mt-auto and sit at the bottom, right above the input. */}
             <LayoutGroup>
-              <div ref={listRef} className="flex flex-1 flex-col gap-3 overflow-y-auto px-4 py-4" aria-live="polite">
+              <div ref={listRef} className="no-scrollbar flex flex-1 flex-col gap-3 overflow-y-auto px-4 py-4" aria-live="polite">
                 <NomiRow>{nomiChat.greeting}</NomiRow>
 
                 <AnimatePresence>
