@@ -1,16 +1,21 @@
 // Eyedropper for the project-card sparkle: reads the cover image/video at
-// the click and returns two colors from that spot — the color right under
-// the click, and the most different color close around it, so the sparkle
-// gets a real two-color gradient rather than one flat color. Returns null if
-// the pixels can't be read (media not loaded yet, or the browser blocks it),
-// so the caller can fall back to its default colors.
+// the click and returns two colors from that spot — the nearest *colorful*
+// pixel to the click, and a second colorful one around it that differs from
+// it, so the sparkle gets a real two-color gradient. Greys, near-black and
+// near-white are skipped: photos are full of them, and picking them made the
+// sparkle read as grey. Returns null if there's no real color near the click
+// or the pixels can't be read (media not loaded yet, or the browser blocks
+// it), so the caller can fall back to its default colors.
 
 // The cover's visible area is sampled on a grid this many cells wide (a cell
-// is ~5px on a card) — fine enough that the first color is what's really
-// under the cursor, cheap enough to do on every click.
+// is ~5px on a card) — fine enough that the picked color is what's really
+// near the cursor, cheap enough to do on every click.
 const GRID = 120;
-// How far around the click (in grid cells, ~60px) to look for the second color.
-const RADIUS = 12;
+// How far (in grid cells, ~100px) past the closest color to keep looking.
+const RADIUS = 20;
+// Minimum colorfulness (max−min channel, 0–255) for a pixel to count as a
+// color rather than a grey.
+const MIN_CHROMA = 45;
 
 type RGB = [number, number, number];
 
@@ -61,31 +66,48 @@ export function pickColorsAt(
   const cx = Math.round((localX / rect.width) * (cols - 1));
   const cy = Math.round((localY / rect.height) * (rows - 1));
 
-  // First color: the cell right under the click
-  const first = pixel(cx, cy);
-
-  // Second color: the most different one nearby
-  let second = first;
-  let best = 0;
-  for (let y = Math.max(0, cy - RADIUS); y <= Math.min(rows - 1, cy + RADIUS); y++) {
-    for (let x = Math.max(0, cx - RADIUS); x <= Math.min(cols - 1, cx + RADIUS); x++) {
-      const p = pixel(x, y);
-      const d = distance(p, first);
-      if (d > best) {
-        best = d;
-        second = p;
-      }
+  // Every colorful pixel on the cover, with how far it is from the click.
+  // Colors come from around the click when there are any; on an area with
+  // none (white UI, cream paper), from the nearest color anywhere on it.
+  const colorful: { color: RGB; dist: number }[] = [];
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      const color = pixel(x, y);
+      if (chroma(color) >= MIN_CHROMA) colorful.push({ color, dist: Math.hypot(x - cx, y - cy) });
     }
   }
+  if (colorful.length === 0) return null;
+  const closest = Math.min(...colorful.map((p) => p.dist));
+  const nearby = colorful.filter((p) => p.dist <= closest + RADIUS);
 
-  // A flat area (one solid color) has no real second color — use a lighter
-  // or darker shade of the first instead, so there's still a gradient.
-  if (best < 40) {
+  // First color: the closest colorful pixel (more colorful wins a near tie)
+  const first = nearby.reduce((a, b) =>
+    b.dist - chroma(b.color) / 40 < a.dist - chroma(a.color) / 40 ? b : a,
+  ).color;
+
+  // Second color: colorful and different from the first, favoring the most
+  // vivid; with nothing different enough nearby, a lighter or darker shade
+  // of the first so there's still a gradient.
+  let second: RGB | null = null;
+  let best = 0;
+  for (const { color } of nearby) {
+    const d = distance(color, first);
+    const score = d * chroma(color);
+    if (d >= 60 && score > best) {
+      best = score;
+      second = color;
+    }
+  }
+  if (!second) {
     const light = (first[0] * 0.299 + first[1] * 0.587 + first[2] * 0.114) / 255 > 0.5;
     second = first.map((v) => Math.round(light ? v * 0.6 : v + (255 - v) * 0.5)) as RGB;
   }
 
   return [rgb(first), rgb(second)];
+}
+
+function chroma([r, g, b]: RGB) {
+  return Math.max(r, g, b) - Math.min(r, g, b);
 }
 
 function distance(a: RGB, b: RGB) {

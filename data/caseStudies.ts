@@ -602,6 +602,15 @@ export type CaseStudyHelport = {
     external: { source: string; useCase: string; result: string }[];
     impact: { value: string; label: string; detail: string }[];
   };
+  // Closing section: the competition result beside its LinkedIn post, shown
+  // with LinkedIn's own embed (the post must stay public for it to load).
+  // `embedHeight` is the height LinkedIn's embed code specifies.
+  recognition?: {
+    result: string;
+    event: string;
+    year: string;
+    post: { embedUrl: string; url: string; embedHeight: number };
+  };
   sections: CaseStudySkeletonSection[];
 };
 
@@ -1077,6 +1086,16 @@ export const helportCaseStudy: CaseStudyHelport = {
         detail: "Real-time QA and intelligent labeling help prevent costly HIPAA/CMS violations",
       },
     ],
+  },
+  recognition: {
+    result: "3rd Place",
+    event: "Helport AI Innovation Competition",
+    year: "2025",
+    post: {
+      embedUrl: "https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7338286617318621184",
+      url: "https://www.linkedin.com/feed/update/urn:li:ugcPost:7338286617318621184/",
+      embedHeight: 1048,
+    },
   },
   sections: [],
 };

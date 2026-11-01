@@ -8,6 +8,8 @@ import CaseStudyShell from "./CaseStudyShell";
 import CaseStudySection from "./CaseStudySection";
 import Reveal from "./Reveal";
 import IconBadge from "./IconBadge";
+import LinkedInPostEmbed from "./LinkedInPostEmbed";
+import { ArrowUpRight } from "lucide-react";
 import type { IconName } from "@/components/icons";
 
 // Helport's local visual system for this case-study page.
@@ -896,6 +898,7 @@ export default function HelportCaseStudyPage({
     { id: "competitive", label: "Competitor Analysis" },
     { id: "pricing", label: "Pricing Model" },
     { id: "outcomes", label: "Quantitative Outcomes" },
+    ...(caseStudy.recognition ? [{ id: "recognition", label: "Recognition" }] : []),
     ...caseStudy.sections.map((section) => ({ id: section.id, label: section.title })),
   ];
 
@@ -1064,6 +1067,42 @@ export default function HelportCaseStudyPage({
           ))}
         </div>
       </CaseStudySection>
+
+      {caseStudy.recognition && (
+        <CaseStudySection id="recognition" number="12 — Recognition" title="Recognition">
+          {/* The result as one row above the full-width post: what it was on
+              the left, the link to the original on the right */}
+          <Reveal variant="soft" className="mb-6 flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
+            <div>
+              <div className="font-serif text-[3rem] leading-none font-bold" style={{ color: HELPORT_MEDIUM }}>
+                {caseStudy.recognition.result}
+              </div>
+              <p className="mt-3 font-serif text-[20px] leading-snug font-bold text-[var(--color-fg)]">
+                {caseStudy.recognition.event}
+                <span className="ml-2 font-sans text-[15px] font-normal text-[var(--color-muted)]">
+                  {caseStudy.recognition.year}
+                </span>
+              </p>
+            </div>
+            <a
+              href={caseStudy.recognition.post.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-[14px] font-semibold transition-colors hover:bg-[color-mix(in_srgb,#0AD48C_12%,white)]"
+              style={{ borderColor: HELPORT_MINT, color: HELPORT_DARK }}
+            >
+              View on LinkedIn <ArrowUpRight aria-hidden className="h-4 w-4" strokeWidth={2} />
+            </a>
+          </Reveal>
+          <Reveal variant="scale" delay={0.1} className="mb-11">
+            <LinkedInPostEmbed
+              embedUrl={caseStudy.recognition.post.embedUrl}
+              height={caseStudy.recognition.post.embedHeight}
+              title={`LinkedIn post: ${caseStudy.recognition.event}, ${caseStudy.recognition.result}`}
+            />
+          </Reveal>
+        </CaseStudySection>
+      )}
     </CaseStudyShell>
   );
 }
