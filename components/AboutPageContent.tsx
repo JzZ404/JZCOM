@@ -2,13 +2,23 @@
 
 import { Fragment, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import {
+  BadgeCheck,
+  BriefcaseBusiness,
+  GraduationCap,
+  Handshake,
+  Trophy,
+  UsersRound,
+  type LucideIcon,
+} from "lucide-react";
 import type { AboutData } from "@/data/about";
 import GradientCarousel from "@/components/GradientCarousel";
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ title, icon: Icon, children }: { title: string; icon?: LucideIcon; children: React.ReactNode }) {
   return (
     <div>
-      <h2 className="mb-4 font-serif text-[length:var(--text-h2)] font-bold text-[var(--color-fg)]">
+      <h2 className="mb-4 flex items-center gap-3 font-serif text-[length:var(--text-h2)] font-bold text-[var(--color-fg)]">
+        {Icon && <Icon aria-hidden className="h-[0.9em] w-[0.9em] shrink-0 text-[var(--color-primary)]" strokeWidth={2} />}
         {title}
       </h2>
       {children}
@@ -362,7 +372,7 @@ export default function AboutPageContent({ about }: { about: AboutData }) {
 
       <div className="mb-14 grid grid-cols-1 gap-x-12 gap-y-14 sm:grid-cols-2">
         <BoldReveal>
-          <Section title="Education">
+          <Section title="Education" icon={GraduationCap}>
             <div>
               {about.education.map((item, i) => {
                 const prev = about.education[i - 1];
@@ -387,7 +397,7 @@ export default function AboutPageContent({ about }: { about: AboutData }) {
         </BoldReveal>
 
         <BoldReveal delay={0.1}>
-          <Section title="Professional Experience">
+          <Section title="Professional Experience" icon={BriefcaseBusiness}>
             <EntryList>
               {about.experience.map((item, i) => (
                 <Entry
@@ -403,7 +413,7 @@ export default function AboutPageContent({ about }: { about: AboutData }) {
 
       <div className="mb-14 grid grid-cols-1 gap-x-12 gap-y-14 sm:grid-cols-2">
         <BoldReveal>
-          <Section title="Hackathons">
+          <Section title="Hackathons" icon={Trophy}>
             <EntryList>
               {about.competitions.map((item, i) => (
                 <Entry
@@ -430,7 +440,7 @@ export default function AboutPageContent({ about }: { about: AboutData }) {
             measured overshoot so Certifications' own bottom edge lines
             up with Competitions' bottom edge in the column beside it. */}
         <BoldReveal delay={0.1} className="flex flex-col gap-[25.5px]">
-          <Section title="Leadership">
+          <Section title="Leadership" icon={UsersRound}>
             <EntryList>
               {about.leadership.map((item, i) => (
                 <Entry key={i} title={`${item.role} — ${item.org}`} subtitle={item.timeframe} />
@@ -438,7 +448,7 @@ export default function AboutPageContent({ about }: { about: AboutData }) {
             </EntryList>
           </Section>
 
-          <Section title="Certifications">
+          <Section title="Certifications" icon={BadgeCheck}>
             <EntryList>
               {about.certifications.map((cert, i) => (
                 <div key={i} className="py-3 first:pt-0 last:pb-0">
@@ -451,7 +461,7 @@ export default function AboutPageContent({ about }: { about: AboutData }) {
       </div>
 
       <BoldReveal>
-        <Section title="Connect">
+        <Section title="Connect" icon={Handshake}>
           <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {about.socials.map((social, i) => (
               <li key={i}>

@@ -195,20 +195,22 @@ export default function DrunkyCaseStudyPage({
             directly means `gap` is now the only space between them. */}
         <div className="mb-11 grid grid-cols-1 gap-5 sm:grid-cols-[2fr_3fr] sm:gap-[40px]">
           {caseStudy.whyWeBuiltThis.image && (
-            <img
-              src={caseStudy.whyWeBuiltThis.image}
-              alt="Drunky bar setup — mini bottles and printed cocktail menus"
-              // aspect-[4/5] is the mobile fallback (natural sizing when
-              // stacked). At sm+ only, an explicit pixel height measured
-              // from the text column overrides it via a CSS var — a plain
-              // inline height would apply on mobile too, where the photo
-              // should keep its own aspect ratio instead of matching a
-              // full-width single-column text block. object-bottom crops
-              // off the top of the photo rather than the menus lower in
-              // frame.
-              className="aspect-[4/5] w-full rounded-xl object-cover object-bottom sm:aspect-auto sm:h-[var(--why-img-h)]"
-              style={whyImgHeight ? ({ "--why-img-h": `${whyImgHeight}px` } as React.CSSProperties) : undefined}
-            />
+            <Reveal variant="left">
+              <img
+                src={caseStudy.whyWeBuiltThis.image}
+                alt="Drunky bar setup — mini bottles and printed cocktail menus"
+                // aspect-[4/5] is the mobile fallback (natural sizing when
+                // stacked). At sm+ only, an explicit pixel height measured
+                // from the text column overrides it via a CSS var — a plain
+                // inline height would apply on mobile too, where the photo
+                // should keep its own aspect ratio instead of matching a
+                // full-width single-column text block. object-bottom crops
+                // off the top of the photo rather than the menus lower in
+                // frame.
+                className="aspect-[4/5] w-full rounded-xl object-cover object-bottom sm:aspect-auto sm:h-[var(--why-img-h)]"
+                style={whyImgHeight ? ({ "--why-img-h": `${whyImgHeight}px` } as React.CSSProperties) : undefined}
+              />
+            </Reveal>
           )}
           <div ref={whyTextRef} className="flex flex-col justify-start gap-5 self-start">
             <p className="text-[17px] leading-relaxed text-[var(--color-muted)]">
@@ -297,14 +299,16 @@ export default function DrunkyCaseStudyPage({
             zero letterboxing since width and height stay locked together. */}
         <div className="mb-6 grid grid-cols-1 items-center gap-8 sm:grid-cols-[3fr_2fr]">
           {caseStudy.pipeline.video && (
-            <video
-              src={caseStudy.pipeline.video.src}
-              className="aspect-[1720/1080] w-full rounded-2xl object-contain"
-              autoPlay
-              muted
-              loop
-              playsInline
-            />
+            <Reveal variant="left">
+              <video
+                src={caseStudy.pipeline.video.src}
+                className="aspect-[1720/1080] w-full rounded-2xl object-contain"
+                autoPlay
+                muted
+                loop
+                playsInline
+              />
+            </Reveal>
           )}
           <div className="flex flex-col gap-4">
             {caseStudy.pipeline.phases.map((phase, i) => (

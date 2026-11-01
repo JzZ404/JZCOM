@@ -10,6 +10,7 @@
 // haven't been supplied yet, so those stay PLACEHOLDER.
 
 import type { CaseStudyLink } from "@/components/case-study/CaseStudyLinkIcons";
+import type { IconName } from "@/components/icons";
 
 // Personas and journey maps are rendered as Joyce's actual research images
 // (the full infographic already carries the name/bio/goals/pains), rather
@@ -109,11 +110,13 @@ export type CaseStudyAlio = {
     image: string;
     blocks: { title: string; body: string }[];
   };
-  technicalStackImage: string;
+  // Rebuilt in code from the old technical-stack.png: one card per layer.
+  technicalStack: { title: string; icon: IconName; items: string[] }[];
   prototypeDemo: {
     features: {
       title: string;
       body: string;
+      icon?: IconName; // badge beside the title (components/icons.ts)
       // Several clips take turns in list order, looping; `caption` sits under
       // each. `side` puts a clip in the left or right column (default:
       // alternating). `playbackRate` sets its speed (1 = normal).
@@ -131,8 +134,10 @@ export type CaseStudyAlio = {
   aiRoadmap: {
     phases: { title: string; goal: string; steps: string[] }[];
   };
+  // Each risk is paired with the safeguard that answers it; `icon` shows
+  // what the safeguard does.
   responsibleAi: {
-    rows: { risk: string; impact: string; safeguard: string }[];
+    rows: { risk: string; impact: string; safeguard: { title: string; body: string; icon: IconName } }[];
   };
   sections: CaseStudySkeletonSection[];
 };
@@ -221,11 +226,45 @@ export const alioCaseStudy: CaseStudyAlio = {
       },
     ],
   },
-  technicalStackImage: "/images/alio/technical-stack.png",
+  technicalStack: [
+    {
+      title: "Frontend",
+      icon: "monitor-smartphone",
+      items: ["Next.js 14", "React 18", "TypeScript", "Tailwind CSS", "pnpm workspaces", "Claude Code"],
+    },
+    {
+      title: "AI Model",
+      icon: "brain-circuit",
+      items: [
+        "Gemma 4 E2B base model",
+        "Fine-tuned via QLoRA",
+        "998 clinical pairs",
+        "Served through Ollama",
+        "Runs fully on-device",
+      ],
+    },
+    {
+      title: "Model Behavior & Constraints",
+      icon: "braces",
+      items: [
+        "Structured JSON schemas",
+        "Programmatic output parsing",
+        "Deterministic over open-ended",
+        "256K-context symptom checks",
+        "Structured vs. freeform routing",
+      ],
+    },
+    {
+      title: "Data & Sync",
+      icon: "refresh-cw",
+      items: ["Supabase real-time sync", "Caregiver-to-family data layer", "Live updates across portals"],
+    },
+  ],
   prototypeDemo: {
     features: [
       {
         title: "Real-Time Arrival & Status",
+        icon: "map-pin",
         body: "Caregivers keep patient details, address, and contact info on their portal. When a caregiver arrives, one tap marks the visit as started, and family receives an instant notification that care is underway.",
         media: [
           { src: "/images/alio/feature1-caregiver.mp4", caption: "Caregiver Portal" },
@@ -234,6 +273,7 @@ export const alioCaseStudy: CaseStudyAlio = {
       },
       {
         title: "AI-Assisted Care Loop Messaging",
+        icon: "messages-square",
         body: "Family messages the caregiver directly, and every request is shared across the whole care loop so everyone stays on the same page. A language model reads each message and flags the ones that need attention, so nothing important slips past, and surfaces them in the caregiver's inbox.",
         media: [
           // Plays in this order: family 1, caregiver 1, family 2, caregiver 2, then loops.
@@ -245,11 +285,13 @@ export const alioCaseStudy: CaseStudyAlio = {
       },
       {
         title: "AI Visit Log & Post-Visit Report",
+        icon: "mic",
         body: "At the end of a visit, the caregiver records a voice memo. Alio's fine-tuned model turns that into a structured post-visit report, then flags anything that needs family's attention. Once the caregiver approves it, the report syncs to the family portal.",
         media: [{ src: "/images/alio/feature3.mp4", playbackRate: 0.75 }],
       },
       {
         title: "Family Q&A with AI",
+        icon: "message-circle-question",
         body: "After receiving a report, family can ask Alio follow-up questions directly. The model draws on the full patient history and logs to give specific, informed answers, general guidance and context, not diagnosis, especially useful when family has lost track of earlier details.",
         media: [{ src: "/images/alio/feature4.mp4", playbackRate: 0.75 }],
       },
@@ -375,28 +417,41 @@ export const alioCaseStudy: CaseStudyAlio = {
         risk: "Sensitive health data exposure",
         impact:
           "Symptom, medication, and behavioral data leaving the device could expose vulnerable seniors to privacy breaches",
-        safeguard: "On-device inference, data never leaves the device to generate a report",
+        safeguard: {
+          title: "On-device inference",
+          body: "Data never leaves the device to generate a report.",
+          icon: "smartphone",
+        },
       },
       {
         risk: "AI misdiagnosis or false reassurance",
         impact:
           "A wrong or overconfident AI read on a symptom could delay real care or cause unnecessary alarm",
-        safeguard:
-          "Flag-only outputs, the model surfaces concerns for a human to evaluate, never issues a diagnosis or standalone recommendation",
+        safeguard: {
+          title: "Flag-only outputs",
+          body: "The model surfaces concerns for a human to evaluate, never issues a diagnosis or standalone recommendation.",
+          icon: "flag",
+        },
       },
       {
         risk: "Errors reaching family unchecked",
         impact:
           "A misread voice log or hallucinated detail could reach family as if it were verified fact",
-        safeguard:
-          "Mandatory caregiver review, no report reaches family without human approval first",
+        safeguard: {
+          title: "Mandatory caregiver review",
+          body: "No report reaches family without human approval first.",
+          icon: "user-check",
+        },
       },
       {
         risk: "Family over-relying on AI for medical guidance",
         impact:
           "Follow-up questions in the family portal could be mistaken for actual clinical advice",
-        safeguard:
-          "Scoped Q&A, responses stay general and history-grounded, explicitly not diagnostic",
+        safeguard: {
+          title: "Scoped Q&A",
+          body: "Responses stay general and history-grounded, explicitly not diagnostic.",
+          icon: "message-circle-question",
+        },
       },
     ],
   },
@@ -441,7 +496,8 @@ export type CaseStudyHelport = {
   problemStatement: (string | { text: string; highlight: true })[];
   solution: {
     intro: string;
-    features: { title: string; body: string }[];
+    // `icon` replaces the "#1"-style numeral (components/icons.ts)
+    features: { title: string; body: string; icon?: IconName }[];
   };
   demoIterations: {
     // Final-prototype demo clips, rendered after the last iteration —
@@ -614,18 +670,22 @@ export const helportCaseStudy: CaseStudyHelport = {
     features: [
       {
         title: "Realtime Policy-Aware Guidance",
+        icon: "compass",
         body: "Empowers agents with instant, plan-specific answers triggered by live call transcription.",
       },
       {
         title: "Streamlined, Scripted Workflows",
+        icon: "list-checks",
         body: "Uses guided speech navigation to walk agents through complex, multi-step processes.",
       },
       {
         title: "Built-In Compliance Safeguards",
+        icon: "shield-check",
         body: "Detects and flags HIPAA/CMS risks during live calls, providing real-time corrective prompts to avoid legal violations and protect star ratings.",
       },
       {
         title: "Automated Call Summaries",
+        icon: "file-text",
         body: "Generates post-call summaries outlining key issues, coverage info, and next steps.",
       },
     ],
@@ -1124,7 +1184,31 @@ export type CaseStudySimple = {
   // `categories` (grouped title + items) renders as a grid of labeled
   // blocks with real text hierarchy. Falls back to a flat bullet `items`
   // list when a project doesn't have grouped categories yet.
-  technicalStack?: { image?: string; items?: string[]; categories?: { title: string; items: string[] }[] };
+  technicalStack?: {
+    image?: string;
+    items?: string[];
+    // `icon` shows beside the category title (components/icons.ts)
+    categories?: { title: string; icon?: IconName; items: string[] }[];
+  };
+  // Optional "how it works" section, rendered right after the Technical
+  // Stack: stages in order (joined by arrows), each holding its steps.
+  // `thresholdChart` adds an illustrated score-vs-time chart of a two-
+  // threshold switch (a Schmitt trigger): the state flips to `lowLabel` when
+  // the score falls below `low`, and back to `highLabel` only above `high`.
+  pipeline?: {
+    title: string;
+    intro?: string;
+    // `icon` picks the stage's node icon (components/icons.ts).
+    stages: { title: string; icon?: IconName; steps: { title: string; body: string }[] }[];
+    thresholdChart?: {
+      low: number;
+      high: number;
+      lowLabel: string;
+      highLabel: string;
+      title?: string;
+      caption?: string;
+    };
+  };
   whatsNext: string[];
 };
 
@@ -1166,26 +1250,32 @@ export const poopidexCaseStudy: CaseStudySimple = {
     categories: [
       {
         title: "Frontend",
+        icon: "monitor",
         items: ["Next.js 16", "React 19", "Tailwind v4"],
       },
       {
         title: "Backend",
+        icon: "server",
         items: ["Next.js API route", "Real-time streaming"],
       },
       {
         title: "AI Models",
+        icon: "brain-circuit",
         items: ["Claude Opus 4.7 — decider", "CLIP ViT-B/32 — fine-tuned", "Chain-of-thought reasoning"],
       },
       {
         title: "Training Data",
+        icon: "database",
         items: ["AnimalClue (Shinoda et al., ICCV 2025)", "Feces-specific subset"],
       },
       {
         title: "Filtering",
+        icon: "filter",
         items: ["Size, habitat, contents", "Hard biological rules"],
       },
       {
         title: "Infrastructure",
+        icon: "cloud",
         items: ["Vercel — frontend hosting", "Hugging Face Spaces — CLIP inference", "Local storage — no signup"],
       },
     ],
@@ -1204,6 +1294,8 @@ export const focusfarmCaseStudy: CaseStudySimple = {
   tldr: PLACEHOLDER,
   heroLabel: "hero screenshot — FocusFarm",
   heroImage: "/images/focusfarm/cover.png",
+  // Same video as the Work grid card (projects.ts)
+  heroVideo: "/images/focusfarm/cover video.mov",
   // Same reason as the Work grid card's coverPosition: the "FOCUS FARM"
   // wordmark sits near the left edge, which a centered 16:9 crop clips.
   heroImagePosition: "left center",
@@ -1248,6 +1340,67 @@ export const focusfarmCaseStudy: CaseStudySimple = {
         items: ["Vercel — auto-deploy on push", "GitHub Actions — CI on every PR"],
       },
     ],
+  },
+  // Condensed from the FocusFarm repo's attention-phase log and classifier
+  // code (summary from the project's agent, Oct 2026). Kept role-neutral:
+  // Joyce was Project Owner / PM — Murphy Wei built the app.
+  pipeline: {
+    title: "Detection Pipeline",
+    intro:
+      "How FocusFarm decides whether you're focused. Detection, scoring, and coin rewards all run client-side in the browser, with progress saved to local storage.",
+    stages: [
+      {
+        title: "Sense",
+        icon: "scan-face",
+        steps: [
+          {
+            title: "Face Landmarks",
+            body: "MediaPipe FaceLandmarker tracks the face on every new webcam frame.",
+          },
+          {
+            title: "Raw Signals",
+            body: "Head pose (yaw and pitch, corrected for tilt), eye openness, and iris gaze.",
+          },
+        ],
+      },
+      {
+        title: "Decide",
+        icon: "gauge",
+        steps: [
+          {
+            title: "Calibration",
+            body: "A quick eye check sets each person's own \"eyes closed\" threshold, and a 3-second onboarding saves their neutral pose. Smoothing runs on time, not frame count, so 30 and 60 fps behave the same.",
+          },
+          {
+            title: "Soft Scoring",
+            body: "Eyes, head angle, and gaze each score 0 to 1. The focus score is the lowest of the three, which also names the reason: eyes closed, head turned, or looking away.",
+          },
+          {
+            title: "Focus State",
+            body: "Two thresholds instead of one, so the state doesn't flicker back and forth.",
+          },
+        ],
+      },
+      {
+        title: "Reward",
+        icon: "coins",
+        steps: [
+          {
+            title: "Coin Rewards",
+            body: "The focus score is added up every second, so half-focus earns half credit, then turned into coins with a tier multiplier from 0.5× to 2×.",
+          },
+        ],
+      },
+    ],
+    thresholdChart: {
+      low: 0.35,
+      high: 0.6,
+      lowLabel: "Distracted",
+      highLabel: "Focused",
+      title: "Why the state doesn't flicker",
+      caption:
+        "A Schmitt trigger uses two thresholds: the state switches to distracted only below 0.35, and back to focused only above 0.6. A dip between the lines changes nothing, and each state holds for at least 600 ms.",
+    },
   },
   whatsNext: [
     "Unlockable farmland — new plots open up as focus hours accumulate",
@@ -1524,9 +1677,10 @@ export type CaseStudyPelican = {
     images: { src: string; alt: string }[];
     story: (string | { text: string; emphasis: true })[];
   };
+  // `icon` fields name a Lucide icon from components/icons.ts.
   systemArchitecture: {
-    stages: { title: string; body: string; items: string[] }[];
-    hardware: string[];
+    stages: { title: string; icon?: IconName; body: string; items: string[] }[];
+    hardware: { name: string; icon?: IconName }[];
     note: string;
   };
   designProcess: {
@@ -1534,7 +1688,7 @@ export type CaseStudyPelican = {
     caption: string;
   };
   pipeline: {
-    states: { title: string; body: string }[];
+    states: { title: string; icon?: IconName; body: string }[];
     interrupt: { title: string; body: string };
     videos: { src: string; caption: string }[];
     summary: string;
@@ -1576,6 +1730,7 @@ export const pelicanCaseStudy: CaseStudyPelican = {
     stages: [
       {
         title: "Perception",
+        icon: "radar",
         body: "Camera + LiDAR",
         items: [
           "RGB/USB camera + YOLOv8 — detects trash in real time",
@@ -1585,6 +1740,7 @@ export const pelicanCaseStudy: CaseStudyPelican = {
       },
       {
         title: "Compute",
+        icon: "cpu",
         body: "Split across two nodes",
         items: [
           "Raspberry Pi 3B+ — hardware drivers, motor control, LiDAR",
@@ -1594,6 +1750,7 @@ export const pelicanCaseStudy: CaseStudyPelican = {
       },
       {
         title: "Control",
+        icon: "sliders-horizontal",
         body: "PID tracking + lid actuation",
         items: [
           "Custom PID node — angular + linear alignment",
@@ -1603,12 +1760,12 @@ export const pelicanCaseStudy: CaseStudyPelican = {
       },
     ],
     hardware: [
-      "TurtleBot3 Waffle base",
-      "LDS-01 360° LiDAR",
-      "RGB/USB camera",
-      "Dynamixel motors ×2 (wheels) + ×1 (lid)",
-      "OpenCR microcontroller",
-      "Raspberry Pi 3B+",
+      { name: "TurtleBot3 Waffle base", icon: "bot" },
+      { name: "LDS-01 360° LiDAR", icon: "radar" },
+      { name: "RGB/USB camera", icon: "camera" },
+      { name: "Dynamixel motors ×2 (wheels) + ×1 (lid)", icon: "cog" },
+      { name: "OpenCR microcontroller", icon: "circuit-board" },
+      { name: "Raspberry Pi 3B+", icon: "microchip" },
     ],
     note: "Detection runs off-robot: the desktop handles YOLOv8 inference and sends tracking commands back to the Pi over the network.",
   },
@@ -1621,18 +1778,22 @@ export const pelicanCaseStudy: CaseStudyPelican = {
     states: [
       {
         title: "Wander",
+        icon: "footprints",
         body: "Explores at a steady 0.12 m/s, using LiDAR to avoid obstacles while the camera scans for trash.",
       },
       {
         title: "Track",
+        icon: "scan-search",
         body: "Once YOLO detects an object, PID control steers toward it — up to 0.25 m/s forward, 0.8 rad/s turning, aligning within a 20px deadband.",
       },
       {
         title: "Aim",
+        icon: "crosshair",
         body: "Fine positioning once the robot is close and aligned, right before the lid actuates.",
       },
       {
         title: "Deposit",
+        icon: "trash-2",
         body: "The lid motor opens (45°–145°) to receive the item, then the robot goes back to wandering.",
       },
     ],

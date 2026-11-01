@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { MotionConfig } from "framer-motion";
 import type { Project } from "@/data/projects";
 import CaseStudySidebar, { type CaseStudyMode, type CaseStudyTocItem } from "./CaseStudySidebar";
 import PlaceholderBlock from "./PlaceholderBlock";
@@ -81,7 +82,13 @@ export default function CaseStudyShell({
       : "group relative mx-5 my-7 block w-[calc(100%-2.5rem)] overflow-hidden rounded-xl sm:mx-6 sm:w-[calc(100%-3rem)] lg:mx-10 lg:w-[calc(100%-5rem)]";
 
   return (
-    <div className="mx-auto flex max-w-[1280px]">
+    // reducedMotion="user": visitors with "reduce motion" on get the scroll
+    // reveals as plain fades (no slides, scales, or tilts). overflow-x-clip:
+    // content mid-slide (starting a little off to the side) can't widen the
+    // page and cause sideways scrolling on phones; clip, unlike hidden,
+    // keeps the sticky sidebar working.
+    <MotionConfig reducedMotion="user">
+    <div className="mx-auto flex max-w-[1280px] overflow-x-clip">
       <CaseStudySidebar mode={mode} onModeChange={setMode} tocItems={tocItems} />
 
       <div className="min-w-0 flex-1">
@@ -142,19 +149,42 @@ export default function CaseStudyShell({
         </div>
 
         {caseStudy.heroVideo ? (
-          // overflow-hidden + a slight scale crops out the black stroke
-          // baked into the source recording's edges.
-          <div className="mx-5 my-7 w-[calc(100%-2.5rem)] overflow-hidden rounded-xl sm:mx-6 sm:w-[calc(100%-3rem)] lg:mx-10 lg:w-[calc(100%-5rem)]">
-            <video
-              ref={heroVideoRef}
-              src={caseStudy.heroVideo}
-              className="w-full scale-[1.03]"
-              autoPlay
-              muted
-              loop
-              playsInline
-            />
-          </div>
+          (() => {
+            // overflow-hidden + a slight scale crops out the black stroke
+            // baked into the source recording's edges.
+            const video = (
+              <video
+                ref={heroVideoRef}
+                src={caseStudy.heroVideo}
+                className="block w-full scale-[1.03]"
+                autoPlay
+                muted
+                loop
+                playsInline
+              />
+            );
+            // With a live demo, the video links to it with the same hover
+            // overlay as the image hero below.
+            return caseStudy.liveDemo ? (
+              <a
+                href={caseStudy.liveDemo.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative mx-5 my-7 block w-[calc(100%-2.5rem)] overflow-hidden rounded-xl sm:mx-6 sm:w-[calc(100%-3rem)] lg:mx-10 lg:w-[calc(100%-5rem)]"
+              >
+                {video}
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                  <span className="rounded-full bg-white px-6 py-3 text-[16px] font-semibold text-[var(--color-fg)]">
+                    {caseStudy.liveDemo.label}
+                  </span>
+                </div>
+              </a>
+            ) : (
+              <div className="mx-5 my-7 w-[calc(100%-2.5rem)] overflow-hidden rounded-xl sm:mx-6 sm:w-[calc(100%-3rem)] lg:mx-10 lg:w-[calc(100%-5rem)]">
+                {video}
+              </div>
+            );
+          })()
         ) : caseStudy.heroImage ? (
           caseStudy.liveDemo ? (
             <a
@@ -233,5 +263,6 @@ export default function CaseStudyShell({
         </Link>
       </div>
     </div>
+    </MotionConfig>
   );
 }

@@ -50,7 +50,7 @@ export default function CaseStudyPage({
             big/bold/green treatment as the other two numbers. */}
         <div className="mb-11 grid grid-cols-1 gap-6 sm:grid-cols-3">
           {caseStudy.research.stats.map((stat, i) => (
-            <Reveal key={i} delay={i * 0.08} className="rounded-xl bg-[var(--color-card)] p-6">
+            <Reveal key={i} delay={i * 0.08} variant="scale" className="rounded-xl bg-[var(--color-card)] p-6">
               <div
                 className={`font-serif leading-tight font-bold text-[var(--color-primary)] ${
                   stat.compact ? "text-[1.4rem]" : "text-[2.75rem] leading-none"
@@ -71,7 +71,7 @@ export default function CaseStudyPage({
           </div>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             {caseStudy.research.quotes.map((quote, i) => (
-              <Reveal key={i} delay={i * 0.08}>
+              <Reveal key={i} delay={i * 0.08} variant={i % 2 === 0 ? "left" : "right"}>
                 <div className="font-serif text-[2.5rem] leading-none text-[var(--color-border)]">
                   “
                 </div>
@@ -83,14 +83,14 @@ export default function CaseStudyPage({
           </div>
         </div>
 
-        <div className="mb-11 rounded-xl bg-[var(--color-surface)] p-6.5">
+        <Reveal variant="soft" className="mb-11 rounded-xl bg-[var(--color-surface)] p-6.5">
           <div className="mb-2 font-mono text-xs font-semibold tracking-wider text-[var(--color-primary)] uppercase">
             Hypothesis
           </div>
           <p className="text-[16px] leading-relaxed text-[var(--color-muted)]">
             {caseStudy.research.hypothesis}
           </p>
-        </div>
+        </Reveal>
       </CaseStudySection>
 
       <CaseStudySection id="personas" number="02 — Persona & Journey Map" title="Who we designed for">
@@ -99,42 +99,48 @@ export default function CaseStudyPage({
             const journey = caseStudy.journeys[i];
             const slug = persona.name.split(" ")[0].toLowerCase();
             return (
-              <Reveal key={persona.name} delay={i * 0.1}>
+              // Persona slides in from the left, its journey map from the right
+              <div key={persona.name}>
                 <div className="mb-3 font-mono text-xs font-semibold tracking-wider text-[var(--color-primary)] uppercase">
                   User {String(i + 1).padStart(2, "0")}
                 </div>
                 <div className="flex flex-col gap-4">
-                  <img
-                    id={`persona-${slug}`}
-                    src={persona.image}
-                    alt={`${persona.name} persona`}
-                    width={1326}
-                    height={663}
-                    className="aspect-[1326/663] w-full scroll-mt-28 rounded-xl border border-[var(--color-border)]"
-                  />
-                  {journey && (
+                  <Reveal variant="left">
                     <img
-                      id={`journey-${slug}`}
-                      src={journey.image}
-                      alt={`${journey.persona} journey map`}
+                      id={`persona-${slug}`}
+                      src={persona.image}
+                      alt={`${persona.name} persona`}
                       width={1326}
-                      height={632}
-                      className="aspect-[1326/632] w-full scroll-mt-28 rounded-xl border border-[var(--color-border)]"
+                      height={663}
+                      className="aspect-[1326/663] w-full scroll-mt-28 rounded-xl border border-[var(--color-border)]"
                     />
+                  </Reveal>
+                  {journey && (
+                    <Reveal variant="right" delay={0.08}>
+                      <img
+                        id={`journey-${slug}`}
+                        src={journey.image}
+                        alt={`${journey.persona} journey map`}
+                        width={1326}
+                        height={632}
+                        className="aspect-[1326/632] w-full scroll-mt-28 rounded-xl border border-[var(--color-border)]"
+                      />
+                    </Reveal>
                   )}
                 </div>
-              </Reveal>
+              </div>
             );
           })}
         </div>
       </CaseStudySection>
 
       <CaseStudySection id="problem" number="03 — Problem Statement" title="The problem">
-        <div className="mb-11 rounded-xl border-l-4 border-[var(--color-primary)] bg-[var(--color-card)] p-8">
+        {/* Slides in from the side its accent bar is on */}
+        <Reveal variant="left" className="mb-11 rounded-xl border-l-4 border-[var(--color-primary)] bg-[var(--color-card)] p-8">
           <p className="w-full text-[18px] font-semibold leading-relaxed text-[var(--color-fg)]">
             {caseStudy.problem}
           </p>
-        </div>
+        </Reveal>
       </CaseStudySection>
 
       <CaseStudySection
@@ -142,13 +148,15 @@ export default function CaseStudyPage({
         number="04 — Competitive Analysis"
         title="What the market already knows"
       >
-        <img
-          src={caseStudy.competitiveAuditImage}
-          alt="Competitive audit"
-          width={1121}
-          height={720}
-          className="aspect-[1121/720] mb-11 w-full rounded-xl border border-[var(--color-border)]"
-        />
+        <Reveal variant="scale" className="mb-11">
+          <img
+            src={caseStudy.competitiveAuditImage}
+            alt="Competitive audit"
+            width={1121}
+            height={720}
+            className="aspect-[1121/720] w-full rounded-xl border border-[var(--color-border)]"
+          />
+        </Reveal>
       </CaseStudySection>
 
       <CaseStudySection id="hmw" number="05 — How Might We" title="Where we chose to focus">
@@ -160,7 +168,7 @@ export default function CaseStudyPage({
           {caseStudy.hmws.map((hmw, i) => {
             const note = STICKY_NOTE_STYLES[i % STICKY_NOTE_STYLES.length];
             return (
-              <Reveal key={i} delay={i * 0.1}>
+              <Reveal key={i} delay={i * 0.1} variant="scale">
                 <div
                   style={{
                     backgroundColor: note.bg,
@@ -191,41 +199,47 @@ export default function CaseStudyPage({
       </CaseStudySection>
 
       <CaseStudySection id="goal" number="06 — Goal Statement" title="The goal">
-        <div className="mb-11 rounded-xl bg-[var(--color-card)] p-8">
+        <Reveal variant="soft" className="mb-11 rounded-xl bg-[var(--color-card)] p-8">
           <p className="w-full text-[16px] leading-relaxed text-[var(--color-muted)]">
             {caseStudy.goal}
           </p>
-        </div>
+        </Reveal>
       </CaseStudySection>
 
       <CaseStudySection id="flow" number="07 — User Flow" title="Structure & flow">
-        <img
-          src={caseStudy.userFlowImage}
-          alt="Information architecture and user flow"
-          width={3169}
-          height={1672}
-          className="aspect-[3169/1672] mb-11 w-full rounded-xl"
-        />
+        <Reveal variant="scale" className="mb-11">
+          <img
+            src={caseStudy.userFlowImage}
+            alt="Information architecture and user flow"
+            width={3169}
+            height={1672}
+            className="aspect-[3169/1672] w-full rounded-xl"
+          />
+        </Reveal>
       </CaseStudySection>
 
       <CaseStudySection id="lofi" number="08 — Lo-fi" title="Early wireframes">
-        <img
-          src={caseStudy.lofiImage}
-          alt="Lo-fi wireframes"
-          width={4833}
-          height={3182}
-          className="aspect-[4833/3182] w-full rounded-xl"
-        />
+        <Reveal variant="scale">
+          <img
+            src={caseStudy.lofiImage}
+            alt="Lo-fi wireframes"
+            width={4833}
+            height={3182}
+            className="aspect-[4833/3182] w-full rounded-xl"
+          />
+        </Reveal>
       </CaseStudySection>
 
       <CaseStudySection id="hifi" number="09 — Hi-fi" title="Final prototype">
-        <img
-          src={caseStudy.hifiImage}
-          alt="Hi-fi prototype screens"
-          width={3683}
-          height={2460}
-          className="aspect-[3683/2460] w-full rounded-xl"
-        />
+        <Reveal variant="scale">
+          <img
+            src={caseStudy.hifiImage}
+            alt="Hi-fi prototype screens"
+            width={3683}
+            height={2460}
+            className="aspect-[3683/2460] w-full rounded-xl"
+          />
+        </Reveal>
       </CaseStudySection>
 
       <CaseStudySection
@@ -234,13 +248,15 @@ export default function CaseStudyPage({
         title="Built to scale"
         className="mb-16"
       >
-        <img
-          src={caseStudy.designSystemImage}
-          alt="Design system"
-          width={1312}
-          height={687}
-          className="aspect-[1312/687] w-full rounded-xl"
-        />
+        <Reveal variant="scale">
+          <img
+            src={caseStudy.designSystemImage}
+            alt="Design system"
+            width={1312}
+            height={687}
+            className="aspect-[1312/687] w-full rounded-xl"
+          />
+        </Reveal>
       </CaseStudySection>
     </CaseStudyShell>
   );

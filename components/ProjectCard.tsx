@@ -5,15 +5,18 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import type { Project } from "@/data/projects";
+import { pickColorsAt } from "./pickColorsAt";
 
 type Sprinkle = { id: number; x: number; y: number; dx: number; dy: number; color: string };
 
-const SPRINKLE_COLORS = [
-  "var(--color-primary)",
-  "var(--color-accent)",
-  "var(--color-primary-light)",
-];
 const SPRINKLE_COUNT = 10;
+// The burst spans one two-color gradient, each sprinkle a step further along
+// it. The colors are eyedropped from the cover where you click (see
+// pickColorsAt); if they can't be read, it falls back to the site's dark →
+// light green.
+const FALLBACK_COLORS: [string, string] = ["var(--color-primary-dark)", "var(--color-primary-light)"];
+const sprinkleColor = (i: number, [from, to]: [string, string]) =>
+  `color-mix(in oklch, ${to} ${Math.round((i / (SPRINKLE_COUNT - 1)) * 100)}%, ${from})`;
 const NAVIGATE_DELAY_MS = 380;
 
 const cardVariants = {
@@ -49,6 +52,8 @@ export default function ProjectCard({
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
+    const cover = e.currentTarget.querySelector<HTMLImageElement | HTMLVideoElement>("video, img");
+    const colors = (cover && pickColorsAt(cover, e.clientX, e.clientY)) || FALLBACK_COLORS;
 
     const burst = Array.from({ length: SPRINKLE_COUNT }, (_, i) => {
       const angle = (i / SPRINKLE_COUNT) * Math.PI * 2 + Math.random() * 0.5;
@@ -59,7 +64,7 @@ export default function ProjectCard({
         y,
         dx: Math.cos(angle) * distance,
         dy: Math.sin(angle) * distance,
-        color: SPRINKLE_COLORS[i % SPRINKLE_COLORS.length],
+        color: sprinkleColor(i, colors),
       };
     });
     setSprinkles(burst);
@@ -163,7 +168,7 @@ export default function ProjectCard({
             animate={{ x: s.x + s.dx, y: s.y + s.dy, opacity: 0, scale: 0.3 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
             style={{ backgroundColor: s.color }}
-            className="pointer-events-none absolute top-0 left-0 h-1.5 w-1.5 rounded-full"
+            className="pointer-events-none absolute top-0 left-0 h-2 w-2 rounded-full shadow-[0_0_0_1px_rgba(0,0,0,0.12)]"
           />
         ))}
       </Link>

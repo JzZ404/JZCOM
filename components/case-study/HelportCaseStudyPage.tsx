@@ -7,6 +7,8 @@ import type { CaseStudyHelport } from "@/data/caseStudies";
 import CaseStudyShell from "./CaseStudyShell";
 import CaseStudySection from "./CaseStudySection";
 import Reveal from "./Reveal";
+import IconBadge from "./IconBadge";
+import type { IconName } from "@/components/icons";
 
 // Helport's local visual system for this case-study page.
 const HELPORT_MINT = "#0AD48C";
@@ -23,13 +25,36 @@ const HELPORT_SOFT_SHADOW =
 // Small shared card shape for the pillar/feature/market blocks below — just
 // a title + body on the site's card surface, reused four times at slightly
 // different grid widths rather than four near-identical one-off blocks.
-function TitleBodyCard({ title, body, index }: { title: string; body: string; index?: number }) {
+function TitleBodyCard({
+  title,
+  body,
+  index,
+  icon,
+}: {
+  title: string;
+  body: string;
+  index?: number;
+  icon?: IconName;
+}) {
   return (
     <div
-      className="relative flex h-full flex-col rounded-xl border bg-white p-6"
+      className={`relative flex h-full flex-col rounded-xl border bg-white p-6 ${icon ? "pt-9" : ""}`}
       style={{ borderColor: HELPORT_CARD_BORDER, boxShadow: HELPORT_SOFT_SHADOW }}
     >
-      {index !== undefined && (
+      {/* An icon badge straddling the top edge (in Helport's mint), or the
+          "#1"-style numeral when there's no icon */}
+      {icon ? (
+        <div className="absolute -top-5 left-6">
+          <IconBadge
+            name={icon}
+            style={{
+              borderColor: HELPORT_MINT,
+              background: `color-mix(in srgb, ${HELPORT_MINT} 14%, white)`,
+              color: HELPORT_MEDIUM,
+            }}
+          />
+        </div>
+      ) : index !== undefined && (
         <div className="absolute -top-5 left-0 font-serif text-[28px] leading-none font-bold text-[#0AD48C]">
           #{index + 1}
         </div>
@@ -953,7 +978,7 @@ export default function HelportCaseStudyPage({
         <div className="mt-3 mb-11 grid grid-cols-1 items-stretch gap-x-6 gap-y-10 sm:grid-cols-2">
           {caseStudy.solution.features.map((feature, i) => (
             <Reveal key={i} delay={i * 0.08} variant={i % 2 === 0 ? "left" : "right"} className="h-full">
-              <TitleBodyCard title={feature.title} body={feature.body} index={i} />
+              <TitleBodyCard title={feature.title} body={feature.body} index={i} icon={feature.icon} />
             </Reveal>
           ))}
         </div>

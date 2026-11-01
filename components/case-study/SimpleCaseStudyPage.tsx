@@ -8,6 +8,9 @@ import PlaceholderBlock from "./PlaceholderBlock";
 import Reveal from "./Reveal";
 import WildlifeCollage from "./WildlifeCollage";
 import PhotoPair from "./PhotoPair";
+import PipelineStages from "./PipelineStages";
+import ThresholdChart from "./ThresholdChart";
+import IconBadge from "./IconBadge";
 
 export default function SimpleCaseStudyPage({
   caseStudy,
@@ -37,6 +40,7 @@ export default function SimpleCaseStudyPage({
     { id: "overview", label: "Overview" },
     ...(hasWhy ? [{ id: "why", label: "Why We Built This" }] : []),
     ...(hasTechStack ? [{ id: "technical-stack", label: "Technical Stack" }] : []),
+    ...(caseStudy.pipeline ? [{ id: "pipeline", label: caseStudy.pipeline.title }] : []),
     { id: "whats-next", label: whatsNextTitle },
   ];
 
@@ -62,7 +66,7 @@ export default function SimpleCaseStudyPage({
             ) : (
               <PlaceholderBlock label="why we built this — image" height={260} />
             )}
-            <div className="flex flex-col justify-center gap-4">
+            <Reveal variant="right" delay={0.15} className="flex flex-col justify-center gap-4">
               {caseStudy.whyWeBuiltThis.story.map((paragraph, i) => {
                 const isEmphasis = typeof paragraph === "object";
                 return (
@@ -78,7 +82,7 @@ export default function SimpleCaseStudyPage({
                   </p>
                 );
               })}
-            </div>
+            </Reveal>
           </div>
         </CaseStudySection>
       )}
@@ -101,10 +105,12 @@ export default function SimpleCaseStudyPage({
               {caseStudy.technicalStack.categories.map((category, i) => (
                 <Reveal
                   key={category.title}
-                  delay={i * 0.06}
+                  delay={i * 0.07}
+                  variant="scale"
                   className="rounded-xl bg-[var(--color-card)] p-6"
                 >
-                  <h3 className="mb-2 text-[16px] font-bold tracking-wider text-[var(--color-primary)] uppercase">
+                  <h3 className="mb-3 flex items-center gap-3 text-[16px] font-bold tracking-wider text-[var(--color-primary)] uppercase">
+                    {category.icon && <IconBadge name={category.icon} size="sm" />}
                     {category.title}
                   </h3>
                   <ul className="flex flex-col gap-2">
@@ -133,6 +139,24 @@ export default function SimpleCaseStudyPage({
               </ul>
             </>
           )}
+        </CaseStudySection>
+      )}
+
+      {caseStudy.pipeline && (
+        <CaseStudySection
+          id="pipeline"
+          number={`${nextNumber()} — ${caseStudy.pipeline.title}`}
+          title={caseStudy.pipeline.title}
+        >
+          {caseStudy.pipeline.intro && (
+            <p className="mb-8 text-[16px] leading-relaxed text-[var(--color-muted)]">
+              {caseStudy.pipeline.intro}
+            </p>
+          )}
+          <div className="mb-11 flex flex-col gap-12">
+            <PipelineStages stages={caseStudy.pipeline.stages} />
+            {caseStudy.pipeline.thresholdChart && <ThresholdChart {...caseStudy.pipeline.thresholdChart} />}
+          </div>
         </CaseStudySection>
       )}
 

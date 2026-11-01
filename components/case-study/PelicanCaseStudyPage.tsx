@@ -7,6 +7,8 @@ import CaseStudyShell from "./CaseStudyShell";
 import CaseStudySection from "./CaseStudySection";
 import Reveal from "./Reveal";
 import PhotoFan from "./PhotoFan";
+import IconBadge, { IconGlyph } from "./IconBadge";
+import { ICONS } from "@/components/icons";
 
 const PELICAN_TOC_ITEMS = [
   { id: "overview", label: "Overview" },
@@ -34,7 +36,7 @@ export default function PelicanCaseStudyPage({
             matching the taller image's box, reading as misaligned. */}
         <div className="mb-11 grid grid-cols-1 items-center gap-8 sm:grid-cols-2 sm:gap-12">
           <PhotoFan images={caseStudy.whyWeBuiltThis.images} />
-          <div className="flex flex-col justify-center gap-4">
+          <Reveal variant="right" delay={0.15} className="flex flex-col justify-center gap-4">
             {/* Sizes match Drunky's Why We Built This (17px body / 18px
                 emphasis) so the two case studies read consistently. */}
             {caseStudy.whyWeBuiltThis.story.map((paragraph, i) => {
@@ -52,7 +54,7 @@ export default function PelicanCaseStudyPage({
                 </p>
               );
             })}
-          </div>
+          </Reveal>
         </div>
       </CaseStudySection>
 
@@ -64,13 +66,21 @@ export default function PelicanCaseStudyPage({
         <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto_1fr_auto_1fr] sm:items-stretch">
           {caseStudy.systemArchitecture.stages.map((stage, i) => (
             <Fragment key={stage.title}>
-              <Reveal delay={i * 0.08} className="rounded-xl bg-[var(--color-card)] p-5">
-                <div className="mb-1 font-mono text-[11px] font-semibold tracking-wider text-[var(--color-primary)] uppercase">
-                  {stage.title}
+              <Reveal delay={i * 0.14} variant="left" className="rounded-xl bg-[var(--color-card)] p-5">
+                {/* Icon beside the label + title pair */}
+                <div className="mb-2 flex items-center gap-3">
+                  {stage.icon && (
+                    <IconGlyph name={stage.icon} className="h-7 w-7 shrink-0 text-[var(--color-primary)]" />
+                  )}
+                  <div>
+                    <div className="mb-0.5 font-mono text-[11px] font-semibold tracking-wider text-[var(--color-primary)] uppercase">
+                      {stage.title}
+                    </div>
+                    <h3 className="font-serif text-[16px] font-bold text-[var(--color-fg)] italic">
+                      {stage.body}
+                    </h3>
+                  </div>
                 </div>
-                <h3 className="mb-2 font-serif text-[16px] font-bold text-[var(--color-fg)] italic">
-                  {stage.body}
-                </h3>
                 <ul className="flex flex-col gap-1">
                   {stage.items.map((item) => (
                     <li key={item} className="text-[13px] leading-snug text-[var(--color-muted)]">
@@ -90,27 +100,39 @@ export default function PelicanCaseStudyPage({
             </Fragment>
           ))}
         </div>
-        <div className="mb-3 rounded-xl bg-[var(--color-surface)] p-6.5">
+        <Reveal variant="soft" delay={0.1} className="mb-3 rounded-xl bg-[var(--color-surface)] p-6.5">
           <div className="mb-2 font-mono text-xs font-semibold tracking-wider text-[var(--color-primary)] uppercase">
             Hardware Stack
           </div>
-          <p className="text-[16px] leading-relaxed text-[var(--color-muted)]">
-            {caseStudy.systemArchitecture.hardware.join(" · ")}
-          </p>
-        </div>
+          {/* One part per row with its icon (lighter than the stage badges,
+              since these are parts, not stages) */}
+          <ul className="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
+            {caseStudy.systemArchitecture.hardware.map((part) => {
+              const Icon = part.icon ? ICONS[part.icon] : null;
+              return (
+                <li key={part.name} className="flex items-start gap-2.5 text-[15px] leading-snug text-[var(--color-fg)]">
+                  {Icon && <Icon aria-hidden className="mt-0.5 h-4.5 w-4.5 shrink-0 text-[var(--color-primary)]" strokeWidth={2} />}
+                  {part.name}
+                </li>
+              );
+            })}
+          </ul>
+        </Reveal>
         <p className="mb-11 text-[14px] leading-relaxed text-[var(--color-muted)] italic">
           {caseStudy.systemArchitecture.note}
         </p>
       </CaseStudySection>
 
       <CaseStudySection id="process" number="03 — Design Process" title="Design Process">
-        <img
-          src={caseStudy.designProcess.image}
-          alt="PELICAN design process — sketch, CAD model, cardboard mockup, 3D-printed shell, final assembly, and live testing"
-          width={1328}
-          height={570}
-          className="aspect-[1328/570] mb-4 w-full rounded-xl object-cover"
-        />
+        <Reveal variant="scale" className="mb-4">
+          <img
+            src={caseStudy.designProcess.image}
+            alt="PELICAN design process — sketch, CAD model, cardboard mockup, 3D-printed shell, final assembly, and live testing"
+            width={1328}
+            height={570}
+            className="aspect-[1328/570] w-full rounded-xl object-cover"
+          />
+        </Reveal>
         <p className="mb-11 text-[14px] leading-relaxed text-[var(--color-muted)] italic">
           {caseStudy.designProcess.caption}
         </p>
@@ -121,11 +143,18 @@ export default function PelicanCaseStudyPage({
           {caseStudy.pipeline.states.map((state, i) => (
             <Reveal
               key={state.title}
-              delay={i * 0.06}
+              delay={i * 0.1}
+              variant="scale"
               className="flex flex-col items-center rounded-xl bg-[var(--color-card)] p-5 text-center"
             >
-              <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-primary)] font-serif text-[15px] font-bold text-[var(--color-on-primary)]">
-                {i + 1}
+              <div className="mb-3">
+                {state.icon ? (
+                  <IconBadge name={state.icon} />
+                ) : (
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-primary)] font-serif text-[15px] font-bold text-[var(--color-on-primary)]">
+                    {i + 1}
+                  </div>
+                )}
               </div>
               <h3 className="mb-1 font-serif text-[16px] font-bold text-[var(--color-fg)]">
                 {state.title}
@@ -135,18 +164,18 @@ export default function PelicanCaseStudyPage({
           ))}
         </div>
 
-        <div className="mb-8 rounded-xl bg-[var(--color-surface)] p-6.5">
+        <Reveal variant="soft" className="mb-8 rounded-xl bg-[var(--color-surface)] p-6.5">
           <div className="mb-2 font-mono text-xs font-semibold tracking-wider text-[var(--color-primary)] uppercase">
             {caseStudy.pipeline.interrupt.title}
           </div>
           <p className="text-[15px] leading-relaxed text-[var(--color-fg)]">
             {caseStudy.pipeline.interrupt.body}
           </p>
-        </div>
+        </Reveal>
 
         <div className="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2">
           {caseStudy.pipeline.videos.map((video, i) => (
-            <Reveal key={video.src} delay={i * 0.08}>
+            <Reveal key={video.src} delay={i * 0.08} variant={i % 2 === 0 ? "left" : "right"}>
               <video
                 src={video.src}
                 className="aspect-video w-full rounded-xl object-cover"

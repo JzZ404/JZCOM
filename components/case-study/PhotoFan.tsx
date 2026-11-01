@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "framer-motion";
 
 // Three photos fanned out and overlapping — like snapshots dropped on a
 // desk, not a tidy grid or a scroll-through carousel. Each keeps a card-like
@@ -47,33 +48,38 @@ export default function PhotoFan({
       {images.slice(0, 3).map((image, i) => {
         const card = CARDS[i];
         const isFront = frontIndex === i;
+        // On scroll-in the cards are dealt out of one stack in the middle
+        // (x offset is % of the card's own width, back to the container's
+        // center) and settle into their tilt, one after another.
+        const fromCenter = ((50 - (card.left + card.width / 2)) / card.width) * 100;
         return (
-          <button
+          <motion.div
             key={image.src}
-            type="button"
-            onClick={() => setFrontIndex(i)}
-            aria-label={`Bring "${image.alt}" to the front`}
-            className="absolute aspect-[4/3] cursor-pointer rounded-lg bg-[var(--color-card)] p-1.5 text-left shadow-[0_10px_24px_rgba(0,0,0,0.22)] transition-[transform,box-shadow] duration-200 ease-out hover:shadow-[0_18px_36px_rgba(0,0,0,0.32)]"
+            className="absolute aspect-[4/3]"
             style={{
               top: `${card.top}%`,
               left: `${card.left}%`,
               width: `${card.width}%`,
               zIndex: isFront ? FRONT_Z : card.z,
-              transform: `rotate(${card.rotate}deg)`,
             }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = `rotate(${card.rotate}deg) scale(1.08)`;
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = `rotate(${card.rotate}deg)`;
-            }}
+            initial={{ opacity: 0, x: `${fromCenter}%`, y: 30, rotate: 0 }}
+            whileInView={{ opacity: 1, x: "0%", y: 0, rotate: card.rotate }}
+            viewport={{ once: false, margin: "-60px" }}
+            transition={{ type: "spring", stiffness: 170, damping: 22, delay: i * 0.12 }}
           >
-            <img
-              src={image.src}
-              alt={image.alt}
-              className="h-full w-full rounded-md object-cover"
-            />
-          </button>
+            <button
+              type="button"
+              onClick={() => setFrontIndex(i)}
+              aria-label={`Bring "${image.alt}" to the front`}
+              className="h-full w-full cursor-pointer rounded-lg bg-[var(--color-card)] p-1.5 text-left shadow-[0_10px_24px_rgba(0,0,0,0.22)] transition-[transform,box-shadow] duration-200 ease-out hover:scale-[1.08] hover:shadow-[0_18px_36px_rgba(0,0,0,0.32)]"
+            >
+              <img
+                src={image.src}
+                alt={image.alt}
+                className="h-full w-full rounded-md object-cover"
+              />
+            </button>
+          </motion.div>
         );
       })}
     </div>

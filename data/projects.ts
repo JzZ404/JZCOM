@@ -37,7 +37,7 @@ export const projects: Project[] = [
     title: "Alio: AI Copilot for Elder Care",
     tags: ["AI/ML", "UX/Product"],
     category: "ux",
-    chips: ["AI/ML", "UX/UI", "Product Strategy", "Hackathon"],
+    chips: ["Voice UI", "On-device LLM", "Applied AI", "UX/UI Design"],
     summary:
       "On-device AI copilot connecting seniors, caregivers, and families through structured visit reports and symptom triage.",
     role: "Product strategy, frontend, and pipeline coordination — ML fine-tuning by Aaron Yeung.",
@@ -50,7 +50,7 @@ export const projects: Project[] = [
     title: "Nest: Gamified Habit-Building App for Real Life",
     tags: ["UX/Product"],
     category: "ux",
-    chips: ["UX Research", "Interaction Design", "Product Design"],
+    chips: ["UX Research", "Service Design", "Product Design"],
     summary:
       "A gamified movement app that turns daily steps into a growing companion and social challenges, built around research on why people stop working out.",
     role: "UX research and product design.",
@@ -61,7 +61,7 @@ export const projects: Project[] = [
     title: "Helport: AI Copilot for Live Calls",
     tags: ["AI/ML", "UX/Product"],
     category: "ux",
-    chips: ["UX/UI", "AI/ML", "Front-End", "Client Work"],
+    chips: ["Voice AI", "LLM Copilot", "RAG", "B2B"],
     summary:
       "A real-time AI dashboard that guides health insurance agents mid-call, pairing a domain knowledge base with live conversational prompts for better handoffs between the agent and the AI.",
     role: "Product Experience Designer — UX/UI and front-end development.",
@@ -73,7 +73,7 @@ export const projects: Project[] = [
     title: "Poopidex: AI-Powered Scat Identification",
     tags: ["AI/ML"],
     category: "ai",
-    chips: ["Computer Vision", "ML", "Fine-Tuned Vision Model"],
+    chips: ["Computer Vision", "Model Fine-tuning", "Frontend"],
     summary:
       "A vision AI app that turns a scat photo into a species ID and a collectible card, powered by a fine-tuned vision model and Claude Vision.",
     role: "Sole developer (concept co-originated with Aaron).",
@@ -100,7 +100,7 @@ export const projects: Project[] = [
     title: "Drunky: Bimanual Bartending Robot",
     tags: ["Robotics"],
     category: "robotics",
-    chips: ["Computer Vision", "Visual Servoing", "Bimanual Manipulation"],
+    chips: ["Imitation Learning", "Robotic Manipulation", "Computer Vision"],
     summary:
       "A two-armed robot bartender that detects, grabs, pours, and tosses drinks end-to-end — YOLO perception, visual servoing, and MoveIt 2 motion planning.",
     role: "Bartender UI design, pour/toss trajectory recording, and dataset labeling.",
@@ -111,7 +111,7 @@ export const projects: Project[] = [
     title: "PELICAN: Autonomous Waste Collection Robot",
     tags: ["Robotics"],
     category: "robotics",
-    chips: ["Autonomous Systems", "Robot Navigation", "Computer Vision"],
+    chips: ["Autonomous Navigation", "Robotics", "Computer Vision"],
     summary:
       "A pelican-inspired autonomous robot that collects waste using LiDAR-based perception and YOLO camera detection.",
     role: "Autonomous systems, perception, and controls.",
