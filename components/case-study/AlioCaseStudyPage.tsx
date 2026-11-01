@@ -9,6 +9,7 @@ import AiRoadmapTimeline, { phaseColor } from "./AiRoadmapTimeline";
 import BusinessModelCanvas from "./BusinessModelCanvas";
 import ResponsibleAiTable from "./ResponsibleAiTable";
 import Reveal from "./Reveal";
+import AlternatingVideos from "./AlternatingVideos";
 
 const ALIO_PROBLEM_HIGHLIGHTS = [
   "constant, valuable information",
@@ -219,26 +220,36 @@ export default function AlioCaseStudyPage({
               className="grid grid-cols-1 gap-8 sm:grid-cols-2 sm:items-center"
             >
               <div className={i % 2 === 1 ? "sm:order-2" : ""}>
-                {feature.media ? (
-                  <div
-                    className={
-                      feature.media.length > 1
-                        ? "grid grid-cols-2 gap-4"
-                        : "mx-auto w-3/5"
-                    }
-                  >
-                    {feature.media.map((src, j) => (
-                      <video
-                        key={j}
-                        src={src}
-                        className="w-full rounded-[1.4rem] shadow-[0_20px_40px_-12px_rgba(0,0,0,0.35)]"
-                        autoPlay
-                        muted
-                        loop
-                        playsInline
-                      />
-                    ))}
-                  </div>
+                {feature.media && feature.media.length > 1 ? (
+                  <AlternatingVideos media={feature.media} />
+                ) : feature.media ? (
+                  <figure className="mx-auto w-3/5">
+                    <video
+                      src={feature.media[0].src}
+                      // The default rate too: loading a source resets the speed to it.
+                      ref={(el) => {
+                        if (!el) return;
+                        el.defaultPlaybackRate = el.playbackRate = feature.media?.[0].playbackRate ?? 1;
+                      }}
+                      // Paused while the mouse is over it (mouse only — not taps)
+                      onPointerEnter={(e) => {
+                        if (e.pointerType === "mouse") e.currentTarget.pause();
+                      }}
+                      onPointerLeave={(e) => {
+                        if (e.pointerType === "mouse") e.currentTarget.play().catch(() => {});
+                      }}
+                      className="w-full rounded-[1.4rem] shadow-[0_20px_40px_-12px_rgba(0,0,0,0.35)]"
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                    />
+                    {feature.media[0].caption && (
+                      <figcaption className="mt-3 text-center text-[14px] leading-relaxed text-[var(--color-muted)] italic">
+                        {feature.media[0].caption}
+                      </figcaption>
+                    )}
+                  </figure>
                 ) : (
                   <PlaceholderBlock label={feature.title} height={220} />
                 )}

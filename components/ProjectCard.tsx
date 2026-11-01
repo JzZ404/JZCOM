@@ -95,6 +95,12 @@ export default function ProjectCard({
           <div className="aspect-[16/9] w-full shrink-0 overflow-hidden bg-[var(--color-border)]">
             {project.video ? (
               <motion.video
+                ref={(el) => {
+                  if (el) {
+                    el.defaultPlaybackRate = el.playbackRate =
+                      project.videoPlaybackRate ?? 1;
+                  }
+                }}
                 src={project.video}
                 autoPlay
                 muted

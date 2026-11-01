@@ -25,6 +25,9 @@ export type Project = {
   // grid card specifically — coverImage stays as the fallback (case-study
   // hero, onError, etc.), video is opt-in per project.
   video?: string;
+  // Speed for `video` (1 = normal). Mirrors the playbackRate convention
+  // used by case-study feature clips.
+  videoPlaybackRate?: number;
   links?: { label: string; href: string }[];
 };
 
@@ -39,6 +42,8 @@ export const projects: Project[] = [
       "On-device AI copilot connecting seniors, caregivers, and families through structured visit reports and symptom triage.",
     role: "Product strategy, frontend, and pipeline coordination — ML fine-tuning by Aaron Yeung.",
     coverImage: "/images/alio/cover.png",
+    video: "/images/alio/alio-cover2.mp4",
+    videoPlaybackRate: 0.8,
   },
   {
     slug: "nest",

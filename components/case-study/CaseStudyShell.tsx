@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { Project } from "@/data/projects";
 import CaseStudySidebar, { type CaseStudyMode, type CaseStudyTocItem } from "./CaseStudySidebar";
@@ -17,6 +17,9 @@ export type CaseStudyShellData = {
   tldr: string;
   heroLabel: string;
   heroVideo?: string; // optional cover video shown in place of the hero placeholder
+  // Speed for heroVideo (1 = normal). Same convention as the per-clip
+  // playbackRate on feature media.
+  heroVideoPlaybackRate?: number;
   heroImage?: string; // optional static cover image — checked if heroVideo isn't set
   heroMediaLayout?: "default" | "compactLower";
   // CSS object-position — for covers whose focal point isn't centered, same
@@ -44,6 +47,27 @@ export default function CaseStudyShell({
 }) {
   const [mode, setMode] = useState<CaseStudyMode>("detailed");
   const detailed = mode === "detailed";
+
+  // Hero playback speed. Set in an effect with a loadedmetadata fallback
+  // rather than inline on the element: a rate assigned before the media is
+  // ready silently reverts to 1, and the hero is often still loading at mount.
+  const heroVideoRef = useRef<HTMLVideoElement>(null);
+  const heroRate = caseStudy.heroVideoPlaybackRate ?? 1;
+  useEffect(() => {
+    const el = heroVideoRef.current;
+    if (!el) return;
+    const apply = () => {
+      el.defaultPlaybackRate = heroRate;
+      el.playbackRate = heroRate;
+    };
+    apply();
+    el.addEventListener("loadedmetadata", apply);
+    el.addEventListener("play", apply);
+    return () => {
+      el.removeEventListener("loadedmetadata", apply);
+      el.removeEventListener("play", apply);
+    };
+  }, [heroRate, caseStudy.heroVideo]);
   // Falls back to a plain solid background if the next project doesn't
   // have a cover image yet (see ProjectCard for the same pattern).
   const [coverFailed, setCoverFailed] = useState(false);
@@ -122,6 +146,7 @@ export default function CaseStudyShell({
           // baked into the source recording's edges.
           <div className="mx-5 my-7 w-[calc(100%-2.5rem)] overflow-hidden rounded-xl sm:mx-6 sm:w-[calc(100%-3rem)] lg:mx-10 lg:w-[calc(100%-5rem)]">
             <video
+              ref={heroVideoRef}
               src={caseStudy.heroVideo}
               className="w-full scale-[1.03]"
               autoPlay

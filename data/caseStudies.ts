@@ -84,6 +84,7 @@ export type CaseStudyAlio = {
   tldr: string;
   heroLabel: string;
   heroVideo?: string;
+  heroVideoPlaybackRate?: number;
   meta: { label: string; value: string }[];
   links?: CaseStudyLink[];
   // Same union pattern as CaseStudySimple/CaseStudyDrunky — emphasis is an
@@ -110,7 +111,14 @@ export type CaseStudyAlio = {
   };
   technicalStackImage: string;
   prototypeDemo: {
-    features: { title: string; body: string; media?: string[] }[];
+    features: {
+      title: string;
+      body: string;
+      // Several clips take turns in list order, looping; `caption` sits under
+      // each. `side` puts a clip in the left or right column (default:
+      // alternating). `playbackRate` sets its speed (1 = normal).
+      media?: { src: string; side?: "left" | "right"; caption?: string; playbackRate?: number }[];
+    }[];
   };
   designSystemImage: string;
   businessModel: {
@@ -135,7 +143,8 @@ export const alioCaseStudy: CaseStudyAlio = {
     "On-device AI copilot connecting seniors, caregivers, and families through structured visit reports and symptom triage.",
   tldr: PLACEHOLDER,
   heroLabel: "hero screenshot — Alio",
-  heroVideo: "/images/alio/alio-cover.mp4",
+  heroVideo: "/images/alio/alio-cover2.mp4",
+  heroVideoPlaybackRate: 0.8,
   meta: [
     { label: "Role", value: "AI PM, Frontend Designer & Engineer" },
     { label: "For", value: "Seniors, caregivers & families" },
@@ -218,22 +227,31 @@ export const alioCaseStudy: CaseStudyAlio = {
       {
         title: "Real-Time Arrival & Status",
         body: "Caregivers keep patient details, address, and contact info on their portal. When a caregiver arrives, one tap marks the visit as started, and family receives an instant notification that care is underway.",
-        media: ["/images/alio/feature1-caregiver.mp4", "/images/alio/feature1-family.mp4"],
+        media: [
+          { src: "/images/alio/feature1-caregiver.mp4", caption: "Caregiver Portal" },
+          { src: "/images/alio/feature1-family.mp4", caption: "Family Portal" },
+        ],
       },
       {
-        title: "Care Loop Messaging",
-        body: "Family can message the caregiver directly with specific requests, everything kept as a permanent record. Multiple family members can join the same care loop, so a caregiver's response reaches everyone at once instead of getting relayed secondhand.",
-        media: ["/images/alio/feature2-caregiver.mp4", "/images/alio/feature2-family.mp4"],
+        title: "AI-Assisted Care Loop Messaging",
+        body: "Family messages the caregiver directly, and every request is shared across the whole care loop so everyone stays on the same page. A language model reads each message and flags the ones that need attention, so nothing important slips past, and surfaces them in the caregiver's inbox.",
+        media: [
+          // Plays in this order: family 1, caregiver 1, family 2, caregiver 2, then loops.
+          { src: "/images/alio/feature2-family1.mp4", side: "right", caption: "Family Portal", playbackRate: 2.5 },
+          { src: "/images/alio/feature2-caregiver1.mp4", side: "left", caption: "Caregiver Portal", playbackRate: 2.5 },
+          { src: "/images/alio/feature2-family2.mp4", side: "right", caption: "Family Portal", playbackRate: 2.5 },
+          { src: "/images/alio/feature2-caregiver2.mp4", side: "left", caption: "Caregiver Portal", playbackRate: 2.5 },
+        ],
       },
       {
         title: "AI Visit Log & Post-Visit Report",
         body: "At the end of a visit, the caregiver records a voice memo. Alio's fine-tuned model turns that into a structured post-visit report, then flags anything that needs family's attention. Once the caregiver approves it, the report syncs to the family portal.",
-        media: ["/images/alio/feature3.mp4"],
+        media: [{ src: "/images/alio/feature3.mp4", playbackRate: 0.75 }],
       },
       {
         title: "Family Q&A with AI",
         body: "After receiving a report, family can ask Alio follow-up questions directly. The model draws on the full patient history and logs to give specific, informed answers, general guidance and context, not diagnosis, especially useful when family has lost track of earlier details.",
-        media: ["/images/alio/feature4.mp4"],
+        media: [{ src: "/images/alio/feature4.mp4", playbackRate: 0.75 }],
       },
     ],
   },
