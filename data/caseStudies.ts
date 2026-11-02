@@ -1472,6 +1472,10 @@ export type CaseStudyDrunky = {
     phases: { number: number; title: string; body: string; time: string }[];
     summary: string;
   };
+  // The Demo section: the full recorded run as a player with controls (with
+  // sound, not autoplaying). `poster` is the still shown before play;
+  // `playbackRate` is the speed it starts at (1 = normal).
+  demo?: { src: string; poster?: string; playbackRate?: number };
   challenges: {
     pivot: {
       title: string;
@@ -1565,6 +1569,11 @@ export const drunkyCaseStudy: CaseStudyDrunky = {
     ],
     summary:
       "One arm takes about 1 min 7 s for 6 phases — sequential arms make a full two-ingredient cocktail in about 2 min 15 s.",
+  },
+  demo: {
+    src: "/images/drunky/final-demo.mp4",
+    poster: "/images/drunky/final-demo-poster.jpg",
+    playbackRate: 1.75,
   },
   challenges: {
     pivot: {
@@ -1709,9 +1718,11 @@ export type CaseStudyPelican = {
   pipeline: {
     states: { title: string; icon?: IconName; body: string }[];
     interrupt: { title: string; body: string };
-    videos: { src: string; caption: string }[];
     summary: string;
   };
+  // The Demo section: one group per behavior, a subtitle over its clips
+  // shown side by side (autoplaying, muted, looping).
+  demo?: { title: string; srcs: string[] }[];
   challenges: { title: string; body: string }[];
   whatsNext: { title: string; body: string }[];
 };
@@ -1820,13 +1831,19 @@ export const pelicanCaseStudy: CaseStudyPelican = {
       title: "Interrupts",
       body: "If something's within 0.5 m, PELICAN backs up and turns regardless of its current state — and if nothing's detected for 7 seconds while tracking, it gives up and returns to wandering.",
     },
-    videos: [
-      { src: "/images/pelican/rover1.mp4", caption: "Wandering and obstacle avoidance" },
-      { src: "/images/pelican/detect1.mp4", caption: "YOLO detection and tracking" },
-    ],
     summary:
       "Detection, tracking, and disposal all run in one continuous loop — no human steps in unless something goes wrong.",
   },
+  demo: [
+    {
+      title: "Wandering and obstacle avoidance",
+      srcs: ["/images/pelican/rover1.mp4", "/images/pelican/rover2.mp4"],
+    },
+    {
+      title: "YOLO detection and tracking",
+      srcs: ["/images/pelican/detect1.mp4", "/images/pelican/detect2.mp4"],
+    },
+  ],
   challenges: [
     {
       title: "Remapping visual space to motor space.",

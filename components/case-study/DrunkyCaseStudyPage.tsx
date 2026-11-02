@@ -8,17 +8,18 @@ import CaseStudySection from "./CaseStudySection";
 import Reveal from "./Reveal";
 
 // Cocktail illustrations Joyce shot for the Drunky menu, cycled one per
-// section instead of a generic icon — same 01-06 order as the printed menu
-// (Whiskey & Coke through Gin Buck), so the numbering doubles as a wink at
-// the actual drink list. Tequila & Tonic, Tequila Sunrise, and the secret
-// Bix Cup stay unused here, free for the hero or an easter egg later.
+// section instead of a generic icon — same 01-07 order as the printed menu
+// (Whiskey & Coke through Tequila & Tonic), so the numbering doubles as a
+// wink at the actual drink list. Tequila Sunrise and the secret Bix Cup stay
+// unused here, free for the hero or an easter egg later.
 const SECTION_ICONS = {
   why: { src: "/images/drunky/whiskey-coke.png", alt: "Whiskey & Coke illustration" },
   architecture: { src: "/images/drunky/whiskey-ginger.png", alt: "Whiskey Ginger illustration" },
   pipeline: { src: "/images/drunky/moscow-mule.png", alt: "Moscow Mule illustration" },
-  challenges: { src: "/images/drunky/screwdriver.png", alt: "Screwdriver illustration" },
-  evaluation: { src: "/images/drunky/gin-tonic.png", alt: "Gin & Tonic illustration" },
-  whatsNext: { src: "/images/drunky/gin-buck.png", alt: "Gin Buck illustration" },
+  demo: { src: "/images/drunky/screwdriver.png", alt: "Screwdriver illustration" },
+  challenges: { src: "/images/drunky/gin-tonic.png", alt: "Gin & Tonic illustration" },
+  evaluation: { src: "/images/drunky/gin-buck.png", alt: "Gin Buck illustration" },
+  whatsNext: { src: "/images/drunky/tequila-tonic.png", alt: "Tequila & Tonic illustration" },
 };
 
 // Part-to-whole "where it fails" breakdown as a solid pie (donut hole and
@@ -142,6 +143,7 @@ const DRUNKY_TOC_ITEMS = [
   { id: "why", label: "Why We Built This" },
   { id: "architecture", label: "System Architecture" },
   { id: "pipeline", label: "The Pipeline" },
+  { id: "demo", label: "Demo" },
   { id: "challenges", label: "Challenges" },
   { id: "evaluation", label: "Evaluation & Results" },
   { id: "whats-next", label: "What's Next" },
@@ -326,16 +328,41 @@ export default function DrunkyCaseStudyPage({
             ))}
           </div>
         </div>
-        <div className="mb-11 rounded-xl bg-[var(--color-surface)] p-6.5">
+        <div
+          className="mb-11 rounded-xl bg-[var(--color-surface)] p-6.5"
+        >
           <p className="text-[15px] leading-relaxed text-[var(--color-fg)]">
             {caseStudy.pipeline.summary}
           </p>
         </div>
       </CaseStudySection>
 
+      {caseStudy.demo && (
+        <CaseStudySection id="demo" number="04 — Demo" title="Demo" icon={SECTION_ICONS.demo}>
+          <Reveal variant="scale" className="mb-11">
+            {/* A real player (controls + sound) rather than a muted loop —
+                it's the whole run, meant to be watched. It starts at the
+                data's playbackRate (set as the default rate too, since
+                loading the source resets the speed to it). preload="none"
+                so the video only downloads once someone presses play. */}
+            <video
+              ref={(el) => {
+                if (el) el.defaultPlaybackRate = el.playbackRate = caseStudy.demo?.playbackRate ?? 1;
+              }}
+              src={caseStudy.demo.src}
+              poster={caseStudy.demo.poster}
+              controls
+              playsInline
+              preload="none"
+              className="aspect-video w-full rounded-xl bg-black object-contain"
+            />
+          </Reveal>
+        </CaseStudySection>
+      )}
+
       <CaseStudySection
         id="challenges"
-        number="04 — Challenges"
+        number="05 — Challenges"
         title="Challenges"
         icon={SECTION_ICONS.challenges}
       >
@@ -391,7 +418,7 @@ export default function DrunkyCaseStudyPage({
 
       <CaseStudySection
         id="evaluation"
-        number="05 — Evaluation & Results"
+        number="06 — Evaluation & Results"
         title="Evaluation & Results"
         icon={SECTION_ICONS.evaluation}
       >
@@ -486,7 +513,7 @@ export default function DrunkyCaseStudyPage({
 
       <CaseStudySection
         id="whats-next"
-        number="06 — What's Next"
+        number="07 — What's Next"
         title="What's Next"
         icon={SECTION_ICONS.whatsNext}
         className="mb-20"

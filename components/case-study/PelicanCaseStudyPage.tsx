@@ -16,6 +16,7 @@ const PELICAN_TOC_ITEMS = [
   { id: "architecture", label: "System Architecture" },
   { id: "process", label: "Design Process" },
   { id: "pipeline", label: "The Pipeline" },
+  { id: "demo", label: "Demo" },
   { id: "challenges", label: "Challenges" },
   { id: "whats-next", label: "What's Next" },
 ];
@@ -173,30 +174,40 @@ export default function PelicanCaseStudyPage({
           </p>
         </Reveal>
 
-        <div className="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2">
-          {caseStudy.pipeline.videos.map((video, i) => (
-            <Reveal key={video.src} delay={i * 0.08} variant={i % 2 === 0 ? "left" : "right"}>
-              <video
-                src={video.src}
-                className="aspect-video w-full rounded-xl object-cover"
-                autoPlay
-                muted
-                loop
-                playsInline
-              />
-              <p className="mt-3 text-[14px] leading-relaxed text-[var(--color-muted)] italic">
-                {video.caption}
-              </p>
-            </Reveal>
-          ))}
-        </div>
-
         <p className="mb-11 text-[15px] leading-relaxed text-[var(--color-fg)]">
           {caseStudy.pipeline.summary}
         </p>
       </CaseStudySection>
 
-      <CaseStudySection id="challenges" number="05 — Challenges" title="Challenges">
+      {caseStudy.demo && (
+        <CaseStudySection id="demo" number="05 — Demo" title="Demo">
+          {/* One group per behavior: its subtitle, then its clips side by
+              side, each sliding in from its own side */}
+          <div className="mb-11 flex flex-col gap-10">
+            {caseStudy.demo.map((group) => (
+              <div key={group.title}>
+                <h3 className="mb-4 font-serif text-[20px] font-bold text-[var(--color-fg)]">{group.title}</h3>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  {group.srcs.map((src, i) => (
+                    <Reveal key={src} delay={i * 0.08} variant={i % 2 === 0 ? "left" : "right"}>
+                      <video
+                        src={src}
+                        className="aspect-video w-full rounded-xl object-cover"
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                      />
+                    </Reveal>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </CaseStudySection>
+      )}
+
+      <CaseStudySection id="challenges" number="06 — Challenges" title="Challenges">
         {/* Same title/body treatment as Drunky's "Engineering challenges
             overcome" — font-serif bold header, muted body below it. */}
         <div className="mb-11 flex flex-col gap-5">
@@ -215,7 +226,7 @@ export default function PelicanCaseStudyPage({
         </div>
       </CaseStudySection>
 
-      <CaseStudySection id="whats-next" number="06 — What's Next" title="What's Next" className="mb-20">
+      <CaseStudySection id="whats-next" number="07 — What's Next" title="What's Next" className="mb-20">
         <ul className="flex flex-col gap-4">
           {caseStudy.whatsNext.map((item, i) => (
             <li key={item.title}>
