@@ -1,13 +1,15 @@
 "use client";
 
 import { Fragment } from "react";
-import { motion } from "framer-motion";
+import { motion, type TargetAndTransition, type Variants } from "framer-motion";
 import type { Project } from "@/data/projects";
 import type { CaseStudyHelport } from "@/data/caseStudies";
 import CaseStudyShell from "./CaseStudyShell";
 import CaseStudySection from "./CaseStudySection";
 import Reveal from "./Reveal";
 import IconBadge from "./IconBadge";
+import HelportResearch from "./HelportResearch";
+import { CountUp, useHoverReplay } from "./researchMotion";
 import LinkedInPostEmbed from "./LinkedInPostEmbed";
 import { ArrowUpRight } from "lucide-react";
 import type { IconName } from "@/components/icons";
@@ -71,23 +73,43 @@ function TitleBodyCard({
 // Solution Overview) — center-aligned, with its illustration absolutely
 // positioned and pulled up by 65% of its own height so it straddles the
 // card's top edge instead of sitting fully inside or fully outside it.
+// Hovering a pain-point card lifts it and gives its illustration a little
+// wiggle as it hops up (the illustration's own rotation keyframes; Tailwind's
+// translate classes set the separate `translate` property, so they compose).
 function PillarCard({ pillar }: { pillar: CaseStudyHelport["painPoints"]["pillars"][number] }) {
   return (
-    <div
+    <motion.div
       className="relative rounded-xl border bg-white p-6 pt-16 text-center"
-      style={{ borderColor: HELPORT_CARD_BORDER, boxShadow: HELPORT_SOFT_SHADOW }}
+      style={{ borderColor: HELPORT_CARD_BORDER }}
+      initial="rest"
+      animate="rest"
+      whileHover="hover"
+      variants={{
+        rest: { y: 0, boxShadow: HELPORT_SOFT_SHADOW },
+        hover: { y: -6, boxShadow: "0px 4px 8px rgba(0,0,0,0.06), 0px 16px 32px rgba(0,66,43,0.12)" },
+      }}
+      transition={{ type: "spring", stiffness: 300, damping: 22 }}
     >
       {pillar.image && (
-        <img
+        <motion.img
           src={pillar.image}
           alt=""
           aria-hidden
           className="absolute top-0 left-1/2 h-24 w-24 -translate-x-1/2 -translate-y-[40%] object-contain"
+          variants={{
+            rest: { y: 0, rotate: 0, scale: 1 },
+            hover: {
+              y: -8,
+              scale: 1.06,
+              rotate: [0, -9, 7, -5, 3, 0],
+              transition: { y: { type: "spring", stiffness: 300, damping: 15 }, scale: { duration: 0.2 }, rotate: { duration: 0.6, ease: "easeInOut" } },
+            },
+          }}
         />
       )}
       <h3 className="mb-1.5 font-serif text-[17px] font-bold text-[var(--color-fg)]">{pillar.title}</h3>
       <p className="text-[15px] leading-relaxed text-[var(--color-fg)]">{pillar.body}</p>
-    </div>
+    </motion.div>
   );
 }
 
@@ -97,15 +119,38 @@ function PillarCard({ pillar }: { pillar: CaseStudyHelport["painPoints"]["pillar
 // page. Each half leads with its own headline stat, then a receipt-style
 // row list (label left, monospace value right, dotted dividers) — per
 // Joyce's second pricing mockup.
+// A headline with its first number counting up ("$130 per agent…", "Over 5x")
+function CountingHeadline({ text }: { text: string }) {
+  const match = text.match(/^(.*?)(\d+)(.*)$/);
+  if (!match) return <>{text}</>;
+  return (
+    <>
+      {match[1]}
+      <CountUp to={Number(match[2])} />
+      {match[3]}
+    </>
+  );
+}
+
+// One half of the pricing card. On scroll-in it prints like a receipt: the
+// headline counts up, then the rows appear top to bottom; a highlighted row
+// gets a highlighter sweep once it lands. `start` staggers the two halves.
 function PricingHalf({
   data,
   dark,
+  start = 0,
 }: {
   data: CaseStudyHelport["marketPlan"]["pricing"]["whatTheyPay" | "whatTheyGetBack"];
   dark?: boolean;
+  start?: number;
 }) {
   return (
-    <div className={`p-8 ${dark ? "bg-[#00422B]" : "bg-[var(--color-card)]"}`}>
+    <motion.div
+      className={`p-8 ${dark ? "bg-[#00422B]" : "bg-[var(--color-card)]"}`}
+      initial="hidden"
+      whileInView="shown"
+      viewport={{ once: true, margin: "-80px 0px -80px 0px" }}
+    >
       <div
         className={`mb-2 font-mono text-[11px] font-semibold tracking-wider uppercase ${
           dark ? "text-[var(--color-primary-light)]" : "text-[var(--color-muted)]"
@@ -118,7 +163,7 @@ function PricingHalf({
           dark ? "text-[var(--color-bg)]" : "text-[var(--color-fg)]"
         }`}
       >
-        {data.headline}
+        <CountingHeadline text={data.headline} />
       </div>
       <p
         className={`mt-1 mb-6 text-[14px] ${
@@ -133,12 +178,33 @@ function PricingHalf({
         }`}
       >
         {data.rows.map((row, i) => (
-          <div key={i} className="flex items-baseline justify-between gap-4 py-3">
-            <span className={`text-[14px] ${dark ? "text-[var(--color-bg)]" : "text-[var(--color-fg)]"}`}>
+          <motion.div
+            key={i}
+            className="relative flex items-baseline justify-between gap-4 py-3"
+            variants={{
+              hidden: { opacity: 0, y: -6 },
+              shown: { opacity: 1, y: 0, transition: { duration: 0.3, ease: "easeOut", delay: start + 0.35 + i * 0.12 } },
+            }}
+          >
+            {"highlight" in row && row.highlight && (
+              <motion.span
+                aria-hidden
+                className="absolute inset-y-1 -right-2 -left-2 origin-left rounded-md"
+                style={{ background: "color-mix(in srgb, var(--color-primary-light) 16%, transparent)" }}
+                variants={{
+                  hidden: { scaleX: 0 },
+                  shown: {
+                    scaleX: 1,
+                    transition: { duration: 0.6, ease: "easeInOut", delay: start + 0.35 + data.rows.length * 0.12 + 0.2 },
+                  },
+                }}
+              />
+            )}
+            <span className={`relative text-[14px] ${dark ? "text-[var(--color-bg)]" : "text-[var(--color-fg)]"}`}>
               {row.label}
             </span>
             <span
-              className={`font-mono text-[13px] whitespace-nowrap ${
+              className={`relative font-mono text-[13px] whitespace-nowrap ${
                 "highlight" in row && row.highlight
                   ? "font-bold text-[var(--color-primary-light)]"
                   : dark
@@ -148,10 +214,10 @@ function PricingHalf({
             >
               {row.value}
             </span>
-          </div>
+          </motion.div>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -159,7 +225,7 @@ function PricingCard({ pricing }: { pricing: CaseStudyHelport["marketPlan"]["pri
   return (
     <Reveal variant="scale" className="mb-11 grid grid-cols-1 overflow-hidden rounded-xl sm:grid-cols-2">
       <PricingHalf data={pricing.whatTheyPay} />
-      <PricingHalf data={pricing.whatTheyGetBack} dark />
+      <PricingHalf data={pricing.whatTheyGetBack} dark start={0.5} />
     </Reveal>
   );
 }
@@ -589,58 +655,106 @@ function DemoFlowDiagram({
             sits at pt-6 (not vertically centered) so it lines up with the
             stage row specifically, not the middle of the whole 4-item stack
             each column now holds (stage → connector → co-pilot → caption). */}
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] sm:flex-1 sm:items-stretch">
-          {flow.map((step, i) => {
-            const system = coPilotSystems[i];
-            return (
-              <Fragment key={step.title}>
-                <div className="flex h-full flex-col items-center gap-2">
-                  <div
-                    className="flex min-h-[72px] w-full items-center justify-center rounded-xl border bg-white px-4 py-4 text-center text-[14px] leading-snug font-bold text-[var(--color-fg)] shadow-[0px_1px_2px_rgba(0,0,0,0.06),0px_4px_14px_rgba(0,0,0,0.05)]"
-                    style={{ borderColor: HELPORT_CARD_BORDER, boxShadow: "0px 1px 2px rgba(0,0,0,0.06), 0px 4px 14px rgba(0,0,0,0.05)" }}
-                  >
-                    {step.title}
-                  </div>
-                  {system && (
-                    <>
-                      <div
-                        className="h-5 w-1 rounded-full"
-                        style={{
-                          backgroundImage: `radial-gradient(circle, ${HELPORT_MINT} 1.5px, transparent 1.8px)`,
-                          backgroundSize: "4px 8px",
-                          backgroundRepeat: "repeat-y",
-                        }}
-                      />
-                      <div
-                        className="flex min-h-[72px] w-full items-center justify-center rounded-xl border px-4 py-3 text-center text-[14px] leading-snug font-bold"
-                        style={{
-                          backgroundColor: `color-mix(in srgb, ${HELPORT_MINT} 16%, white)`,
-                          borderColor: `color-mix(in srgb, ${HELPORT_MINT} 42%, white)`,
-                          color: HELPORT_DARK,
-                        }}
-                      >
-                        {system.label}
-                      </div>
-                      <div className="w-full rounded-md bg-white/70 p-2.5 text-center text-[13px] leading-snug text-[var(--color-fg)]">
-                        {system.caption}
-                      </div>
-                    </>
-                  )}
-                </div>
-                {i < flow.length - 1 && (
-                  <div
-                    aria-hidden
-                    className="hidden items-start justify-center pt-6 text-[18px] font-bold text-[#00774D] sm:flex"
-                  >
-                    →
-                  </div>
-                )}
-              </Fragment>
-            );
-          })}
-        </div>
+        <FlowSequence flow={flow} coPilotSystems={coPilotSystems} />
       </div>
     </Reveal>
+  );
+}
+
+// The call, played as a sequence: each human step appears, its connector
+// drops to the co-pilot system below it, then an arrow draws to the next
+// step. Plays the first time it scrolls into view and replays from the start
+// on hover. Times are in seconds from the start.
+const FLOW_STEP_S = 0.9;
+const flowAt = (i: number, offset: number) => i * FLOW_STEP_S + offset;
+const flowShown = (delay: number, extra: TargetAndTransition = {}): Variants => ({
+  hidden: { opacity: 0, y: 8 },
+  shown: { opacity: 1, y: 0, ...extra, transition: { duration: 0.35, ease: "easeOut", delay } },
+});
+
+function FlowSequence({
+  flow,
+  coPilotSystems,
+}: {
+  flow: CaseStudyHelport["demo"]["flow"];
+  coPilotSystems: CaseStudyHelport["demo"]["coPilotSystems"];
+}) {
+  const { replays, replay, handlers } = useHoverReplay();
+  return (
+    <motion.div
+      key={replays}
+      className="grid grid-cols-1 gap-5 sm:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] sm:flex-1 sm:items-stretch"
+      initial="hidden"
+      {...(replay ? { animate: "shown" } : { whileInView: "shown", viewport: { once: true, margin: "-80px 0px -80px 0px" } })}
+      {...handlers}
+    >
+      {flow.map((step, i) => {
+        const system = coPilotSystems[i];
+        return (
+          <Fragment key={step.title}>
+            <div className="flex h-full flex-col items-center gap-2">
+              {/* 1. the human step */}
+              <motion.div
+                variants={flowShown(flowAt(i, 0))}
+                className="flex min-h-[72px] w-full items-center justify-center rounded-xl border bg-white px-4 py-4 text-center text-[14px] leading-snug font-bold text-[var(--color-fg)]"
+                style={{ borderColor: HELPORT_CARD_BORDER, boxShadow: "0px 1px 2px rgba(0,0,0,0.06), 0px 4px 14px rgba(0,0,0,0.05)" }}
+              >
+                {step.title}
+              </motion.div>
+              {system && (
+                <>
+                  {/* 2. the dotted connector drops down… */}
+                  <motion.div
+                    className="h-5 w-1 origin-top rounded-full"
+                    style={{
+                      backgroundImage: `radial-gradient(circle, ${HELPORT_MINT} 1.5px, transparent 1.8px)`,
+                      backgroundSize: "4px 8px",
+                      backgroundRepeat: "repeat-y",
+                    }}
+                    variants={{
+                      hidden: { scaleY: 0 },
+                      shown: { scaleY: 1, transition: { duration: 0.2, delay: flowAt(i, 0.25) } },
+                    }}
+                  />
+                  {/* 3. …to the co-pilot system and what it does */}
+                  <motion.div
+                    variants={flowShown(flowAt(i, 0.4))}
+                    className="flex min-h-[72px] w-full items-center justify-center rounded-xl border px-4 py-3 text-center text-[14px] leading-snug font-bold"
+                    style={{
+                      backgroundColor: `color-mix(in srgb, ${HELPORT_MINT} 16%, white)`,
+                      borderColor: `color-mix(in srgb, ${HELPORT_MINT} 42%, white)`,
+                      color: HELPORT_DARK,
+                    }}
+                  >
+                    {system.label}
+                  </motion.div>
+                  <motion.div
+                    variants={flowShown(flowAt(i, 0.5))}
+                    className="w-full rounded-md bg-white/70 p-2.5 text-center text-[13px] leading-snug text-[var(--color-fg)]"
+                  >
+                    {system.caption}
+                  </motion.div>
+                </>
+              )}
+            </div>
+            {/* 4. the arrow draws to the next step */}
+            {i < flow.length - 1 && (
+              <div aria-hidden className="hidden items-start justify-center pt-[29px] sm:flex">
+                <svg viewBox="0 0 22 14" className="h-3.5 w-[22px]" fill="none" stroke={HELPORT_MEDIUM} strokeWidth={2.25} strokeLinecap="round" strokeLinejoin="round">
+                  <motion.path
+                    d="M1 7h18M14 2l5 5-5 5"
+                    variants={{
+                      hidden: { pathLength: 0, opacity: 0 },
+                      shown: { pathLength: 1, opacity: 1, transition: { duration: 0.3, delay: flowAt(i, 0.62) } },
+                    }}
+                  />
+                </svg>
+              </div>
+            )}
+          </Fragment>
+        );
+      })}
+    </motion.div>
   );
 }
 
@@ -775,8 +889,18 @@ function PerceptualMap({
       <h4 className="mb-4 text-center font-serif text-[17px] font-bold text-[var(--color-fg)]">
         {title}
       </h4>
-      <div className="relative min-h-[300px] w-full flex-1 overflow-hidden">
-        <div className="absolute inset-x-4 top-1/2 h-px bg-[#0AD48C]/45" />
+      {/* On scroll-in: the axes draw out from the center, the competitors pop
+          in one by one, Helport lands last and keeps rippling */}
+      <motion.div
+        className="relative min-h-[300px] w-full flex-1 overflow-hidden"
+        initial="hidden"
+        whileInView="shown"
+        viewport={{ once: true, margin: "-80px 0px -80px 0px" }}
+      >
+        <motion.div
+          className="absolute inset-x-4 top-1/2 h-px bg-[#0AD48C]/45"
+          variants={{ hidden: { scaleX: 0 }, shown: { scaleX: 1, transition: { duration: 0.6, ease: "easeOut" } } }}
+        />
         <div
           aria-hidden
           className="absolute top-1/2 right-4 h-0 w-0 -translate-y-1/2 border-y-[5px] border-l-[8px] border-y-transparent border-l-[#0AD48C]/70"
@@ -785,7 +909,10 @@ function PerceptualMap({
           aria-hidden
           className="absolute top-1/2 left-4 h-0 w-0 -translate-y-1/2 border-y-[5px] border-r-[8px] border-y-transparent border-r-[#0AD48C]/70"
         />
-        <div className="absolute inset-y-4 left-1/2 w-px bg-[#0AD48C]/45" />
+        <motion.div
+          className="absolute inset-y-4 left-1/2 w-px bg-[#0AD48C]/45"
+          variants={{ hidden: { scaleY: 0 }, shown: { scaleY: 1, transition: { duration: 0.6, ease: "easeOut" } } }}
+        />
         <div
           aria-hidden
           className="absolute top-4 left-1/2 h-0 w-0 -translate-x-1/2 border-x-[5px] border-b-[8px] border-x-transparent border-b-[#0AD48C]/70"
@@ -807,21 +934,60 @@ function PerceptualMap({
           {xAxis[1]}
         </span>
 
-        {points.map((point) => (
-          <div
+        {points.map((point, i) => (
+          <motion.div
             key={point.name}
             className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1.5"
             style={{
               left: `clamp(2.5rem, ${point.x}%, calc(100% - 2.5rem))`,
               top: `clamp(4rem, ${100 - point.y}%, calc(100% - 4rem))`,
+              zIndex: point.isHelport ? 1 : undefined,
+            }}
+            variants={{
+              hidden: { opacity: 0, scale: 0.6 },
+              shown: {
+                opacity: 1,
+                scale: 1,
+                transition: {
+                  type: "spring",
+                  stiffness: 320,
+                  damping: point.isHelport ? 12 : 20,
+                  delay: point.isHelport ? 0.5 + points.length * 0.12 : 0.5 + i * 0.12,
+                },
+              },
             }}
           >
             {point.isHelport ? (
-              <div
-                className="flex h-11 w-16 items-center justify-center rounded-md border bg-white p-1.5 shadow-sm"
-                style={{ borderColor: HELPORT_MINT }}
-              >
-                <img src={point.logo} alt={point.name} className="max-h-8 max-w-full object-contain" />
+              <div className="relative">
+                {/* Ripples: mint rings pulsing out from the logo, staggered,
+                    starting once it has landed (none with reduced motion) */}
+                {[0, 1].map((ring) => (
+                  <motion.span
+                    key={ring}
+                    aria-hidden
+                    className="pointer-events-none absolute top-1/2 left-1/2 -z-10 h-11 w-16 -translate-x-1/2 -translate-y-1/2 rounded-lg border-[1.5px] motion-reduce:hidden"
+                    style={{ borderColor: HELPORT_MINT }}
+                    variants={{
+                      hidden: { opacity: 0, scale: 1 },
+                      shown: {
+                        opacity: [0.4, 0],
+                        scale: [1, 1.4],
+                        transition: {
+                          duration: 3,
+                          ease: "easeOut",
+                          repeat: Infinity,
+                          delay: 1.4 + points.length * 0.12 + ring * 1.5,
+                        },
+                      },
+                    }}
+                  />
+                ))}
+                <div
+                  className="relative flex h-11 w-16 items-center justify-center rounded-md border bg-white p-1.5 shadow-sm"
+                  style={{ borderColor: HELPORT_MINT }}
+                >
+                  <img src={point.logo} alt={point.name} className="max-h-8 max-w-full object-contain" />
+                </div>
               </div>
             ) : (
               <div className="flex h-9 w-16 items-center justify-center rounded-md bg-white p-1 shadow-sm">
@@ -831,9 +997,9 @@ function PerceptualMap({
             <span className="text-[10px] font-semibold whitespace-nowrap text-[var(--color-muted)]">
               {point.name}
             </span>
-          </div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
     </div>
   );
 }
@@ -843,11 +1009,18 @@ function CompetitiveConclusionCallout({ conclusion }: { conclusion: string }) {
   const focus = "real-time agent guidance, compliance support, and workflow automation";
   const [beforeFocus, afterFocus = ""] = conclusion.split(focus);
 
+  // On scroll-in: the dotted line draws down, the arrowhead lands, then the
+  // callout rises in; after that the dots keep drifting down into it.
   return (
-    <div className="mb-11 flex flex-col items-center">
+    <motion.div
+      className="mb-11 flex flex-col items-center"
+      initial="hidden"
+      whileInView="shown"
+      viewport={{ once: true, margin: "-80px 0px -80px 0px" }}
+    >
       <div className="flex h-20 flex-col items-center" aria-hidden>
-        <div
-          className="h-11 w-1 rounded-full"
+        <motion.div
+          className="h-11 w-1 origin-top rounded-full"
           style={{
             backgroundImage: `linear-gradient(to bottom, color-mix(in srgb, ${HELPORT_MINT} 18%, white), ${HELPORT_MINT})`,
             WebkitMaskImage: "radial-gradient(circle, black 1.5px, transparent 1.8px)",
@@ -857,10 +1030,32 @@ function CompetitiveConclusionCallout({ conclusion }: { conclusion: string }) {
             maskSize: "4px 8px",
             maskRepeat: "repeat-y",
           }}
+          variants={{
+            hidden: { scaleY: 0 },
+            shown: {
+              scaleY: 1,
+              // the dots' drift: the mask slides one dot-step down, on loop
+              maskPosition: ["0px 0px", "0px 8px"],
+              transition: {
+                scaleY: { duration: 0.5, ease: "easeOut" },
+                maskPosition: { duration: 0.6, ease: "linear", repeat: Infinity, delay: 1.2 },
+              },
+            },
+          }}
         />
-        <div className="h-0 w-0 border-x-[6px] border-t-[9px] border-x-transparent border-t-[#0AD48C]" />
+        <motion.div
+          className="h-0 w-0 border-x-[6px] border-t-[9px] border-x-transparent border-t-[#0AD48C]"
+          variants={{
+            hidden: { opacity: 0, y: -8 },
+            shown: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 400, damping: 14, delay: 0.45 } },
+          }}
+        />
       </div>
-      <div
+      <motion.div
+        variants={{
+          hidden: { opacity: 0, y: 14 },
+          shown: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut", delay: 0.65 } },
+        }}
         className="w-full rounded-xl border p-6 text-center sm:p-7"
         style={{
           backgroundImage: "linear-gradient(135deg, rgb(103 209 144 / 0.72), rgb(92 188 180 / 0.72))",
@@ -873,8 +1068,8 @@ function CompetitiveConclusionCallout({ conclusion }: { conclusion: string }) {
           <strong className="font-bold">{focus}</strong>
           {afterFocus}
         </p>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -905,34 +1100,7 @@ export default function HelportCaseStudyPage({
   return (
     <CaseStudyShell caseStudy={caseStudy} tocItems={tocItems} nextProject={nextProject}>
       <CaseStudySection id="research" number="01 — Research" title="Why We Built This">
-        <div className="mb-8 grid grid-cols-1 items-stretch gap-6 sm:grid-cols-3">
-          {caseStudy.research.stats.map((stat, i) => (
-            <Reveal
-              key={i}
-              delay={i * 0.08}
-              variant="scale"
-              className="flex h-full flex-col rounded-xl border bg-white p-6"
-              style={{ borderColor: HELPORT_CARD_BORDER, boxShadow: HELPORT_SOFT_SHADOW }}
-            >
-              <div className="font-serif text-[2.25rem] leading-tight font-bold text-[#00774D]">
-                {stat.value}
-              </div>
-              <p className="mt-1.5 text-[16px] leading-snug text-[var(--color-fg)]">{stat.finding}</p>
-            </Reveal>
-          ))}
-        </div>
-        <p className="mb-8 text-[16px] leading-relaxed text-[var(--color-fg)]">{caseStudy.research.intro}</p>
-        <div
-          className="mb-11 rounded-xl border p-8"
-          style={HELPORT_PANEL_STYLE}
-        >
-          <div className="mb-2 font-mono text-xs font-bold tracking-wider text-[#00774D] uppercase">
-            {caseStudy.research.gapLabel}
-          </div>
-          <p className="text-[16px] leading-relaxed font-normal text-[var(--color-fg)]">
-            {caseStudy.research.gap}
-          </p>
-        </div>
+        <HelportResearch research={caseStudy.research} />
       </CaseStudySection>
 
       <CaseStudySection id="pain-points" number="02 — Pain Points" title="Three ways it breaks down">

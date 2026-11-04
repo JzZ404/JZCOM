@@ -1,7 +1,8 @@
 "use client";
 
-import { Fragment, useEffect, useRef, useState } from "react";
-import { animate, motion, useInView } from "framer-motion";
+import { Fragment } from "react";
+import { motion } from "framer-motion";
+import { BoldPhrases, CountUp, inView, useHoverReplay } from "./researchMotion";
 import { ArrowDown, ArrowRight } from "lucide-react";
 import type { CaseStudy, CaseStudyResearchStat } from "@/data/caseStudies";
 import Reveal from "./Reveal";
@@ -14,7 +15,6 @@ const LIME_INK = "#5E9A1F";
 const MINT_TINT = "rgba(126, 238, 196, 0.28)";
 const MINT_INK = "#1F7A5A";
 const PERIWINKLE_TINT = "rgba(140, 147, 240, 0.22)";
-const inView = { once: true, margin: "-80px" } as const;
 
 // Nest's research, told in four beats, each with its own form: what we did
 // (the counts in the intro count up), what we found (percentages as filling
@@ -38,37 +38,6 @@ export default function NestResearch({ research }: { research: Research }) {
   );
 }
 
-// Counts a number up from 0 the first time it scrolls into view. The final
-// value renders on the server, so it reads correctly without JavaScript;
-// reduced motion skips the count.
-function CountUp({ to, suffix = "", replay = false }: { to: number; suffix?: string; replay?: boolean }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const seen = useInView(ref, inView);
-  // A hover replay starts right away (the card is already on screen)
-  const go = seen || replay;
-  useEffect(() => {
-    if (!go) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      if (ref.current) ref.current.textContent = `${to}${suffix}`;
-      return;
-    }
-    const controls = animate(0, to, {
-      duration: 1.3,
-      ease: [0.16, 1, 0.3, 1],
-      onUpdate: (n) => {
-        if (ref.current) ref.current.textContent = `${Math.round(n)}${suffix}`;
-      },
-    });
-    return () => controls.stop();
-  }, [go, to, suffix]);
-  return (
-    <span ref={ref} className="tabular-nums">
-      {replay ? 0 : to}
-      {suffix}
-    </span>
-  );
-}
-
 // The intro sentence with its numbers set large and counting up
 function IntroWithCounts({ text }: { text: string }) {
   return (
@@ -86,53 +55,13 @@ function IntroWithCounts({ text }: { text: string }) {
   );
 }
 
-// A finding card. Hovering replays its ring and count-up (by remounting them
-// under a new key) when it has one.
+// A finding card. Hovering replays its ring and count-up, when it has one.
 function FindingCard({ stat }: { stat: CaseStudyResearchStat }) {
-  const [replays, setReplays] = useState(0);
-  // Replaying swaps the content under the cursor, which makes React report
-  // the mouse entering again — so each hover only counts once, until it
-  // actually leaves.
-  const hovering = useRef(false);
+  const { replays, replay, handlers } = useHoverReplay(stat.percent !== undefined);
   return (
-    <div
-      className="flex h-full flex-col justify-center rounded-xl bg-[var(--color-card)] p-6"
-      onMouseEnter={
-        stat.percent !== undefined
-          ? () => {
-              if (hovering.current) return;
-              hovering.current = true;
-              setReplays((n) => n + 1);
-            }
-          : undefined
-      }
-      onMouseLeave={() => {
-        hovering.current = false;
-      }}
-    >
-      <Finding key={replays} stat={stat} replay={replays > 0} />
+    <div className="flex h-full flex-col justify-center rounded-xl bg-[var(--color-card)] p-6" {...handlers}>
+      <Finding key={replays} stat={stat} replay={replay} />
     </div>
-  );
-}
-
-// The finding sentence with its `bold` phrases emphasized
-function FindingText({ stat }: { stat: CaseStudyResearchStat }) {
-  const phrases = stat.bold ?? [];
-  const parts = phrases.length
-    ? stat.finding.split(new RegExp(`(${phrases.map((p) => p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})`))
-    : [stat.finding];
-  return (
-    <>
-      {parts.map((part, i) =>
-        phrases.includes(part) ? (
-          <strong key={i} className="font-semibold text-[var(--color-primary)]">
-            {part}
-          </strong>
-        ) : (
-          <Fragment key={i}>{part}</Fragment>
-        ),
-      )}
-    </>
   );
 }
 
@@ -142,7 +71,7 @@ function Finding({ stat, replay }: { stat: CaseStudyResearchStat; replay: boolea
       <div className="flex items-center gap-5">
         <Ring percent={stat.percent} replay={replay} />
         <p className="text-[15px] leading-snug text-[var(--color-muted)]">
-          <FindingText stat={stat} />
+          <BoldPhrases text={stat.finding} phrases={stat.bold} className="text-[var(--color-primary)]" />
         </p>
       </div>
     );

@@ -692,9 +692,19 @@ export type CaseStudyHelport = {
   links?: CaseStudyLink[];
   research: {
     intro: string;
+    // Phrases in `intro` to emphasize
+    introBold?: string[];
     stats: { value: string; finding: string }[];
     gapLabel: string;
-    gap: string;
+    // The gap in its parts: the headline number, then the signals that the
+    // industry is ready for AI
+    gap: {
+      value: string;
+      valueLabel: string;
+      signalsLead: string;
+      // `bold` lists phrases in `text` to emphasize
+      signals: { text: string; bold?: string[] }[];
+    };
   };
   painPoints: {
     pillars: { title: string; body: string; image?: string }[];
@@ -843,6 +853,7 @@ export const helportCaseStudy: CaseStudyHelport = {
   research: {
     intro:
       "Health insurance support in the U.S. is breaking down at scale — for the members trying to use their coverage and the agents trying to help them.",
+    introBold: ["members", "agents"],
     stats: [
       {
         value: "58%",
@@ -855,7 +866,19 @@ export const helportCaseStudy: CaseStudyHelport = {
       },
     ],
     gapLabel: "The Gap",
-    gap: "U.S. health insurers collectively cover around 300 million Americans, and the industry is already signaling it's ready for AI — CVS Health kicked off a multiyear $2B cost-cutting effort, and UnitedHealth's CTO has said AI investment is core to fixing a health care system that needs it.",
+    // Joyce's gap paragraph, split at its own joints
+    gap: {
+      value: "~300M",
+      valueLabel: "Americans covered by U.S. health insurers",
+      signalsLead: "And the industry is already signaling it's ready for AI:",
+      signals: [
+        { text: "CVS Health kicked off a multiyear $2B cost-cutting effort", bold: ["CVS Health", "$2B"] },
+        {
+          text: "UnitedHealth's CTO has said AI investment is core to fixing a health care system that needs it",
+          bold: ["UnitedHealth's CTO"],
+        },
+      ],
+    },
   },
   painPoints: {
     pillars: [

@@ -3,10 +3,10 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Reveal from "./Reveal";
+import { ROLL_LINE as LINE, RollingDigit } from "./researchMotion";
 
 // The site's own card colors, with the numbers in Alio's indigo
 const INDIGO = "#4F46E5";
-const LINE = 1.15; // em — the number's line height, and each digit window's
 
 type Stat = { value: string; finding: string };
 
@@ -56,32 +56,5 @@ function StatCard({ stat }: { stat: Stat }) {
         {stat.finding}
       </p>
     </div>
-  );
-}
-
-// One digit in a window one line tall, over a strip of 0–9 twice. At rest it
-// shows its digit in the first set; a roll spins a full turn to the same digit
-// in the second set (each hover restarts from the first). Digits further right
-// take a beat longer, like an odometer. With reduced motion on, the case
-// study's MotionConfig skips the spin and the digit simply stays put.
-function RollingDigit({ digit, rolls, order }: { digit: number; rolls: number; order: number }) {
-  return (
-    // The invisible copy of the digit sets the window to its own width (a
-    // "1" stays narrow); the spinning strip is centered over it.
-    <span aria-hidden className="relative inline-block overflow-hidden align-top" style={{ height: `${LINE}em` }}>
-      <span className="invisible">{digit}</span>
-      <motion.span
-        key={rolls}
-        className="absolute inset-x-0 top-0 flex flex-col items-center"
-        style={{ lineHeight: `${LINE}em` }}
-        initial={{ y: `${-digit * LINE}em` }}
-        animate={{ y: rolls ? [`${-digit * LINE}em`, `${-(digit + 10) * LINE}em`] : `${-digit * LINE}em` }}
-        transition={rolls ? { duration: 0.75 + order * 0.08, ease: [0.22, 1, 0.36, 1] } : { duration: 0 }}
-      >
-        {[...Array(20)].map((_, n) => (
-          <span key={n}>{n % 10}</span>
-        ))}
-      </motion.span>
-    </span>
   );
 }
