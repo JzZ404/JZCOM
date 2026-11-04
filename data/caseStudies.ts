@@ -21,7 +21,15 @@ export type CaseStudyJourney = { persona: string; image: string };
 // ranking result gets a highlighted phrase instead, styled the same way as
 // a numeral (bold, green) but smaller when `compact` is set, since a
 // multi-word phrase at numeral size wraps to 3 lines and overpowers the row.
-export type CaseStudyResearchStat = { value?: string; finding: string; compact?: boolean };
+// `percent` draws the stat as a ring filled to that share; `bold` lists
+// phrases in `finding` to emphasize.
+export type CaseStudyResearchStat = {
+  value?: string;
+  finding: string;
+  compact?: boolean;
+  percent?: number;
+  bold?: string[];
+};
 
 export type CaseStudy = {
   title: string; // short case-study header ("Nest") — independent of the Work card's full title
@@ -35,13 +43,27 @@ export type CaseStudy = {
     stats: CaseStudyResearchStat[];
     quotesTitle: string;
     quotes: string[];
-    hypothesis: string;
+    // The "If … then …" hypothesis, split at its "then"
+    hypothesis: { label: string; if: string; then: string };
   };
   personas: CaseStudyPersona[];
   journeys: CaseStudyJourney[];
   problem: string;
-  goal: string;
-  competitiveAuditImage: string;
+  // Phrases in `problem` to mark with a highlighter
+  problemHighlights?: string[];
+  // The goal statement in its three parts: what the product does, who it
+  // serves, and how success is measured
+  goal: {
+    what: { label: string; text: string };
+    who: { label: string; text: string };
+    measure: { label: string; items: string[] };
+  };
+  // Rebuilt in code from the old competitive-audit.png: `columns` are the
+  // headings after the competitor name; each row's `cells` follow them in order.
+  competitiveAudit: {
+    columns: string[];
+    rows: { name: string; cells: string[] }[];
+  };
   hmws: string[];
   userFlowImage: string;
   lofiImage: string;
@@ -1306,15 +1328,19 @@ export const caseStudies: Record<string, CaseStudy> = {
     ],
     research: {
       intro:
-        "We collected 146 survey responses and conducted 18 close interviews to understand what actually keeps people from staying active.",
+        "146 survey responses and 18 interviews on what keeps people from staying active.",
       stats: [
         {
           value: "42%",
           finding: "said lack of time, not motivation, is what keeps them from staying active",
+          percent: 42,
+          bold: ["lack of time, not motivation"],
         },
         {
           value: "65%",
           finding: "would give a habit app just 5 to 30 minutes a day",
+          percent: 65,
+          bold: ["5 to 30 minutes a day"],
         },
         {
           value: "Daily Goals & Visible Progress",
@@ -1328,8 +1354,11 @@ export const caseStudies: Record<string, CaseStudy> = {
         "People don't want a leaderboard. They want proof they're moving forward.",
       ],
       // Hypothesis Statement — the synthesis drawn from the findings above.
-      hypothesis:
-        "If we give users a low-effort daily habit loop that combines visible personal progress with optional, low-pressure social features, then they will sustain the habit longer than they have with past fitness or habit-tracking apps, regardless of whether their main barrier is time or motivation.",
+      hypothesis: {
+        label: "Hypothesis",
+        if: "we give users a low-effort daily habit loop that combines visible personal progress with optional, low-pressure social features,",
+        then: "they will sustain the habit longer than they have with past fitness or habit-tracking apps, regardless of whether their main barrier is time or motivation.",
+      },
     },
     personas: [
       { name: "Alex Chen", image: "/images/nest/persona-alex.png" },
@@ -1341,8 +1370,85 @@ export const caseStudies: Record<string, CaseStudy> = {
     ],
     problem:
       "Urban, early-career professionals want to build a healthier movement habit, but limited time and inconsistent motivation get in the way. Their existing routines and attempts with fitness or habit-tracking apps have not been flexible or engaging enough to survive a busy, unpredictable schedule.",
-    goal: "Our app will let users build a movement habit through small daily actions, visible progress systems, and optional social challenges, which will affect time-constrained and motivation-constrained users alike by meeting them at their specific point of friction rather than requiring a fixed routine or schedule. We will measure effectiveness by tracking habit retention past the 14-day mark, weekday engagement (independent of weekend plans), and participation in both solo and social features across user types.",
-    competitiveAuditImage: "/images/nest/competitive-audit.png",
+    problemHighlights: ["limited time and inconsistent motivation", "flexible or engaging enough"],
+    // Joyce's goal statement, split at its own joints
+    goal: {
+      what: {
+        label: "What we'll build",
+        text: "Our app will let users build a movement habit through small daily actions, visible progress systems, and optional social challenges.",
+      },
+      who: {
+        label: "Who it's for",
+        text: "Time-constrained and motivation-constrained users alike, met at their specific point of friction rather than asked to keep a fixed routine or schedule.",
+      },
+      measure: {
+        label: "How we'll measure it",
+        items: [
+          "Habit retention past the 14-day mark",
+          "Weekday engagement, independent of weekend plans",
+          "Participation in both solo and social features across user types",
+        ],
+      },
+    },
+    competitiveAudit: {
+      columns: ["Core Offering", "Key Strength", "Key Weakness", "Relevance to Our Product"],
+      rows: [
+        {
+          name: "Zombies, Run!",
+          cells: [
+            "Narrative-driven running app",
+            "Immersive storytelling drives intrinsic motivation",
+            "No social features, subscription-gated, cardio-only",
+            "Validates our solo/narrative-driven approach for Alex",
+          ],
+        },
+        {
+          name: "Pikmin Bloom",
+          cells: [
+            "Walking-based AR companion",
+            "Extremely low barrier to entry, gentle tone",
+            "Shallow long-term depth",
+            "Closest analog to our pet-growth mechanic",
+          ],
+        },
+        {
+          name: "INTVL",
+          cells: [
+            "Map territory-capture via walking",
+            "High user rating, team/community options, health-data integration",
+            "Limited public detail on execution",
+            "Closest analog to our social/duel mechanic",
+          ],
+        },
+        {
+          name: "Strava",
+          cells: [
+            "Fitness social network",
+            "Strong existing community, competitive leaderboards",
+            "Assumes an athlete baseline, not gamified",
+            "Shows the ceiling for social accountability, without the intimidation factor we want to avoid",
+          ],
+        },
+        {
+          name: "Sweatcoin",
+          cells: [
+            "Step-to-currency rewards",
+            "Simple, easy adoption",
+            "Rewards feel hollow without paying",
+            "Cautionary example: extrinsic rewards alone don't sustain a habit loop",
+          ],
+        },
+        {
+          name: "Pokémon GO",
+          cells: [
+            "AR exploration/collection",
+            "Massive engagement history, beloved IP",
+            "Repetitive over time, heavy AR/GPS dependency",
+            "Shows engagement can fade without narrative or social refresh",
+          ],
+        },
+      ],
+    },
     hmws: [
       "How might we help users with limited time and energy integrate healthy habits into daily life? ⏳",
       "How might we balance competition and collaboration to fit different user motivations? 🤝",

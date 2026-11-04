@@ -5,6 +5,11 @@ import type { CaseStudy } from "@/data/caseStudies";
 import CaseStudyShell from "./CaseStudyShell";
 import CaseStudySection from "./CaseStudySection";
 import Reveal from "./Reveal";
+import MarkedQuote from "./MarkedQuote";
+import NestCompetitiveTable from "./NestCompetitiveTable";
+import NestGoal from "./NestGoal";
+import NestResearch from "./NestResearch";
+import StickyNote from "./StickyNote";
 
 // Approximated from Joyce's palette swatch image (no hex values given) —
 // Lime Deep, Mint Bright, Periwinkle. Adjust if she supplies exact hex.
@@ -42,55 +47,7 @@ export default function CaseStudyPage({
   return (
     <CaseStudyShell caseStudy={caseStudy} tocItems={NEST_TOC_ITEMS} nextProject={nextProject}>
       <CaseStudySection id="research" number="01 — Research" title="What we heard">
-        <p className="mb-8 w-full text-[16px] leading-relaxed text-[var(--color-muted)]">
-          {caseStudy.research.intro}
-        </p>
-        {/* Exactly 3 findings, evenly spaced. The third has no numeral
-            to anchor to, so the key phrase itself gets the same
-            big/bold/green treatment as the other two numbers. */}
-        <div className="mb-11 grid grid-cols-1 gap-6 sm:grid-cols-3">
-          {caseStudy.research.stats.map((stat, i) => (
-            <Reveal key={i} delay={i * 0.08} variant="scale" className="rounded-xl bg-[var(--color-card)] p-6">
-              <div
-                className={`font-serif leading-tight font-bold text-[var(--color-primary)] ${
-                  stat.compact ? "text-[1.4rem]" : "text-[2.75rem] leading-none"
-                }`}
-              >
-                {stat.value}
-              </div>
-              <p className="mt-1.5 text-[16px] leading-snug text-[var(--color-muted)]">
-                {stat.finding}
-              </p>
-            </Reveal>
-          ))}
-        </div>
-
-        <div className="mb-8">
-          <div className="mb-4 font-mono text-[12px] font-semibold tracking-wider text-[var(--color-primary)] uppercase">
-            {caseStudy.research.quotesTitle}
-          </div>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-            {caseStudy.research.quotes.map((quote, i) => (
-              <Reveal key={i} delay={i * 0.08} variant={i % 2 === 0 ? "left" : "right"}>
-                <div className="font-serif text-[2.5rem] leading-none text-[var(--color-border)]">
-                  “
-                </div>
-                <p className="-mt-3 font-serif text-[16px] leading-relaxed text-[var(--color-fg)] italic">
-                  {quote}
-                </p>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-
-        <Reveal variant="soft" className="mb-11 rounded-xl bg-[var(--color-surface)] p-6.5">
-          <div className="mb-2 font-mono text-xs font-semibold tracking-wider text-[var(--color-primary)] uppercase">
-            Hypothesis
-          </div>
-          <p className="text-[16px] leading-relaxed text-[var(--color-muted)]">
-            {caseStudy.research.hypothesis}
-          </p>
-        </Reveal>
+        <NestResearch research={caseStudy.research} />
       </CaseStudySection>
 
       <CaseStudySection id="personas" number="02 — Persona & Journey Map" title="Who we designed for">
@@ -135,12 +92,13 @@ export default function CaseStudyPage({
       </CaseStudySection>
 
       <CaseStudySection id="problem" number="03 — Problem" title="The problem">
-        {/* Slides in from the side its accent bar is on */}
-        <Reveal variant="left" className="mb-11 rounded-xl border-l-4 border-[var(--color-primary)] bg-[var(--color-card)] p-8">
-          <p className="w-full text-[18px] font-semibold leading-relaxed text-[var(--color-fg)]">
-            {caseStudy.problem}
-          </p>
-        </Reveal>
+        {/* Same pull-quote treatment as Alio's problem, with the key phrases
+            highlighted in the HMW notes' mint */}
+        <MarkedQuote
+          text={caseStudy.problem}
+          highlights={caseStudy.problemHighlights}
+          color="rgba(126, 238, 196, 0.55)"
+        />
       </CaseStudySection>
 
       <CaseStudySection
@@ -148,15 +106,7 @@ export default function CaseStudyPage({
         number="04 — Competitive Analysis"
         title="What the market already knows"
       >
-        <Reveal variant="scale" className="mb-11">
-          <img
-            src={caseStudy.competitiveAuditImage}
-            alt="Competitive audit"
-            width={1121}
-            height={720}
-            className="aspect-[1121/720] w-full rounded-xl border border-[var(--color-border)]"
-          />
-        </Reveal>
+        <NestCompetitiveTable {...caseStudy.competitiveAudit} />
       </CaseStudySection>
 
       <CaseStudySection id="hmw" number="05 — How Might We" title="Where we chose to focus">
@@ -169,29 +119,7 @@ export default function CaseStudyPage({
             const note = STICKY_NOTE_STYLES[i % STICKY_NOTE_STYLES.length];
             return (
               <Reveal key={i} delay={i * 0.1} variant="scale">
-                <div
-                  style={{
-                    backgroundColor: note.bg,
-                    transform: `rotate(${note.rotate}deg)`,
-                    boxShadow: "6px 12px 20px rgba(0,0,0,0.3)",
-                  }}
-                  className="relative flex h-56 w-64 shrink-0 items-center justify-center rounded-sm p-7"
-                >
-                  <p className="text-center text-[16px] leading-snug font-semibold text-[#1a1f16]">
-                    {hmw}
-                  </p>
-                  {/* Folded corner: a darker triangle (the paper's
-                      underside) with its own drop-shadow, like a real
-                      peeled sticky-note corner lifting off the page. */}
-                  <div
-                    className="pointer-events-none absolute right-0 bottom-0 h-11 w-11"
-                    style={{
-                      backgroundColor: note.fold,
-                      clipPath: "polygon(0% 0%, 100% 0%, 0% 100%)",
-                      filter: "drop-shadow(-2px -3px 3px rgba(0,0,0,0.35))",
-                    }}
-                  />
-                </div>
+                <StickyNote text={hmw} bg={note.bg} fold={note.fold} rotate={note.rotate} />
               </Reveal>
             );
           })}
@@ -199,11 +127,7 @@ export default function CaseStudyPage({
       </CaseStudySection>
 
       <CaseStudySection id="goal" number="06 — Goal Statement" title="The goal">
-        <Reveal variant="soft" className="mb-11 rounded-xl bg-[var(--color-card)] p-8">
-          <p className="w-full text-[16px] leading-relaxed text-[var(--color-muted)]">
-            {caseStudy.goal}
-          </p>
-        </Reveal>
+        <NestGoal goal={caseStudy.goal} />
       </CaseStudySection>
 
       <CaseStudySection id="flow" number="07 — User Flow" title="Structure & flow">
