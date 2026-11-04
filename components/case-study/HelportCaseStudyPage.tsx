@@ -889,7 +889,7 @@ export default function HelportCaseStudyPage({
     { id: "overview", label: "Overview" },
     { id: "research", label: "Research" },
     { id: "pain-points", label: "Pain Points" },
-    { id: "problem", label: "Problem Statement" },
+    { id: "problem", label: "Problem" },
     { id: "solution", label: "Solutions" },
     { id: "personas", label: "User Personas" },
     { id: "target-market", label: "Target Market" },
@@ -949,7 +949,7 @@ export default function HelportCaseStudyPage({
         </div>
       </CaseStudySection>
 
-      <CaseStudySection id="problem" number="03 — Problem Statement" title="The problem">
+      <CaseStudySection id="problem" number="03 — Problem" title="The problem">
         {/* Same pull-quote treatment as Alio/Nest's problem statement — a
             single scoped user/need/insight sentence, not another pillar
             grid, so it reads as the one problem the product targets rather

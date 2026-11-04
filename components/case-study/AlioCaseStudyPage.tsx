@@ -7,8 +7,12 @@ import CaseStudySection from "./CaseStudySection";
 import PlaceholderBlock from "./PlaceholderBlock";
 import AiRoadmapTimeline, { phaseColor, phaseDelay } from "./AiRoadmapTimeline";
 import BusinessModelCanvas from "./BusinessModelCanvas";
+import AlioPositioningMap from "./AlioPositioningMap";
+import AlioFeatureMatrix from "./AlioFeatureMatrix";
+import AlioArchitectureFlow from "./AlioArchitectureFlow";
 import ResponsibleAiSafeguards from "./ResponsibleAiSafeguards";
 import AlioTechStack from "./AlioTechStack";
+import AlioResearchStats from "./AlioResearchStats";
 import Reveal from "./Reveal";
 import AlternatingVideos from "./AlternatingVideos";
 import { IconGlyph } from "./IconBadge";
@@ -53,13 +57,13 @@ export default function AlioCaseStudyPage({
   const tocItems = [
     { id: "overview", label: "Overview" },
     { id: "why", label: "Research" },
-    { id: "problem", label: "Problem Statement" },
-    { id: "competitive", label: "Competitive Analysis" },
-    { id: "architecture", label: "System Architecture" },
-    { id: "tech-stack", label: "Technical Stack" },
-    { id: "prototype-demo", label: "Prototype Demo" },
+    { id: "problem", label: "Problem" },
+    { id: "competitive", label: "Competitor" },
+    { id: "architecture", label: "Architecture" },
+    { id: "tech-stack", label: "Technical" },
+    { id: "demo", label: "Demo" },
     { id: "design-system", label: "Design System" },
-    { id: "business-model", label: "Business Model Canvas" },
+    { id: "business-model", label: "Business Model" },
     { id: "roadmap", label: "AI Product Roadmap" },
     { id: "responsible-ai", label: "Responsible AI" },
     ...caseStudy.sections.map((section) => ({ id: section.id, label: section.title })),
@@ -113,18 +117,7 @@ export default function AlioCaseStudyPage({
         >
           Research Results
         </h3>
-        <div className="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-3">
-          {caseStudy.researchResults.stats.map((stat, i) => (
-            <Reveal key={i} delay={i * 0.08} variant="scale" className="rounded-xl bg-[var(--color-card)] p-6">
-              <div className="font-serif text-[2.25rem] leading-tight font-bold text-[var(--color-primary)]">
-                {stat.value}
-              </div>
-              <p className="mt-1.5 text-[16px] leading-snug text-[var(--color-muted)]">
-                {stat.finding}
-              </p>
-            </Reveal>
-          ))}
-        </div>
+        <AlioResearchStats stats={caseStudy.researchResults.stats} />
 
         <Reveal variant="soft" delay={0.1} className="mb-11 rounded-xl bg-[var(--color-card)] p-8">
           <div className="mb-2 font-mono text-xs font-semibold tracking-wider text-[var(--color-primary)] uppercase">
@@ -136,7 +129,7 @@ export default function AlioCaseStudyPage({
         </Reveal>
       </CaseStudySection>
 
-      <CaseStudySection id="problem" number="02 — Problem Statement" title="The problem">
+      <CaseStudySection id="problem" number="02 — Problem" title="The problem">
         {/* Editorial pull-quote treatment instead of a bordered info-card —
             matches the "Why We Built This" quote styling elsewhere on the
             page, reads as a statement rather than a templated callout box. */}
@@ -151,17 +144,30 @@ export default function AlioCaseStudyPage({
       </CaseStudySection>
 
       <CaseStudySection id="competitive" number="03 — Competitive Analysis" title="Competitive Analysis">
-        <div className="mb-6 grid grid-cols-1 gap-8 sm:grid-cols-[1.6fr_1fr]">
-          <Reveal variant="left">
-            <img
-              src={caseStudy.competitive.image}
-              alt="Competitive analysis of elder-care coordination and AI platforms"
-              width={3690}
-              height={2056}
-              className="aspect-[3690/2056] w-full rounded-xl object-cover"
-            />
-          </Reveal>
-          <Reveal variant="right" delay={0.08} className="flex flex-col justify-center rounded-xl bg-[var(--color-card)] p-8">
+        {/* What each one does (left) beside where everyone sits (right) */}
+        {/* Both columns stretch to the same height: the table sets it and
+            the map fills it */}
+        <div className="mb-10 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)] lg:gap-4">
+          <div className="flex flex-col">
+            <h3 className="mb-4 font-serif text-[20px] font-bold text-[var(--color-fg)]">Feature comparison</h3>
+            <div className="flex-1">
+              <AlioFeatureMatrix {...caseStudy.competitive.features} />
+            </div>
+          </div>
+          <div className="flex flex-col">
+            <h3 className="mb-4 font-serif text-[20px] font-bold text-[var(--color-fg)]">Positioning</h3>
+            <div className="flex-1">
+              <AlioPositioningMap
+                {...caseStudy.competitive.positioning}
+                descriptions={Object.fromEntries(caseStudy.competitive.competitors.map((c) => [c.name, c.description]))}
+              />
+            </div>
+          </div>
+        </div>
+        {/* The takeaway pair under the cards: the gap in the field (neutral)
+            beside Alio's answer to it (light purple, the differentiation) */}
+        <div className="mb-11 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <Reveal variant="left" className="flex flex-col justify-center rounded-xl bg-[var(--color-card)] p-8">
             <div className="mb-2 font-mono text-xs font-semibold tracking-wider text-[var(--color-primary)] uppercase">
               {caseStudy.competitive.gapLabel}
             </div>
@@ -169,40 +175,30 @@ export default function AlioCaseStudyPage({
               {caseStudy.competitive.gap}
             </p>
           </Reveal>
+          <Reveal variant="right" delay={0.08} className="rounded-xl bg-[#EAEBF7]/75 p-8">
+            <div className="mb-2 font-mono text-xs font-semibold tracking-wider text-[#3730A3] uppercase">
+              {caseStudy.competitive.positionLabel}
+            </div>
+            <p className="text-[16px] leading-relaxed font-semibold text-[#1E1B4B]">
+              {caseStudy.competitive.position}
+            </p>
+          </Reveal>
         </div>
-        {/* Distinct treatment from the neutral Gap card above — a light
-            purple fill marks this as the differentiation takeaway, not
-            another finding. */}
-        <Reveal variant="scale" delay={0.12} className="mb-11 rounded-xl bg-[#EAEBF7]/75 p-8">
-          <div className="mb-2 font-mono text-xs font-semibold tracking-wider text-[#3730A3] uppercase">
-            {caseStudy.competitive.positionLabel}
-          </div>
-          <p className="text-[16px] leading-relaxed font-semibold text-[#1E1B4B]">
-            {caseStudy.competitive.position}
-          </p>
-        </Reveal>
       </CaseStudySection>
 
       <CaseStudySection id="architecture" number="04 — System Architecture" title="System Architecture">
-        <div className="mb-11 grid grid-cols-1 gap-8 sm:grid-cols-[1.15fr_1fr]">
-          <Reveal variant="left">
-            <img
-              src={caseStudy.systemArchitecture.image}
-              alt="Alio system architecture: Caregiver Portal and Family Portal linked by the Alio AI Core"
-              width={1892}
-              height={1796}
-              className="aspect-[1892/1796] w-full object-contain"
-            />
-          </Reveal>
-          <div className="flex flex-col justify-center gap-6">
+        {/* The flowchart on the left; the three ideas on the right, staying in
+            view while the (tall) chart scrolls past on wide screens */}
+        <div className="mb-11 grid grid-cols-1 items-start gap-10 lg:grid-cols-[3fr_2fr]">
+          <AlioArchitectureFlow
+            lanes={caseStudy.systemArchitecture.lanes}
+            crossLinks={caseStudy.systemArchitecture.crossLinks}
+          />
+          <div className="flex flex-col gap-7 lg:sticky lg:top-32">
             {caseStudy.systemArchitecture.blocks.map((block, i) => (
               <Reveal key={i} delay={0.1 + i * 0.1} variant="right">
-                <h3 className="mb-1.5 font-serif text-[19px] font-bold text-[var(--color-fg)]">
-                  {block.title}
-                </h3>
-                <p className="text-[16px] leading-relaxed text-[var(--color-muted)]">
-                  {block.body}
-                </p>
+                <h3 className="mb-1.5 font-serif text-[19px] font-bold text-[var(--color-fg)]">{block.title}</h3>
+                <p className="text-[16px] leading-relaxed text-[var(--color-muted)]">{block.body}</p>
               </Reveal>
             ))}
           </div>
@@ -213,7 +209,7 @@ export default function AlioCaseStudyPage({
         <AlioTechStack layers={caseStudy.technicalStack} />
       </CaseStudySection>
 
-      <CaseStudySection id="prototype-demo" number="06 — Prototype Demo" title="Prototype Demo">
+      <CaseStudySection id="demo" number="06 — Demo" title="Demo">
         <div className="flex flex-col gap-1">
           {caseStudy.prototypeDemo.features.map((feature, i) => (
             // Each row's media slides in from its own side and the text from
@@ -257,7 +253,11 @@ export default function AlioCaseStudyPage({
               <Reveal
                 variant={i % 2 === 0 ? "right" : "left"}
                 delay={0.1}
-                className={i % 2 === 1 ? "sm:order-1" : ""}
+                // Text on the left under a single video on the left (centered at
+                // w-3/5, so inset 20%) starts at that video's left edge
+                className={`${i % 2 === 1 ? "sm:order-1" : ""} ${
+                  i % 2 === 1 && caseStudy.prototypeDemo.features[i - 1]?.media?.length === 1 ? "sm:pl-[20%]" : ""
+                }`}
               >
                 <h3 className="mb-1.5 flex items-center gap-2.5 font-serif text-[19px] font-bold text-[var(--color-fg)]">
                   {/* In Alio's indigo, matching the page's other accents */}
@@ -292,18 +292,7 @@ export default function AlioCaseStudyPage({
         number="08 — Business Model Canvas"
         title="Business Model Canvas"
       >
-        {/* Reverted to the static export for now — the code-rebuilt grid's
-            hierarchy wasn't reading clearly enough yet. BusinessModelCanvas
-            is kept around to pick back up later. */}
-        <Reveal variant="scale" className="mb-11">
-          <img
-            src="/images/alio/business-model.png"
-            alt="Alio business model canvas"
-            width={1206}
-            height={681}
-            className="aspect-[1206/681] w-full rounded-xl object-contain"
-          />
-        </Reveal>
+        <BusinessModelCanvas topRow={caseStudy.businessModel.topRow} bottomRow={caseStudy.businessModel.bottomRow} />
       </CaseStudySection>
 
       <CaseStudySection id="roadmap" number="09 — AI Product Roadmap" title="AI Product Roadmap">

@@ -79,6 +79,24 @@ export const caseStudySkeletons: Record<string, CaseStudySkeleton> = {};
 // (real content below), while everything after it is still a placeholder,
 // same incremental approach as Nest: convert one section at a time as real
 // content arrives, renumbering the remaining skeleton sections to make room.
+// A box in Alio's architecture flowchart: a screen, an action the user
+// takes, an Alio AI Core step (`detail` = what the AI does), or a question.
+// `id` marks a box that a cross-portal arrow starts or ends at.
+export type AlioFlowNode = {
+  label: string;
+  kind: "screen" | "action" | "ai" | "decision";
+  detail?: string;
+  id?: string;
+};
+// One step down a lane: a single box (`note` labels the arrow into it), or
+// parallel paths that fork from the step above — each path a column of boxes
+// (`label` sits on its arrow, e.g. "Yes") — and, with `merge`, join back
+// into the next step. `start` begins a separate flow in the lane (no arrow
+// from the step above).
+export type AlioFlowStep =
+  | { node: AlioFlowNode; note?: string; start?: boolean }
+  | { paths: { label?: string; nodes: AlioFlowNode[] }[]; merge?: boolean; start?: boolean };
+
 export type CaseStudyAlio = {
   title: string;
   subheading: string;
@@ -99,16 +117,49 @@ export type CaseStudyAlio = {
     gap: string;
   };
   problem: string;
+  // Shown as two charts: a positioning map and a feature comparison.
+  // `competitors` holds each one's description (shown when its point on the
+  // map is hovered or tapped); the AI adoption notes come from the original
+  // competitive.png and aren't currently shown.
   competitive: {
-    image: string;
+    // Positions run -1 to 1 on each axis (0 = the center line); the
+    // opportunity area is given as [from, to] ranges on the same scale.
+    positioning: {
+      xAxis: [string, string];
+      yAxis: [string, string];
+      opportunity: { label: string; x: [number, number]; y: [number, number] };
+      points: { name: string; x: number; y: number; highlight?: boolean }[];
+    };
+    // `products[i]` is the column for `values[i]` in every row; the
+    // highlighted product (Alio) is the first column.
+    features: {
+      products: string[];
+      rows: { feature: string; values: ("yes" | "partial" | "no")[] }[];
+    };
+    competitors: {
+      name: string;
+      description: string;
+      aiAdoption: { level: "high" | "moderate" | "low-moderate" | "unknown"; note?: string };
+      closest?: boolean;
+    }[];
     gapLabel: string;
     gap: string;
     positionLabel: string;
     position: string;
   };
+  // The flowchart is rebuilt in code from the old architecture.png: one lane
+  // per portal, each a top-to-bottom list of steps (see AlioFlowStep).
   systemArchitecture: {
-    image: string;
     blocks: { title: string; body: string }[];
+    lanes: {
+      title: string;
+      icon: IconName;
+      tone: "caregiver" | "family";
+      steps: AlioFlowStep[];
+    }[];
+    // Every touch point between the two portals: an arrow from one box's
+    // `id` to another's, drawn across the gap between the lanes.
+    crossLinks: { from: string; to: string }[];
   };
   // Rebuilt in code from the old technical-stack.png: one card per layer.
   technicalStack: { title: string; icon: IconName; items: string[] }[];
@@ -128,8 +179,8 @@ export type CaseStudyAlio = {
     // Each entry in topRow is one of the 5 canvas columns — either a single
     // tall block, or two stacked blocks (Key Activities/Resources,
     // Customer Relationships/Channels) sharing that column's width.
-    topRow: { title: string; items: string[] }[][];
-    bottomRow: { title: string; items: string[] }[];
+    topRow: { title: string; icon?: IconName; items: string[] }[][];
+    bottomRow: { title: string; icon?: IconName; items: string[] }[];
   };
   aiRoadmap: {
     phases: { title: string; goal: string; steps: string[] }[];
@@ -202,15 +253,71 @@ export const alioCaseStudy: CaseStudyAlio = {
   problem:
     "Caregivers generate constant, valuable information, but almost none of it reaches family or becomes clinically useful. What does get through arrives unstructured, easy to miss, buried in a text or an inbox until it's too late. Alio needed to turn raw caregiver input into something actionable: interpreted labs, triage, structured logs, and visit reports, without adding more work for an already stretched caregiver.",
   competitive: {
-    image: "/images/alio/competitive.png",
-    gapLabel: "The Gap We Found",
-    gap: "Coordination platforms solve who's involved but leave AI's role vague, still depending on someone checking an inbox. Platforms with real AI depth go deep on one function, companionship or medication, but none structure everyday caregiver input across the full picture.",
-    positionLabel: "Alio's Position",
-    position:
-      "The only one combining structured, AI-generated caregiver-to-family communication with clinical-grade output (interpreted labs, triage, structured logs) in one lightweight tool, not a device, not a single-purpose reminder app.",
+    // From Joyce's positioning-map draft (point positions measured off it)
+    positioning: {
+      xAxis: ["Family-only circle", "Caregiver in the loop"],
+      yAxis: ["Low or no AI", "High AI adoption"],
+      opportunity: { label: "Opportunity space", x: [0.05, 0.98], y: [0.08, 0.97] },
+      points: [
+        { name: "ElliQ", x: -0.27, y: 0.84 },
+        { name: "Ianacare", x: -0.65, y: 0.62 },
+        { name: "Caring Village", x: -0.23, y: 0.34 },
+        { name: "Medisafe", x: -0.85, y: -0.33 },
+        { name: "CareCircle", x: -0.62, y: -0.8 },
+        { name: "Connected Caregiver", x: 0.5, y: -0.66 },
+        { name: "Alio", x: 0.62, y: 0.73, highlight: true },
+      ],
+    },
+    // From Joyce's feature-comparison draft
+    features: {
+      products: ["Alio", "Ianacare", "Caring Village", "ElliQ", "Connected Caregiver", "Medisafe", "CareCircle"],
+      rows: [
+        { feature: "Shared care circle", values: ["yes", "yes", "yes", "yes", "yes", "partial", "yes"] },
+        { feature: "Paid caregiver as an active user", values: ["yes", "no", "partial", "partial", "yes", "no", "no"] },
+        { feature: "Caregiver visit logging", values: ["yes", "partial", "partial", "no", "no", "no", "no"] },
+        { feature: "AI summary pushed to family", values: ["yes", "partial", "no", "partial", "no", "no", "no"] },
+        { feature: "Elder-facing interface", values: ["yes", "no", "no", "yes", "partial", "partial", "no"] },
+      ],
+    },
+    competitors: [
+      {
+        name: "Caring Village",
+        description: "All-in-one family care coordination",
+        aiAdoption: { level: "moderate", note: "AI positioned as guidance support, not medical decisions" },
+      },
+      {
+        name: "ElliQ",
+        description: "AI companion robot for seniors, proactive conversation, wellbeing check-ins",
+        aiAdoption: { level: "high", note: "AI is the core product experience" },
+      },
+      {
+        name: "Ianacare",
+        description: "Syncs family, caregiver, and patient, closest comparable to Alio",
+        aiAdoption: { level: "unknown" },
+        closest: true,
+      },
+      {
+        name: "CareCircle",
+        description: "Adds family members into shared task tracking",
+        aiAdoption: { level: "unknown" },
+      },
+      {
+        name: "Connected Caregiver",
+        description: "Wearable with fall detection, GPS, emergency alerts",
+        aiAdoption: { level: "low-moderate", note: "Rule and threshold-based, not generative" },
+      },
+      {
+        name: "Medisafe",
+        description: "Medication reminders with an AI voice assistant, adherence risk prediction",
+        aiAdoption: { level: "high", note: "But scoped narrowly to medication" },
+      },
+    ],
+    gapLabel: "What's missing",
+    gap: "Today's apps connect the family or point AI at the senior, but none listen to the caregiver, the one person who was actually there.",
+    positionLabel: "Alio's position",
+    position: "The only tool that uses AI to turn every caregiver visit into peace of mind for the family who couldn't be there.",
   },
   systemArchitecture: {
-    image: "/images/alio/architecture.png",
     blocks: [
       {
         title: "Two Portals, One System",
@@ -224,6 +331,80 @@ export const alioCaseStudy: CaseStudyAlio = {
         title: "Always in the Loop",
         body: "Reports and messages stay shared and up to date, so family is never catching up on what they missed.",
       },
+    ],
+    lanes: [
+      {
+        title: "Caregiver Portal",
+        icon: "hand-heart",
+        tone: "caregiver",
+        steps: [
+          { node: { label: "Home", kind: "screen" } },
+          {
+            paths: [
+              { nodes: [{ label: "Tap Patient Details", kind: "action" }] },
+              {
+                nodes: [
+                  { label: "Chat", kind: "screen" },
+                  { label: "Check for inbox", kind: "action", id: "cg-inbox" },
+                ],
+              },
+            ],
+            merge: true,
+          },
+          { node: { label: "Tap I'm Arrived", kind: "action", id: "cg-arrived" } },
+          { node: { label: "AI Log", kind: "screen" }, note: "Finish caregiving service" },
+          {
+            paths: [
+              { nodes: [{ label: "Voice", kind: "action" }] },
+              { nodes: [{ label: "Photo", kind: "action" }] },
+              { nodes: [{ label: "Labs", kind: "action" }] },
+            ],
+            merge: true,
+          },
+          { node: { label: "Alio AI Core", kind: "ai", detail: "Generate post-visit reports" } },
+          { node: { label: "Report for human review", kind: "screen" } },
+          { node: { label: "Approve and send", kind: "action", id: "cg-approve" } },
+        ],
+      },
+      {
+        title: "Family Portal",
+        icon: "users-round",
+        tone: "family",
+        steps: [
+          // Care loop messaging (see the AI-Assisted Care Loop Messaging demo)
+          { node: { label: "Message the caregiver", kind: "action" } },
+          {
+            node: { label: "Alio AI Core", kind: "ai", detail: "Flag messages that need attention", id: "fam-triage" },
+          },
+          // Real-time arrival (see the Real-Time Arrival & Status demo)
+          { node: { label: "Arrival notification", kind: "screen", id: "fam-arrived" }, start: true },
+          // The approved post-visit report
+          { node: { label: "Tap Records", kind: "action", id: "fam-records" }, start: true },
+          { node: { label: "Records", kind: "screen" } },
+          { node: { label: "Visit Summary", kind: "action" } },
+          {
+            node: { label: "Alio AI Core", kind: "ai", detail: "Generate summary explanation & flag alerts" },
+          },
+          { node: { label: "Have questions about the report?", kind: "decision" } },
+          {
+            paths: [
+              { label: "No", nodes: [{ label: "Home screen", kind: "screen" }] },
+              {
+                label: "Yes",
+                nodes: [
+                  { label: "AI Chat", kind: "screen" },
+                  { label: "Alio AI Core", kind: "ai", detail: "Answer questions" },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+    crossLinks: [
+      { from: "fam-triage", to: "cg-inbox" },
+      { from: "cg-arrived", to: "fam-arrived" },
+      { from: "cg-approve", to: "fam-records" },
     ],
   },
   technicalStack: [
@@ -303,6 +484,7 @@ export const alioCaseStudy: CaseStudyAlio = {
       [
         {
           title: "Key Partners",
+          icon: "handshake",
           items: [
             "Healthcare providers",
             "Insurance companies",
@@ -315,6 +497,7 @@ export const alioCaseStudy: CaseStudyAlio = {
       [
         {
           title: "Key Activities",
+          icon: "workflow",
           items: [
             "AI agent development",
             "Model training & evaluation",
@@ -324,12 +507,14 @@ export const alioCaseStudy: CaseStudyAlio = {
         },
         {
           title: "Key Resources",
+          icon: "boxes",
           items: ["Fine-tuned AI model", "Healthcare data", "Secure infrastructure"],
         },
       ],
       [
         {
           title: "Value Propositions",
+          icon: "gem",
           items: [
             "Real-time family visibility, no added caregiver burden",
             "Voice memo to AI-generated post-visit report",
@@ -341,10 +526,12 @@ export const alioCaseStudy: CaseStudyAlio = {
       [
         {
           title: "Customer Relationships",
+          icon: "heart-handshake",
           items: ["AI assistant support", "Guided onboarding", "Transparent AI disclosure"],
         },
         {
           title: "Channels",
+          icon: "megaphone",
           items: [
             "Mobile app",
             "In-app notifications",
@@ -357,6 +544,7 @@ export const alioCaseStudy: CaseStudyAlio = {
       [
         {
           title: "Customer Segments",
+          icon: "users-round",
           items: [
             "Older adults",
             "Family caregivers",
@@ -369,6 +557,7 @@ export const alioCaseStudy: CaseStudyAlio = {
     bottomRow: [
       {
         title: "Cost",
+        icon: "receipt",
         items: [
           "AI inference cost",
           "Cloud infrastructure",
@@ -379,6 +568,7 @@ export const alioCaseStudy: CaseStudyAlio = {
       },
       {
         title: "Revenue Streams",
+        icon: "trending-up",
         items: ["User subscription", "Caregiver premium features", "Insurance partnerships"],
       },
     ],

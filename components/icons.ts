@@ -1,5 +1,6 @@
 import {
   Bot,
+  Boxes,
   Braces,
   BrainCircuit,
   Camera,
@@ -16,8 +17,13 @@ import {
   Flag,
   Footprints,
   Gauge,
+  Gem,
+  HandHeart,
+  Handshake,
+  HeartHandshake,
   ListChecks,
   MapPin,
+  Megaphone,
   MessageCircleQuestion,
   MessagesSquare,
   Mic,
@@ -25,6 +31,7 @@ import {
   Monitor,
   MonitorSmartphone,
   Radar,
+  Receipt,
   RefreshCw,
   ScanFace,
   ScanSearch,
@@ -33,7 +40,10 @@ import {
   SlidersHorizontal,
   Smartphone,
   Trash2,
+  TrendingUp,
   UserCheck,
+  UsersRound,
+  Workflow,
   type LucideIcon,
 } from "lucide-react";
 
@@ -42,6 +52,7 @@ import {
 // add it here under its lucide.dev name.
 export const ICONS = {
   bot: Bot,
+  boxes: Boxes,
   braces: Braces,
   "brain-circuit": BrainCircuit,
   camera: Camera,
@@ -58,8 +69,13 @@ export const ICONS = {
   flag: Flag,
   footprints: Footprints,
   gauge: Gauge,
+  gem: Gem,
+  "hand-heart": HandHeart,
+  handshake: Handshake,
+  "heart-handshake": HeartHandshake,
   "list-checks": ListChecks,
   "map-pin": MapPin,
+  megaphone: Megaphone,
   "message-circle-question": MessageCircleQuestion,
   "messages-square": MessagesSquare,
   mic: Mic,
@@ -67,6 +83,7 @@ export const ICONS = {
   monitor: Monitor,
   "monitor-smartphone": MonitorSmartphone,
   radar: Radar,
+  receipt: Receipt,
   "refresh-cw": RefreshCw,
   "scan-face": ScanFace,
   "scan-search": ScanSearch,
@@ -75,7 +92,10 @@ export const ICONS = {
   "sliders-horizontal": SlidersHorizontal,
   smartphone: Smartphone,
   "trash-2": Trash2,
+  "trending-up": TrendingUp,
   "user-check": UserCheck,
+  "users-round": UsersRound,
+  workflow: Workflow,
 } satisfies Record<string, LucideIcon>;
 
 export type IconName = keyof typeof ICONS;

@@ -22,7 +22,7 @@ const NEST_TOC_ITEMS = [
   { id: "research", label: "Research" },
   { id: "persona-alex", label: "Personas" },
   { id: "journey-alex", label: "Journey Map" },
-  { id: "problem", label: "Problem Statement" },
+  { id: "problem", label: "Problem" },
   { id: "competitive", label: "Competitive Analysis" },
   { id: "hmw", label: "How Might We" },
   { id: "goal", label: "Goal Statement" },
@@ -134,7 +134,7 @@ export default function CaseStudyPage({
         </div>
       </CaseStudySection>
 
-      <CaseStudySection id="problem" number="03 — Problem Statement" title="The problem">
+      <CaseStudySection id="problem" number="03 — Problem" title="The problem">
         {/* Slides in from the side its accent bar is on */}
         <Reveal variant="left" className="mb-11 rounded-xl border-l-4 border-[var(--color-primary)] bg-[var(--color-card)] p-8">
           <p className="w-full text-[18px] font-semibold leading-relaxed text-[var(--color-fg)]">
