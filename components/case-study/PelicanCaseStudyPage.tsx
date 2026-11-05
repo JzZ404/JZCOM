@@ -8,6 +8,7 @@ import CaseStudySection from "./CaseStudySection";
 import Reveal from "./Reveal";
 import PhotoFan from "./PhotoFan";
 import PelicanStory from "./PelicanStory";
+import ChallengeSketch from "./ChallengeSketch";
 import ExplodedView from "./ExplodedView";
 import IconBadge, { IconGlyph } from "./IconBadge";
 import { ICONS } from "@/components/icons";
@@ -194,36 +195,47 @@ export default function PelicanCaseStudyPage({
       )}
 
       <CaseStudySection id="challenges" number="06 — Challenges" title="Challenges">
-        {/* Same title/body treatment as Drunky's "Engineering challenges
-            overcome" — font-serif bold header, muted body below it. */}
-        <div className="mb-11 flex flex-col gap-5">
+        {/* Each challenge beside a small drawing of the problem; the text
+            column is kept to a readable line length */}
+        <div className="mb-11 flex flex-col">
           {caseStudy.challenges.map((item, i) => (
             <Reveal
               key={item.title}
               delay={i * 0.06}
-              className="border-b border-[var(--color-border)] pb-5 last:border-b-0"
+              className="grid grid-cols-1 items-center gap-5 border-b border-[var(--color-border)] py-7 first:pt-0 last:border-b-0 last:pb-0 sm:grid-cols-[15rem_minmax(0,1fr)] sm:gap-10"
             >
-              <h3 className="mb-1.5 font-serif text-[17px] font-bold text-[var(--color-fg)]">
-                {item.title}
-              </h3>
-              <p className="text-[15px] leading-relaxed text-[var(--color-muted)]">{item.body}</p>
+              <div className="max-w-[18rem] rounded-xl bg-[var(--color-surface)] px-4 py-5 sm:max-w-none">
+                <ChallengeSketch name={item.sketch} />
+              </div>
+              <div className="max-w-[62ch]">
+                <h3 className="mb-1.5 font-serif text-[18px] font-bold text-[var(--color-fg)]">{item.title}</h3>
+                <p className="text-[15.5px] leading-relaxed text-[var(--color-muted)]">{item.body}</p>
+              </div>
             </Reveal>
           ))}
         </div>
       </CaseStudySection>
 
       <CaseStudySection id="whats-next" number="07 — What's Next" title="What's Next" className="mb-20">
-        <ul className="flex flex-col gap-4">
-          {caseStudy.whatsNext.map((item, i) => (
-            <li key={item.title}>
-              <Reveal delay={i * 0.06}>
-                <p className="text-[16px] leading-relaxed text-[var(--color-fg)]">
-                  <span className="font-bold">{item.title}</span> {item.body}
-                </p>
-              </Reveal>
-            </li>
+        {/* Grouped by the part of the robot each improvement is for */}
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-10">
+          {caseStudy.whatsNext.map((group, i) => (
+            <Reveal key={group.group} delay={i * 0.08}>
+              <div className="mb-4 flex items-center gap-2.5 border-b border-[var(--color-border)] pb-3">
+                <IconGlyph name={group.icon} className="h-5 w-5 shrink-0 text-[var(--color-primary)]" />
+                <h3 className="font-serif text-[18px] font-bold text-[var(--color-fg)]">{group.group}</h3>
+              </div>
+              <ul className="flex flex-col gap-4">
+                {group.items.map((item) => (
+                  <li key={item.title}>
+                    <div className="text-[15.5px] font-semibold text-[var(--color-fg)]">{item.title}</div>
+                    <p className="text-[14.5px] leading-relaxed text-[var(--color-muted)]">{item.body}</p>
+                  </li>
+                ))}
+              </ul>
+            </Reveal>
           ))}
-        </ul>
+        </div>
       </CaseStudySection>
     </CaseStudyShell>
   );

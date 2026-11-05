@@ -2067,9 +2067,15 @@ export type CaseStudyPelican = {
   // The Demo section: one group per behavior, a subtitle over its clips
   // shown side by side (autoplaying, muted, looping).
   demo?: { title: string; srcs: string[] }[];
-  challenges: { title: string; body: string }[];
-  whatsNext: { title: string; body: string }[];
+  // `sketch` picks the little drawing beside each challenge (see
+  // components/case-study/ChallengeSketch.tsx)
+  challenges: { title: string; body: string; sketch: ChallengeSketchName }[];
+  // Grouped by the part of the robot each improvement is for; `icon` matches
+  // that part's icon in System Architecture
+  whatsNext: { group: string; icon: IconName; items: { title: string; body: string }[] }[];
 };
+
+export type ChallengeSketchName = "camera-tilt" | "pid" | "priority";
 
 export const pelicanCaseStudy: CaseStudyPelican = {
   title: "PELICAN",
@@ -2220,41 +2226,41 @@ export const pelicanCaseStudy: CaseStudyPelican = {
   challenges: [
     {
       title: "Remapping visual space to motor space.",
-      body: "Our camera sits at a 45-degree upward tilt, breaking the standard assumption that object position in frame maps directly to heading and distance. We built a custom correction model to translate what the camera saw into the correct motor response.",
+      body: "Our camera tilts 45° upward, so an object's position in the frame no longer maps directly to heading and distance. We built a custom correction model to translate what the camera sees into the right motor response.",
+      sketch: "camera-tilt",
     },
     {
       title: "Tuning PID against a live camera feed.",
-      body: "Detection noise and lighting changes injected error into tracking, wrong gains meant the robot either oscillated around the target or drifted too slowly to catch it.",
+      body: "Detection noise and lighting changes fed error into tracking. With the wrong gains, the robot either oscillated around the target or drifted too slowly to reach it.",
+      sketch: "pid",
     },
     {
       title: "Balancing search and safety.",
-      body: "The robot had to wander for trash, interrupt itself for obstacles, and still catch a valid detection mid-interrupt, prioritizing either one too heavily broke the other.",
-    },
-    {
-      title: "DDS discovery across two machines.",
-      body: "Detection runs off-robot on a desktop PC, so ROS_DOMAIN_ID had to match exactly between the Pi and desktop. Discovery state doesn't persist across reboots, so a mismatch meant nodes ran clean with zero errors, just no data flowing.",
+      body: "The robot had to wander for trash, interrupt itself for obstacles, and still catch a detection mid-interrupt. Favoring either one too heavily broke the other.",
+      sketch: "priority",
     },
   ],
   whatsNext: [
     {
-      title: "Increase capacity.",
-      body: "Enable the system to carry and manage a larger volume of waste.",
+      group: "Perception",
+      icon: "radar",
+      items: [
+        { title: "Extend perception range.", body: "Spot trash beyond the current view with wide-angle lenses or more cameras." },
+        { title: "Improve detection accuracy.", body: "More training data, to recognize more kinds of objects more reliably." },
+      ],
     },
     {
-      title: "Add audio feedback.",
-      body: "Sound or voice cues to make the robot's behavior clearer to people nearby.",
+      group: "Hardware",
+      icon: "bot",
+      items: [
+        { title: "Increase capacity.", body: "Carry and manage a larger volume of waste." },
+        { title: "Add audio feedback.", body: "Sound or voice cues, so people nearby know what the robot is doing." },
+      ],
     },
     {
-      title: "Extend perception range.",
-      body: "Detect trash beyond the current camera view with wide-angle lenses or a multi-camera setup.",
-    },
-    {
-      title: "Improve detection accuracy.",
-      body: "Expand training data to recognize more object types more reliably.",
-    },
-    {
-      title: "Speed up response time.",
-      body: "Optimize navigation and control for quicker movement and less latency.",
+      group: "Control",
+      icon: "sliders-horizontal",
+      items: [{ title: "Speed up response time.", body: "Faster navigation and control, with less latency." }],
     },
   ],
 };
