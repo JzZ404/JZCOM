@@ -2008,6 +2008,27 @@ export const drunkyCaseStudy: CaseStudyDrunky = {
 // full WANDER/TRACK/AIM state machine, tunable params, real limitations).
 // Unlike Drunky, neither source has any quantitative trial/success-rate
 // data — no Evaluation & Results section here, rather than inventing one.
+// The exploded view's canvas, in the parts' units. Saving from the layout
+// editor crops it to the drawing's outermost points.
+export type ExplodedCanvasSize = { w: number; h: number };
+
+// One part in PELICAN's exploded view: a transparent WebP from
+// /images/pelican/parts/, placed on the canvas. `x`/`y` are its top-left
+// corner and `w` its width, in canvas units; `flip` mirrors it left-right
+// and `rotate` turns it (degrees, negative is counterclockwise). `name` and
+// `detail` fill the card shown when it's clicked. A part can appear more
+// than once (the hinges, the wheels).
+export type ExplodedPart = {
+  src: string;
+  name: string;
+  detail?: string;
+  x: number;
+  y: number;
+  w: number;
+  flip?: boolean;
+  rotate?: number;
+};
+
 export type CaseStudyPelican = {
   title: string;
   subheading: string;
@@ -2022,22 +2043,26 @@ export type CaseStudyPelican = {
     // illustration, a real pelican with a bottle in its beak (the actual
     // namesake inspiration), and the robot itself.
     images: { src: string; alt: string }[];
-    story: (string | { text: string; emphasis: true })[];
+    // A paragraph with `detection` shows that image, at text size, where its
+    // text says {detection}, with a YOLO-style detection box and class label,
+    // the way the robot's camera sees it
+    story: (string | { text: string; emphasis: true } | { text: string; detection: { image: string; label: string } })[];
   };
   // `icon` fields name a Lucide icon from components/icons.ts.
   systemArchitecture: {
     stages: { title: string; icon?: IconName; body: string; items: string[] }[];
     hardware: { name: string; icon?: IconName }[];
-    note: string;
   };
   designProcess: {
     image: string;
-    caption: string;
+    // The exploded view: each physical part cut out on its own, placed on a
+    // canvas (see ExplodedPart). Later items draw on top. In dev, the
+    // layout editor on the page rewrites `items` when you save.
+    parts?: { title: string; canvas: ExplodedCanvasSize; items: ExplodedPart[] };
   };
   pipeline: {
     states: { title: string; icon?: IconName; body: string }[];
     interrupt: { title: string; body: string };
-    summary: string;
   };
   // The Demo section: one group per behavior, a subtitle over its clips
   // shown side by side (autoplaying, muted, looping).
@@ -2067,10 +2092,13 @@ export const pelicanCaseStudy: CaseStudyPelican = {
       { src: "/images/pelican/lab-photo.jpg", alt: "PELICAN in the lab with a bottle in its open lid" },
     ],
     story: [
-      "Most cleaning robots wait for trash to be placed in them, or need someone to drive them to it. PELICAN flips that around — instead of waiting, it wanders indoor spaces on its own, watches for litter with an onboard camera, and comes to the trash instead of the other way around.",
-      "When the camera spots something — a bottle, a cup, a can — the robot switches out of its default wandering behavior, tracks the object, and moves to align it in the center of its view.",
+      "Most cleaning robots wait for trash to come to them, or for someone to drive them to it. PELICAN flips that: it roams indoor spaces on its own, watches for litter with an onboard camera, and goes to the trash itself.",
       {
-        text: "Once it's in position, it opens its lid — like a pelican's beak — to receive the trash. That's where the name comes from.",
+        text: "When the camera spots something — {detection} — the robot stops wandering, tracks it, and centers it in view.",
+        detection: { image: "/images/pelican/water-bottle.webp", label: "bottle" },
+      },
+      {
+        text: "Lined up, it opens its lid like a pelican's beak to catch the trash. Hence the name.",
         emphasis: true,
       },
     ],
@@ -2116,12 +2144,40 @@ export const pelicanCaseStudy: CaseStudyPelican = {
       { name: "OpenCR microcontroller", icon: "circuit-board" },
       { name: "Raspberry Pi 3B+", icon: "microchip" },
     ],
-    note: "Detection runs off-robot: the desktop handles YOLOv8 inference and sends tracking commands back to the Pi over the network.",
   },
   designProcess: {
     image: "/images/pelican/process-work.png",
-    caption:
-      "Sketch → CAD model → cardboard mockup → 3D-printed shell → painted final assembly — then straight to live testing with a bottle and the detection feed running.",
+    parts: {
+      title: "Exploded View",
+      canvas: { w: 606, h: 714 },
+      items: [
+        { src: "/images/pelican/parts/mouth-body.webp", name: "Collection bin", detail: "3D-printed · holds the collected trash", x: 98, y: 187.7, w: 250 },
+        { src: "/images/pelican/parts/slotted-plate.webp", name: "Lid", detail: "3D-printed · opens like a pelican's beak", x: 41, y: 109.7, w: 262, rotate: 3 },
+        { src: "/images/pelican/parts/hinge.webp", name: "Butt hinge", detail: "Lid pivot", x: 265, y: 113.7, w: 36, flip: true },
+        { src: "/images/pelican/parts/hinge.webp", name: "Butt hinge", detail: "Lid pivot", x: 316, y: 139.7, w: 36, flip: true },
+        { src: "/images/pelican/parts/servo-arm.webp", name: "Servo horn", detail: "Links the lid motor to the lid", x: 214, y: 35.7, w: 72, flip: true, rotate: -26 },
+        { src: "/images/pelican/parts/lidar.webp", name: "LDS-01 360° LiDAR", detail: "Maps the space for SLAM and obstacle avoidance", x: 417, y: 0.7, w: 110 },
+        { src: "/images/pelican/parts/head-shell.webp", name: "Head housing", detail: "3D-printed · the pelican's head", x: 353, y: 91.7, w: 230 },
+        { src: "/images/pelican/parts/tire.webp", name: "Tire", detail: "Drive wheel tread", x: 71.3, y: 437.4, w: 80 },
+        { src: "/images/pelican/parts/lid-servo.webp", name: "DYNAMIXEL servo", detail: "Lid actuator · opens 45°–145°", x: 296, y: 34.7, w: 66 },
+        { src: "/images/pelican/parts/camera.webp", name: "USB camera module", detail: "Feeds YOLOv8 trash detection", x: 365, y: 61.7, w: 70 },
+        { src: "/images/pelican/parts/wheel-hub.webp", name: "Wheel hub", detail: "Drive wheel", x: 137.3, y: 469.4, w: 58 },
+        { src: "/images/pelican/parts/raspberry-pi.webp", name: "Raspberry Pi 3 Model B+", detail: "Single-board computer · drivers, motor control, LiDAR", x: 342, y: 373.7, w: 112 },
+        { src: "/images/pelican/parts/tire.webp", name: "Tire", detail: "Drive wheel tread", x: 0.3, y: 487.4, w: 80 },
+        { src: "/images/pelican/parts/wheel-hub.webp", name: "Wheel hub", detail: "Drive wheel", x: 77.3, y: 524.4, w: 58 },
+        { src: "/images/pelican/parts/opencr-board.webp", name: "OpenCR controller board", detail: "Microcontroller · drives the DYNAMIXEL motors", x: 229, y: 375.7, w: 105, rotate: -7 },
+        { src: "/images/pelican/parts/wheel-motor-left.webp", name: "DYNAMIXEL servo", detail: "Drive wheel actuator", x: 182.3, y: 496.4, w: 58 },
+        { src: "/images/pelican/parts/wheel-motor-left.webp", name: "DYNAMIXEL servo", detail: "Drive wheel actuator", x: 132.3, y: 540.4, w: 58 },
+        { src: "/images/pelican/parts/waffle-plates.webp", name: "Waffle plate chassis", detail: "TurtleBot3 Waffle base", x: 197.3, y: 500.4, w: 220 },
+        { src: "/images/pelican/parts/battery.webp", name: "LiPo battery pack", detail: "Powers the robot", x: 253.3, y: 452.4, w: 125 },
+        { src: "/images/pelican/parts/wheel-motor-right.webp", name: "DYNAMIXEL servo", detail: "Drive wheel actuator", x: 416.3, y: 559.4, w: 58 },
+        { src: "/images/pelican/parts/wheel-motor-right.webp", name: "DYNAMIXEL servo", detail: "Drive wheel actuator", x: 356.3, y: 599.4, w: 58 },
+        { src: "/images/pelican/parts/wheel-hub.webp", name: "Wheel hub", detail: "Drive wheel", x: 474.3, y: 560.4, w: 58 },
+        { src: "/images/pelican/parts/wheel-hub.webp", name: "Wheel hub", detail: "Drive wheel", x: 421.3, y: 614.4, w: 58 },
+        { src: "/images/pelican/parts/tire.webp", name: "Tire", detail: "Drive wheel tread", x: 525.3, y: 551.4, w: 80 },
+        { src: "/images/pelican/parts/tire.webp", name: "Tire", detail: "Drive wheel tread", x: 474.3, y: 619.4, w: 80 },
+      ],
+    },
   },
   pipeline: {
     states: [
@@ -2150,8 +2206,6 @@ export const pelicanCaseStudy: CaseStudyPelican = {
       title: "Interrupts",
       body: "If something's within 0.5 m, PELICAN backs up and turns regardless of its current state — and if nothing's detected for 7 seconds while tracking, it gives up and returns to wandering.",
     },
-    summary:
-      "Detection, tracking, and disposal all run in one continuous loop — no human steps in unless something goes wrong.",
   },
   demo: [
     {

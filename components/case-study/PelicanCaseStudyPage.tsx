@@ -7,6 +7,8 @@ import CaseStudyShell from "./CaseStudyShell";
 import CaseStudySection from "./CaseStudySection";
 import Reveal from "./Reveal";
 import PhotoFan from "./PhotoFan";
+import PelicanStory from "./PelicanStory";
+import ExplodedView from "./ExplodedView";
 import IconBadge, { IconGlyph } from "./IconBadge";
 import { ICONS } from "@/components/icons";
 
@@ -38,23 +40,7 @@ export default function PelicanCaseStudyPage({
         <div className="mb-11 grid grid-cols-1 items-center gap-8 sm:grid-cols-2 sm:gap-12">
           <PhotoFan images={caseStudy.whyWeBuiltThis.images} />
           <Reveal variant="right" delay={0.15} className="flex flex-col justify-center gap-4">
-            {/* Sizes match Drunky's Why We Built This (17px body / 18px
-                emphasis) so the two case studies read consistently. */}
-            {caseStudy.whyWeBuiltThis.story.map((paragraph, i) => {
-              const isEmphasis = typeof paragraph === "object";
-              return (
-                <p
-                  key={i}
-                  className={
-                    isEmphasis
-                      ? "text-[18px] leading-relaxed font-bold text-[var(--color-primary)]"
-                      : "text-[17px] leading-relaxed text-[var(--color-muted)]"
-                  }
-                >
-                  {isEmphasis ? paragraph.text : paragraph}
-                </p>
-              );
-            })}
+            <PelicanStory story={caseStudy.whyWeBuiltThis.story} />
           </Reveal>
         </div>
       </CaseStudySection>
@@ -101,7 +87,7 @@ export default function PelicanCaseStudyPage({
             </Fragment>
           ))}
         </div>
-        <Reveal variant="soft" delay={0.1} className="mb-3 rounded-xl bg-[var(--color-surface)] p-6.5">
+        <Reveal variant="soft" delay={0.1} className="mb-11 rounded-xl bg-[var(--color-surface)] p-6.5">
           <div className="mb-2 font-mono text-xs font-semibold tracking-wider text-[var(--color-primary)] uppercase">
             Hardware Stack
           </div>
@@ -119,13 +105,10 @@ export default function PelicanCaseStudyPage({
             })}
           </ul>
         </Reveal>
-        <p className="mb-11 text-[14px] leading-relaxed text-[var(--color-muted)] italic">
-          {caseStudy.systemArchitecture.note}
-        </p>
       </CaseStudySection>
 
       <CaseStudySection id="process" number="03 — Design Process" title="Design Process">
-        <Reveal variant="scale" className="mb-4">
+        <Reveal variant="scale" className="mb-11">
           <img
             src={caseStudy.designProcess.image}
             alt="PELICAN design process — sketch, CAD model, cardboard mockup, 3D-printed shell, final assembly, and live testing"
@@ -134,9 +117,16 @@ export default function PelicanCaseStudyPage({
             className="aspect-[1328/570] w-full rounded-xl object-cover"
           />
         </Reveal>
-        <p className="mb-11 text-[14px] leading-relaxed text-[var(--color-muted)] italic">
-          {caseStudy.designProcess.caption}
-        </p>
+        {caseStudy.designProcess.parts && (
+          <div className="mb-11">
+            <h3 className="mb-4 font-serif text-[20px] font-bold text-[var(--color-fg)]">
+              {caseStudy.designProcess.parts.title}
+            </h3>
+            <Reveal variant="soft">
+              <ExplodedView canvas={caseStudy.designProcess.parts.canvas} items={caseStudy.designProcess.parts.items} />
+            </Reveal>
+          </div>
+        )}
       </CaseStudySection>
 
       <CaseStudySection id="pipeline" number="04 — The Pipeline" title="The Pipeline">
@@ -165,7 +155,7 @@ export default function PelicanCaseStudyPage({
           ))}
         </div>
 
-        <Reveal variant="soft" className="mb-8 rounded-xl bg-[var(--color-surface)] p-6.5">
+        <Reveal variant="soft" className="mb-11 rounded-xl bg-[var(--color-surface)] p-6.5">
           <div className="mb-2 font-mono text-xs font-semibold tracking-wider text-[var(--color-primary)] uppercase">
             {caseStudy.pipeline.interrupt.title}
           </div>
@@ -173,10 +163,6 @@ export default function PelicanCaseStudyPage({
             {caseStudy.pipeline.interrupt.body}
           </p>
         </Reveal>
-
-        <p className="mb-11 text-[15px] leading-relaxed text-[var(--color-fg)]">
-          {caseStudy.pipeline.summary}
-        </p>
       </CaseStudySection>
 
       {caseStudy.demo && (
