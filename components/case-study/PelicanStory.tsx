@@ -12,9 +12,9 @@ type Paragraph = CaseStudyPelican["whyWeBuiltThis"]["story"][number];
 const LID = "#E35F07";
 const LABEL = "#B84A00";
 
-// PELICAN's Why We Built This text: the lead, the paragraph about what the
-// camera spots (with a bottle in the sentence, boxed like a YOLO
-// detection), and the beak line.
+// PELICAN's Why We Built This text: the lead, the character, the paragraph
+// about what the camera spots (with a bottle in the sentence, boxed like a
+// YOLO detection), and the beak line.
 // Sizes match Drunky's Why We Built This (17px body / 18px emphasis) so the
 // two case studies read consistently.
 export default function PelicanStory({ story }: { story: Paragraph[] }) {

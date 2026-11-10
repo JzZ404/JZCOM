@@ -11,6 +11,8 @@ import PhotoPair from "./PhotoPair";
 import PipelineStages from "./PipelineStages";
 import ThresholdChart from "./ThresholdChart";
 import IconBadge from "./IconBadge";
+import FarmUnlocks from "./FarmUnlocks";
+import FarmPlayground from "./FarmPlayground";
 
 export default function SimpleCaseStudyPage({
   caseStudy,
@@ -25,9 +27,11 @@ export default function SimpleCaseStudyPage({
   // in progress..." is a more honest label than an empty "What's Next" with
   // nothing under it yet. Projects with a real roadmap (Poopidex, FocusFarm)
   // keep the normal title.
-  const whatsNextIsPlaceholder = caseStudy.whatsNext.every((item) =>
-    item.includes("PLACEHOLDER")
+  const whatsNextIsPlaceholder = caseStudy.whatsNext.every(
+    (item) => typeof item === "string" && item.includes("PLACEHOLDER"),
   );
+  // Upgrades (title + detail + icon) get the locked-unlock tiles
+  const whatsNextUnlocks = caseStudy.whatsNext.filter((item) => typeof item === "object");
   const whatsNextTitle = whatsNextIsPlaceholder ? "Building in progress..." : "What's Next";
 
   // Numbering stays sequential based on which sections actually render,
@@ -39,6 +43,7 @@ export default function SimpleCaseStudyPage({
   const tocItems = [
     { id: "overview", label: "Overview" },
     ...(hasWhy ? [{ id: "why", label: "Why We Built This" }] : []),
+    ...(caseStudy.playground ? [{ id: "playground", label: "Playground" }] : []),
     ...(hasTechStack ? [{ id: "technical-stack", label: "Technical Stack" }] : []),
     ...(caseStudy.pipeline ? [{ id: "pipeline", label: caseStudy.pipeline.title }] : []),
     { id: "whats-next", label: whatsNextTitle },
@@ -87,6 +92,28 @@ export default function SimpleCaseStudyPage({
         </CaseStudySection>
       )}
 
+      {caseStudy.playground && (
+        <CaseStudySection id="playground" number={`${nextNumber()} — Playground`} title="Playground">
+          {/* The island takes most of the row, its numbers stacked beside
+              it (a row of four under it on narrower screens) */}
+          <div className="mb-11 grid grid-cols-1 items-center gap-8 lg:grid-cols-[3fr_1fr] lg:gap-10">
+            <Reveal variant="scale">
+              <FarmPlayground animals={caseStudy.playground.animals} />
+            </Reveal>
+            <Reveal variant="right" delay={0.1} className="grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-4 lg:grid-cols-1">
+              {caseStudy.playground.stats.map((stat) => (
+                <div key={stat.label}>
+                  <div className="font-serif text-[2rem] leading-none font-bold text-[var(--color-fg)] tabular-nums">
+                    {stat.value}
+                  </div>
+                  <p className="mt-1.5 text-[13px] leading-snug text-[var(--color-muted)]">{stat.label}</p>
+                </div>
+              ))}
+            </Reveal>
+          </div>
+        </CaseStudySection>
+      )}
+
       {hasTechStack && caseStudy.technicalStack && (
         <CaseStudySection
           id="technical-stack"
@@ -109,7 +136,7 @@ export default function SimpleCaseStudyPage({
                   variant="scale"
                   className="rounded-xl bg-[var(--color-card)] p-6"
                 >
-                  <h3 className="mb-3 flex items-center gap-3 text-[16px] font-bold tracking-wider text-[var(--color-primary)] uppercase">
+                  <h3 className="mb-3 flex items-center gap-3 text-[14.5px] font-bold tracking-wider whitespace-nowrap text-[var(--color-primary)] uppercase">
                     {category.icon && <IconBadge name={category.icon} size="sm" />}
                     {category.title}
                   </h3>
@@ -155,7 +182,42 @@ export default function SimpleCaseStudyPage({
           )}
           <div className="mb-11 flex flex-col gap-12">
             <PipelineStages stages={caseStudy.pipeline.stages} />
-            {caseStudy.pipeline.thresholdChart && <ThresholdChart {...caseStudy.pipeline.thresholdChart} />}
+            {caseStudy.pipeline.thresholdChart &&
+              (caseStudy.pipeline.liveView ? (
+                // The app's own debug view on the left, the chart on the right
+                <div className="grid grid-cols-1 items-center gap-6 lg:grid-cols-[1fr_1.15fr]">
+                  <Reveal variant="left">
+                    <figure>
+                      {caseStudy.pipeline.liveView.src.endsWith(".mp4") ? (
+                        <video
+                          src={caseStudy.pipeline.liveView.src}
+                          poster={caseStudy.pipeline.liveView.poster}
+                          aria-label={caseStudy.pipeline.liveView.alt}
+                          className="w-full rounded-xl"
+                          autoPlay
+                          muted
+                          loop
+                          playsInline
+                        />
+                      ) : (
+                        <img
+                          src={caseStudy.pipeline.liveView.src}
+                          alt={caseStudy.pipeline.liveView.alt}
+                          className="w-full rounded-xl"
+                        />
+                      )}
+                      {caseStudy.pipeline.liveView.caption && (
+                        <figcaption className="mt-3 text-[14px] leading-relaxed text-[var(--color-muted)] italic">
+                          {caseStudy.pipeline.liveView.caption}
+                        </figcaption>
+                      )}
+                    </figure>
+                  </Reveal>
+                  <ThresholdChart {...caseStudy.pipeline.thresholdChart} />
+                </div>
+              ) : (
+                <ThresholdChart {...caseStudy.pipeline.thresholdChart} />
+              ))}
           </div>
         </CaseStudySection>
       )}
@@ -170,12 +232,14 @@ export default function SimpleCaseStudyPage({
           <p className="text-[16px] leading-relaxed text-[var(--color-muted)]">
             Roadmap not written up yet — check back soon.
           </p>
+        ) : whatsNextUnlocks.length ? (
+          <FarmUnlocks items={whatsNextUnlocks} />
         ) : (
           <ul className="flex flex-col gap-3">
             {caseStudy.whatsNext.map((item, i) => (
               <li key={i}>
                 <Reveal delay={i * 0.06}>
-                  <p className="text-[16px] leading-relaxed text-[var(--color-fg)]">• {item}</p>
+                  <p className="text-[16px] leading-relaxed text-[var(--color-fg)]">• {typeof item === "string" ? item : item.title}</p>
                 </Reveal>
               </li>
             ))}

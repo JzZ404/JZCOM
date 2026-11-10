@@ -7,6 +7,8 @@ import type { Project } from "@/data/projects";
 import CaseStudySidebar, { type CaseStudyMode, type CaseStudyTocItem } from "./CaseStudySidebar";
 import PlaceholderBlock from "./PlaceholderBlock";
 import CaseStudyLinkIcons, { type CaseStudyLink } from "./CaseStudyLinkIcons";
+import { usePdfHeroImage, usePdfMode } from "./PdfMode";
+import PdfCover from "./PdfCover";
 
 // The chrome every case study shares — sidebar, overview header, hero image,
 // Detailed/TL;DR toggle, next-case-study footer — regardless of how
@@ -48,6 +50,9 @@ export default function CaseStudyShell({
 }) {
   const [mode, setMode] = useState<CaseStudyMode>("detailed");
   const detailed = mode === "detailed";
+  // In the PDF portfolio: just the case study, no navigation around it
+  const pdf = usePdfMode();
+  const pdfHeroImage = usePdfHeroImage();
 
   // Hero playback speed. Set in an effect with a loadedmetadata fallback
   // rather than inline on the element: a rate assigned before the media is
@@ -89,66 +94,76 @@ export default function CaseStudyShell({
     // keeps the sticky sidebar working.
     <MotionConfig reducedMotion="user">
     <div className="mx-auto flex max-w-[1280px] overflow-x-clip">
-      <CaseStudySidebar mode={mode} onModeChange={setMode} tocItems={tocItems} />
+      {!pdf && <CaseStudySidebar mode={mode} onModeChange={setMode} tocItems={tocItems} />}
 
       <div className="min-w-0 flex-1">
         {/* Sidebar (with "Back to work") is hidden below lg, so this stands
             in as the mobile/tablet way back to the work grid. */}
-        <Link
-          href="/#work"
-          className="block px-5 pt-6 text-[15px] font-medium text-[var(--color-muted)] no-underline sm:px-6 lg:hidden"
-        >
-          ← Back to work
-        </Link>
-        {/* pt-9 matches the sidebar's py-9, so the title lines up with
-            "Back to work" instead of sitting lower than it. */}
-        <div id="overview" className="scroll-mt-28 px-5 pt-4 sm:px-6 lg:px-10 lg:pt-9">
-          {/* flex-col below sm — a title plus the link icons/live-demo
-              button side by side was overflowing the viewport on phone
-              widths (e.g. "FocusFarm" + GitHub icon + "Try Live Demo"). */}
-          <div className="mb-5 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
-            <h1 className="font-serif text-[32px] leading-[1.1] font-bold text-[var(--color-fg)] sm:text-[40px] lg:text-[56px]">
-              {caseStudy.title}
-            </h1>
-            <div className="flex shrink-0 items-center gap-3">
-              {caseStudy.links && <CaseStudyLinkIcons links={caseStudy.links} />}
-              {caseStudy.liveDemo && (
-                <a
-                  href={caseStudy.liveDemo.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-primary)] px-4 py-2 text-[14px] font-semibold whitespace-nowrap text-white no-underline transition-opacity hover:opacity-90 sm:px-5 sm:py-2.5 sm:text-[15px]"
-                >
-                  {caseStudy.liveDemo.label}
-                  <span aria-hidden>↗</span>
-                </a>
-              )}
-            </div>
-          </div>
-          <p className="mb-8 w-full text-[18px] leading-relaxed font-semibold text-[var(--color-muted)] sm:text-[20px] lg:mb-14 lg:text-[24px]">
-            {caseStudy.subheading}
-          </p>
-          {/* grid-cols-4 splits the row into 4 equal columns with a
-              consistent gap, instead of a fixed gap that just pushes items
-              apart by the same amount regardless of row width — and it
-              bounds each item's width so a long value wraps instead of
-              overflowing into the next column. Collapses to 2 columns below
-              sm so long meta values have room to wrap without overflowing. */}
-          <div className="grid grid-cols-2 gap-4 border-b border-[var(--color-border)] pb-7 sm:grid-cols-4 sm:gap-6">
-            {caseStudy.meta.map((item) => (
-              <div key={item.label} className="flex min-w-0 flex-col gap-1">
-                <span className="text-[12px] font-semibold tracking-wider text-[var(--color-primary)] uppercase">
-                  {item.label}
-                </span>
-                <span className="text-[16px] font-semibold text-balance text-[var(--color-fg)]">
-                  {item.value}
-                </span>
+        {!pdf && (
+          <Link
+            href="/#work"
+            className="block px-5 pt-6 text-[15px] font-medium text-[var(--color-muted)] no-underline sm:px-6 lg:hidden"
+          >
+            ← Back to work
+          </Link>
+        )}
+        {/* The PDF portfolio gets its own cover page in place of the title
+            block and hero */}
+        {pdfHeroImage ? (
+          <PdfCover caseStudy={caseStudy} image={pdfHeroImage} />
+        ) : (
+          <>
+            {/* pt-9 matches the sidebar's py-9, so the title lines up with
+                "Back to work" instead of sitting lower than it. */}
+            <div id="overview" className="scroll-mt-28 px-5 pt-4 sm:px-6 lg:px-10 lg:pt-9">
+              {/* flex-col below sm — a title plus the link icons/live-demo
+                  button side by side was overflowing the viewport on phone
+                  widths (e.g. "FocusFarm" + GitHub icon + "Try Live Demo"). */}
+              <div className="mb-5 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+                <h1 className="font-serif text-[32px] leading-[1.1] font-bold text-[var(--color-fg)] sm:text-[40px] lg:text-[56px]">
+                  {caseStudy.title}
+                </h1>
+                <div className="flex shrink-0 items-center gap-3">
+                  {caseStudy.links && <CaseStudyLinkIcons links={caseStudy.links} />}
+                  {caseStudy.liveDemo && (
+                    <a
+                      href={caseStudy.liveDemo.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-primary)] px-4 py-2 text-[14px] font-semibold whitespace-nowrap text-white no-underline transition-opacity hover:opacity-90 sm:px-5 sm:py-2.5 sm:text-[15px]"
+                    >
+                      {caseStudy.liveDemo.label}
+                      <span aria-hidden>↗</span>
+                    </a>
+                  )}
+                </div>
               </div>
-            ))}
-          </div>
-        </div>
+              <p className="mb-8 w-full text-[18px] leading-relaxed font-semibold text-[var(--color-muted)] sm:text-[20px] lg:mb-14 lg:text-[24px]">
+                {caseStudy.subheading}
+              </p>
+              {/* grid-cols-4 splits the row into 4 equal columns with a
+                  consistent gap, instead of a fixed gap that just pushes items
+                  apart by the same amount regardless of row width — and it
+                  bounds each item's width so a long value wraps instead of
+                  overflowing into the next column. Collapses to 2 columns below
+                  sm so long meta values have room to wrap without overflowing. */}
+              <div className="grid grid-cols-2 gap-4 border-b border-[var(--color-border)] pb-7 sm:grid-cols-4 sm:gap-6">
+                {caseStudy.meta.map((item) => (
+                  <div key={item.label} className="flex min-w-0 flex-col gap-1">
+                    <span className="text-[12px] font-semibold tracking-wider text-[var(--color-primary)] uppercase">
+                      {item.label}
+                    </span>
+                    <span className="text-[16px] font-semibold text-balance text-[var(--color-fg)]">
+                      {item.value}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
 
-        {caseStudy.heroVideo ? (
+        {pdfHeroImage ? null : caseStudy.heroVideo ? (
           (() => {
             // overflow-hidden + a slight scale crops out the black stroke
             // baked into the source recording's edges.
@@ -171,6 +186,7 @@ export default function CaseStudyShell({
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group relative mx-5 my-7 block w-[calc(100%-2.5rem)] overflow-hidden rounded-xl sm:mx-6 sm:w-[calc(100%-3rem)] lg:mx-10 lg:w-[calc(100%-5rem)]"
+                data-pdf-hero
               >
                 {video}
                 <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
@@ -180,7 +196,10 @@ export default function CaseStudyShell({
                 </div>
               </a>
             ) : (
-              <div className="mx-5 my-7 w-[calc(100%-2.5rem)] overflow-hidden rounded-xl sm:mx-6 sm:w-[calc(100%-3rem)] lg:mx-10 lg:w-[calc(100%-5rem)]">
+              <div
+                className="mx-5 my-7 w-[calc(100%-2.5rem)] overflow-hidden rounded-xl sm:mx-6 sm:w-[calc(100%-3rem)] lg:mx-10 lg:w-[calc(100%-5rem)]"
+                data-pdf-hero
+              >
                 {video}
               </div>
             );
@@ -192,6 +211,7 @@ export default function CaseStudyShell({
               target="_blank"
               rel="noopener noreferrer"
               className={heroLinkClassName}
+              data-pdf-hero
             >
               <img
                 src={caseStudy.heroImage}
@@ -215,6 +235,7 @@ export default function CaseStudyShell({
               // drove the box height directly, so a squarer source photo
               // (Drunky, Pelican) rendered visibly taller than the rest.
               className={heroMediaClassName}
+              data-pdf-hero
             />
           )
         ) : (
@@ -238,29 +259,31 @@ export default function CaseStudyShell({
           </div>
         )}
 
-        <Link
-          href={`/work/${nextProject.slug}`}
-          className="relative block overflow-hidden bg-[var(--color-fg)] px-5 py-10 text-center no-underline sm:px-6 lg:px-10 lg:py-14"
-        >
-          {!coverFailed && (
-            <>
-              <img
-                src={nextProject.coverImage}
-                alt=""
-                aria-hidden
-                onError={() => setCoverFailed(true)}
-                className="absolute inset-0 h-full w-full scale-110 object-cover blur-sm"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30" />
-            </>
-          )}
-          <div className="relative mb-3 text-[0.9375rem] text-white opacity-70">
-            Next case study
-          </div>
-          <div className="relative font-serif text-2xl font-bold text-white">
-            {nextProject.title} →
-          </div>
-        </Link>
+        {!pdf && (
+          <Link
+            href={`/work/${nextProject.slug}`}
+            className="relative block overflow-hidden bg-[var(--color-fg)] px-5 py-10 text-center no-underline sm:px-6 lg:px-10 lg:py-14"
+          >
+            {!coverFailed && (
+              <>
+                <img
+                  src={nextProject.coverImage}
+                  alt=""
+                  aria-hidden
+                  onError={() => setCoverFailed(true)}
+                  className="absolute inset-0 h-full w-full scale-110 object-cover blur-sm"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30" />
+              </>
+            )}
+            <div className="relative mb-3 text-[0.9375rem] text-white opacity-70">
+              Next case study
+            </div>
+            <div className="relative font-serif text-2xl font-bold text-white">
+              {nextProject.title} →
+            </div>
+          </Link>
+        )}
       </div>
     </div>
     </MotionConfig>

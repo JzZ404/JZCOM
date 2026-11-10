@@ -50,10 +50,14 @@ export default function AlioArchitectureFlow({
     if (!container) return;
     const measure = () => {
       const c = container.getBoundingClientRect();
+      // Measured sizes are on-screen; when the diagram is scaled (e.g. the
+      // PDF portfolio shrinking a page), divide by that scale to draw in
+      // the diagram's own units
+      const k = c.width / container.offsetWidth || 1;
       const [left, right] = laneRefs.current.map((l) => l?.getBoundingClientRect());
       if (!left || !right) return;
-      const gap = (left.right + right.left) / 2 - c.left;
-      setBox({ w: c.width, h: c.height });
+      const gap = ((left.right + right.left) / 2 - c.left) / k;
+      setBox({ w: c.width / k, h: c.height / k });
       setLinks(
         crossLinks.map((link, i) => {
           const a = nodeEls.current.get(link.from)?.getBoundingClientRect();
@@ -61,10 +65,10 @@ export default function AlioArchitectureFlow({
           if (!a || !b) return { d: "", head: "" };
           const rightward = a.left < b.left;
           const dir = rightward ? 1 : -1;
-          const sx = (rightward ? a.right : a.left) - c.left + dir * 3;
-          const sy = a.top + a.height / 2 - c.top;
-          const tx = (rightward ? b.left : b.right) - c.left - dir * 4;
-          const ty = b.top + b.height / 2 - c.top;
+          const sx = ((rightward ? a.right : a.left) - c.left) / k + dir * 3;
+          const sy = (a.top + a.height / 2 - c.top) / k;
+          const tx = ((rightward ? b.left : b.right) - c.left) / k - dir * 4;
+          const ty = (b.top + b.height / 2 - c.top) / k;
           // Spread the vertical runs a little so arrows sharing the gap don't overlap
           const gx = gap + (i - (crossLinks.length - 1) / 2) * 7;
           return {

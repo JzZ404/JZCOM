@@ -10,6 +10,7 @@ import PhotoFan from "./PhotoFan";
 import PelicanStory from "./PelicanStory";
 import ChallengeSketch from "./ChallengeSketch";
 import ExplodedView from "./ExplodedView";
+import { usePdfMode } from "./PdfMode";
 import IconBadge, { IconGlyph } from "./IconBadge";
 import { ICONS } from "@/components/icons";
 
@@ -31,6 +32,7 @@ export default function PelicanCaseStudyPage({
   caseStudy: CaseStudyPelican;
   nextProject: Project;
 }) {
+  const pdf = usePdfMode();
   return (
     <CaseStudyShell caseStudy={caseStudy} tocItems={PELICAN_TOC_ITEMS} nextProject={nextProject}>
       <CaseStudySection id="why" number="01 — Why We Built This" title="Why We Built This">
@@ -109,24 +111,44 @@ export default function PelicanCaseStudyPage({
       </CaseStudySection>
 
       <CaseStudySection id="process" number="03 — Design Process" title="Design Process">
-        <Reveal variant="scale" className="mb-11">
-          <img
-            src={caseStudy.designProcess.image}
-            alt="PELICAN design process — sketch, CAD model, cardboard mockup, 3D-printed shell, final assembly, and live testing"
-            width={1328}
-            height={570}
-            className="aspect-[1328/570] w-full rounded-xl object-cover"
-          />
-        </Reveal>
-        {caseStudy.designProcess.parts && (
-          <div className="mb-11">
-            <h3 className="mb-4 font-serif text-[20px] font-bold text-[var(--color-fg)]">
-              {caseStudy.designProcess.parts.title}
-            </h3>
-            <Reveal variant="soft">
+        {pdf && caseStudy.designProcess.pdfImage && caseStudy.designProcess.parts ? (
+          // The PDF portfolio: the exploded view on the left, the build
+          // photos stacked in a column on the right
+          <div className="mb-11 grid grid-cols-[1.25fr_1fr] items-center gap-10">
+            <div>
+              <h3 className="mb-4 font-serif text-[20px] font-bold text-[var(--color-fg)]">
+                {caseStudy.designProcess.parts.title}
+              </h3>
               <ExplodedView canvas={caseStudy.designProcess.parts.canvas} items={caseStudy.designProcess.parts.items} />
-            </Reveal>
+            </div>
+            <img
+              src={caseStudy.designProcess.pdfImage}
+              alt="PELICAN design process — sketch, CAD model, cardboard mockups, 3D-printed shell, final assembly, and live testing"
+              className="w-full rounded-xl"
+            />
           </div>
+        ) : (
+          <>
+            <Reveal variant="scale" className="mb-11">
+              <img
+                src={caseStudy.designProcess.image}
+                alt="PELICAN design process — sketch, CAD model, cardboard mockup, 3D-printed shell, final assembly, and live testing"
+                width={1328}
+                height={570}
+                className="aspect-[1328/570] w-full rounded-xl object-cover"
+              />
+            </Reveal>
+            {caseStudy.designProcess.parts && (
+              <div className="mb-11">
+                <h3 className="mb-4 font-serif text-[20px] font-bold text-[var(--color-fg)]">
+                  {caseStudy.designProcess.parts.title}
+                </h3>
+                <Reveal variant="soft">
+                  <ExplodedView canvas={caseStudy.designProcess.parts.canvas} items={caseStudy.designProcess.parts.items} />
+                </Reveal>
+              </div>
+            )}
+          </>
         )}
       </CaseStudySection>
 
@@ -177,14 +199,19 @@ export default function PelicanCaseStudyPage({
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   {group.srcs.map((src, i) => (
                     <Reveal key={src} delay={i * 0.08} variant={i % 2 === 0 ? "left" : "right"}>
-                      <video
-                        src={src}
-                        className="aspect-video w-full rounded-xl object-cover"
-                        autoPlay
-                        muted
-                        loop
-                        playsInline
-                      />
+                      {/* The PDF shows a chosen frame (pdfStills) in place of the clip */}
+                      {pdf && group.pdfStills?.[i] ? (
+                        <img src={group.pdfStills[i]} alt="" className="aspect-video w-full rounded-xl object-cover" />
+                      ) : (
+                        <video
+                          src={src}
+                          className="aspect-video w-full rounded-xl object-cover"
+                          autoPlay
+                          muted
+                          loop
+                          playsInline
+                        />
+                      )}
                     </Reveal>
                   ))}
                 </div>

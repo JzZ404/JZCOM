@@ -317,3 +317,30 @@ body::after {
   mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch' result='noise'/%3E%3CfeColorMatrix in='noise' type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 9 -4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
+
+/*
+ * The PDF portfolio (/portfolio-pdf). Only the case studies show: the
+ * nav, footer, Nomi, and cursor (every body child but <main>) and the film
+ * grain are hidden; the grain would also turn the whole PDF into a
+ * picture. Pages are laid out by scripts/export-portfolio-pdf.mjs.
+ */
+body:has([data-pdf-root]) > :not(main) {
+  display: none !important;
+}
+body:has([data-pdf-root])::after {
+  display: none;
+}
+body:has([data-pdf-root]) > main {
+  padding-top: 0;
+}
+/* The hero, cropped to share the first page with the title */
+[data-pdf-root] [data-pdf-hero] {
+  height: 500px;
+}
+[data-pdf-root] [data-pdf-hero] :is(img, video) {
+  height: 100%;
+  object-fit: cover;
+}
+@page {
+  size: A4 landscape;
+}

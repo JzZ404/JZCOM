@@ -185,6 +185,8 @@ export type CaseStudyAlio = {
   };
   // Rebuilt in code from the old technical-stack.png: one card per layer.
   technicalStack: { title: string; icon: IconName; items: string[] }[];
+  // Every app screen, grouped by app, for the PDF portfolio's screen page
+  screens?: { app: string; intro: string; items: { src: string; title: string; body: string }[] }[];
   prototypeDemo: {
     features: {
       title: string;
@@ -193,7 +195,11 @@ export type CaseStudyAlio = {
       // Several clips take turns in list order, looping; `caption` sits under
       // each. `side` puts a clip in the left or right column (default:
       // alternating). `playbackRate` sets its speed (1 = normal).
-      media?: { src: string; side?: "left" | "right"; caption?: string; playbackRate?: number }[];
+      // `pdfStill`: a still shown in place of this clip in the PDF portfolio
+      media?: { src: string; side?: "left" | "right"; caption?: string; playbackRate?: number; pdfStill?: string }[];
+      // Stills shown side by side in place of all of this feature's media in
+      // the PDF portfolio
+      pdfStills?: string[];
     }[];
   };
   designSystemImage: string;
@@ -463,6 +469,35 @@ export const alioCaseStudy: CaseStudyAlio = {
       items: ["Supabase real-time sync", "Caregiver-to-family data layer", "Live updates across portals"],
     },
   ],
+  screens: [
+    {
+      app: "Caregiver app",
+      intro: "Built for the visit itself: log it by voice, check the AI's draft, and keep up with what families ask for.",
+      items: [
+        { src: "/images/alio/screens/cg-home.jpg", title: "Today's visits", body: "Address, contacts, and a one-tap arrival" },
+        { src: "/images/alio/screens/cg-voice.jpg", title: "Voice log", body: "Talk through the visit, hands free" },
+        { src: "/images/alio/screens/cg-draft.jpg", title: "Visit draft", body: "The memo, turned into a report" },
+        { src: "/images/alio/screens/cg-review.jpg", title: "Review and send", body: "Flags to check before family sees it" },
+        { src: "/images/alio/screens/cg-logs.jpg", title: "Past logs", body: "Every visit, by date" },
+        { src: "/images/alio/screens/cg-inbox.jpg", title: "Inbox", body: "Families and care circles in one place" },
+        { src: "/images/alio/screens/cg-pending.jpg", title: "Pending", body: "Requests waiting on the caregiver" },
+        { src: "/images/alio/screens/cg-confirmed.jpg", title: "Confirmed", body: "A record of what got done" },
+        { src: "/images/alio/screens/cg-chat.jpg", title: "Chat", body: "Confirm a request in the thread" },
+      ],
+    },
+    {
+      app: "Family app",
+      intro: "Built for staying close from far away: see arrivals and reports, and ask about either anytime.",
+      items: [
+        { src: "/images/alio/screens/fam-home.jpg", title: "Home", body: "Arrival status and today's report" },
+        { src: "/images/alio/screens/fam-chat.jpg", title: "Chat", body: "Alio suggests what needs the caregiver" },
+        { src: "/images/alio/screens/fam-voice.jpg", title: "Ask Alio", body: "Questions about mom, by voice" },
+        { src: "/images/alio/screens/fam-questions.jpg", title: "Past questions", body: "Every answer, saved by date" },
+        { src: "/images/alio/screens/fam-records.jpg", title: "Records", body: "Every report in one place" },
+        { src: "/images/alio/screens/fam-report.jpg", title: "Visit report", body: "The caregiver's report, flags first" },
+      ],
+    },
+  ],
   prototypeDemo: {
     features: [
       {
@@ -480,7 +515,13 @@ export const alioCaseStudy: CaseStudyAlio = {
         body: "Family messages the caregiver directly, and every request is shared across the whole care loop so everyone stays on the same page. A language model reads each message and flags the ones that need attention, so nothing important slips past, and surfaces them in the caregiver's inbox.",
         media: [
           // Plays in this order: family 1, caregiver 1, family 2, caregiver 2, then loops.
-          { src: "/images/alio/feature2-family1.mp4", side: "right", caption: "Family Portal", playbackRate: 2.5 },
+          {
+            src: "/images/alio/feature2-family1.mp4",
+            side: "right",
+            caption: "Family Portal",
+            playbackRate: 2.5,
+            pdfStill: "/images/alio/pdf-feature2-family.png",
+          },
           { src: "/images/alio/feature2-caregiver1.mp4", side: "left", caption: "Caregiver Portal", playbackRate: 2.5 },
           { src: "/images/alio/feature2-family2.mp4", side: "right", caption: "Family Portal", playbackRate: 2.5 },
           { src: "/images/alio/feature2-caregiver2.mp4", side: "left", caption: "Caregiver Portal", playbackRate: 2.5 },
@@ -491,12 +532,14 @@ export const alioCaseStudy: CaseStudyAlio = {
         icon: "mic",
         body: "At the end of a visit, the caregiver records a voice memo. Alio's fine-tuned model turns that into a structured post-visit report, then flags anything that needs family's attention. Once the caregiver approves it, the report syncs to the family portal.",
         media: [{ src: "/images/alio/feature3.mp4", playbackRate: 0.75 }],
+        pdfStills: ["/images/alio/pdf-feature3-log.png", "/images/alio/pdf-feature3-listening.jpg"],
       },
       {
         title: "Family Q&A with AI",
         icon: "message-circle-question",
         body: "After receiving a report, family can ask Alio follow-up questions directly. The model draws on the full patient history and logs to give specific, informed answers, general guidance and context, not diagnosis, especially useful when family has lost track of earlier details.",
         media: [{ src: "/images/alio/feature4.mp4", playbackRate: 0.75 }],
+        pdfStills: ["/images/alio/pdf-feature4-records.png", "/images/alio/pdf-feature4-report.png"],
       },
     ],
   },
@@ -725,7 +768,8 @@ export type CaseStudyHelport = {
     // Final-prototype demo clips, rendered after the last iteration —
     // autoplay/muted/loop, no player controls. explanation is Joyce's own
     // write-up under each clip; undefined shows a PLACEHOLDER line instead.
-    videos: { title: string; subtitle: string; src: string; explanation: string }[];
+    // `pdfStill`: a still shown in place of the clip in the PDF portfolio
+    videos: { title: string; subtitle: string; src: string; explanation: string; pdfStill?: string }[];
     // feedback is empty for an iteration that hasn't been critiqued yet
     // (the box then shows a PLACEHOLDER line instead of an empty list).
     // outcome is an optional closing summary rendered below the feedback
@@ -961,6 +1005,7 @@ export const helportCaseStudy: CaseStudyHelport = {
         title: "04 · Automated Post-Call Summary",
         subtitle: "Turn every conversation into actionable documentation",
         src: "/images/helport/demo4.mov",
+        pdfStill: "/images/helport/pdf-demo4.png",
         explanation:
           "After each call, AI automatically organizes the interaction into a call summary, key notes, follow-up actions, transcript, and recording, reducing manual documentation and making the conversation easier to review later.",
       },
@@ -1522,6 +1567,10 @@ export type CaseStudySimple = {
   // `categories` (grouped title + items) renders as a grid of labeled
   // blocks with real text hierarchy. Falls back to a flat bullet `items`
   // list when a project doesn't have grouped categories yet.
+  // A playground of the project's characters on a miniature of its world
+  // (FocusFarm: components/case-study/FarmPlayground.tsx), with a few
+  // numbers about that world beside it
+  playground?: { stats: { value: string; label: string }[]; animals: ("dog" | "sheep" | "chicken" | "deer" | "bee")[] };
   technicalStack?: {
     image?: string;
     items?: string[];
@@ -1546,8 +1595,13 @@ export type CaseStudySimple = {
       title?: string;
       caption?: string;
     };
+    // A screenshot, or a looping clip with its poster frame, shown to the
+    // left of the threshold chart
+    liveView?: { src: string; poster?: string; alt: string; caption?: string };
   };
-  whatsNext: string[];
+  // Plain lines, or (FocusFarm) upgrades with a title, a line of detail,
+  // and an icon, shown as locked farm unlocks
+  whatsNext: (string | { title: string; body: string; icon: IconName })[];
 };
 
 export const poopidexCaseStudy: CaseStudySimple = {
@@ -1663,18 +1717,33 @@ export const focusfarmCaseStudy: CaseStudySimple = {
       },
     ],
   },
+  // Counted from the FocusFarm repo: sprites and palette in
+  // public/focusfarm/sprites.js, animals and frames in
+  // public/animals/manifest.json, the island's size in scene.js
+  playground: {
+    stats: [
+      { value: "41", label: "pixel sprites, each typed out one character per pixel" },
+      { value: "36", label: "colors in the whole palette" },
+      { value: "20", label: "animals to collect" },
+      { value: "160", label: "animation frames, eight per animal" },
+    ],
+    animals: ["dog", "sheep", "chicken", "deer", "bee"],
+  },
   technicalStack: {
     categories: [
       {
         title: "Frontend & Detection",
+        icon: "webcam",
         items: ["React", "Next.js", "MediaPipe / TensorFlow.js", "Webcam-based attention tracking"],
       },
       {
         title: "Data & Progression",
+        icon: "coins",
         items: ["Coin economy", "Pixel farm rendering", "Local storage — MVP", "Supabase/Firebase — planned"],
       },
       {
         title: "Deployment & CI",
+        icon: "rocket",
         items: ["Vercel — auto-deploy on push", "GitHub Actions — CI on every PR"],
       },
     ],
@@ -1737,16 +1806,22 @@ export const focusfarmCaseStudy: CaseStudySimple = {
       highLabel: "Focused",
       title: "Why the state doesn't flicker",
       caption:
-        "A Schmitt trigger uses two thresholds: the state switches to distracted only below 0.35, and back to focused only above 0.6. A dip between the lines changes nothing, and each state holds for at least 600 ms.",
+        "Two thresholds instead of one: the state turns distracted below 0.35 and focused again only above 0.6, so a dip in between changes nothing.",
+    },
+    liveView: {
+      src: "/images/focusfarm/attention-debug.mp4",
+      poster: "/images/focusfarm/attention-debug-poster.jpg",
+      alt: "A FocusFarm session beside the attention debug panel, its verdict switching between Focused and Distracted",
+      caption: "A live session with the attention debug panel. As I look away or pick up my phone, the verdict flips to Distracted, then back.",
     },
   },
   whatsNext: [
-    "Unlockable farmland — new plots open up as focus hours accumulate",
-    "Tiered animals and buildings gated behind farm level, not just coins",
-    "A progression system with milestones, not just a flat shop",
-    "Seasonal or rotating decorations to keep long-term use engaging",
-    "Streak-based multipliers that reward consistency, not just single sessions",
-    "A leaderboard, once there's a real progression system worth comparing",
+    { title: "Unlockable farmland", body: "New plots open up as focus hours accumulate.", icon: "fence" },
+    { title: "Tiered animals and buildings", body: "Gated behind farm level, not just coins.", icon: "paw-print" },
+    { title: "Progression milestones", body: "A path to work toward, not just a flat shop.", icon: "milestone" },
+    { title: "Seasonal decorations", body: "Rotating decor to keep long-term use engaging.", icon: "leaf" },
+    { title: "Streak multipliers", body: "Reward consistency, not just single sessions.", icon: "flame" },
+    { title: "Leaderboard", body: "Once there's a real progression system worth comparing.", icon: "trophy" },
   ],
 };
 
@@ -2039,9 +2114,9 @@ export type CaseStudyPelican = {
   links?: CaseStudyLink[];
   liveDemo?: { label: string; href: string };
   whyWeBuiltThis: {
-    // Fanned-out photo trio instead of a single image — the concept
-    // illustration, a real pelican with a bottle in its beak (the actual
-    // namesake inspiration), and the robot itself.
+    // Fanned-out photo trio instead of a single image, in the story's order:
+    // a real pelican with a bottle in its beak (the problem), the cartoon
+    // pelican (the friendly character), and the robot with its lid open.
     images: { src: string; alt: string }[];
     // A paragraph with `detection` shows that image, at text size, where its
     // text says {detection}, with a YOLO-style detection box and class label,
@@ -2055,6 +2130,9 @@ export type CaseStudyPelican = {
   };
   designProcess: {
     image: string;
+    // The same photos, cut apart and stacked in a column, for the PDF
+    // portfolio's side-by-side layout
+    pdfImage?: string;
     // The exploded view: each physical part cut out on its own, placed on a
     // canvas (see ExplodedPart). Later items draw on top. In dev, the
     // layout editor on the page rewrites `items` when you save.
@@ -2065,8 +2143,9 @@ export type CaseStudyPelican = {
     interrupt: { title: string; body: string };
   };
   // The Demo section: one group per behavior, a subtitle over its clips
-  // shown side by side (autoplaying, muted, looping).
-  demo?: { title: string; srcs: string[] }[];
+  // shown side by side (autoplaying, muted, looping). `pdfStills`: a chosen
+  // frame per clip, shown in its place in the PDF portfolio.
+  demo?: { title: string; srcs: string[]; pdfStills?: string[] }[];
   // `sketch` picks the little drawing beside each challenge (see
   // components/case-study/ChallengeSketch.tsx)
   challenges: { title: string; body: string; sketch: ChallengeSketchName }[];
@@ -2093,18 +2172,19 @@ export const pelicanCaseStudy: CaseStudyPelican = {
   liveDemo: { label: "View on GitHub", href: "https://github.com/JzZ404/The_Pelican" },
   whyWeBuiltThis: {
     images: [
-      { src: "/images/pelican/pollution-illustration.png", alt: "Please Don't Pollute illustration" },
       { src: "/images/pelican/pollution-photo.jpg", alt: "A real pelican with a plastic bottle caught in its beak" },
-      { src: "/images/pelican/lab-photo.jpg", alt: "PELICAN in the lab with a bottle in its open lid" },
+      { src: "/images/pelican/pollution-illustration.png", alt: "Cartoon pelican with bottles in its pouch beside the words Please Don't Pollute" },
+      { src: "/images/pelican/lab-photo.jpg", alt: "PELICAN in the lab with its orange lid open over collected bottles" },
     ],
     story: [
-      "Most cleaning robots wait for trash to come to them, or for someone to drive them to it. PELICAN flips that: it roams indoor spaces on its own, watches for litter with an onboard camera, and goes to the trash itself.",
+      "Pelicans scoop fish from the water with their beaks. More and more often, they come up with plastic instead.",
+      "PELICAN borrows that image and turns it around. It’s a trash bin that roams indoor spaces, spots litter with an onboard camera, and treats cleanup as something to play along with instead of a chore. The character is the point: a friendly bird that kids want to feed is a bin they’ll actually use.",
       {
-        text: "When the camera spots something — {detection} — the robot stops wandering, tracks it, and centers it in view.",
+        text: "Once it spots something like {detection}, it stops wandering and turns until the object sits centered in its view.",
         detection: { image: "/images/pelican/water-bottle.webp", label: "bottle" },
       },
       {
-        text: "Lined up, it opens its lid like a pelican's beak to catch the trash. Hence the name.",
+        text: "Lined up, it opens its lid like a pelican’s beak to catch the trash. Hence the name.",
         emphasis: true,
       },
     ],
@@ -2153,6 +2233,7 @@ export const pelicanCaseStudy: CaseStudyPelican = {
   },
   designProcess: {
     image: "/images/pelican/process-work.png",
+    pdfImage: "/images/pelican/pdf-process-vertical.jpg",
     parts: {
       title: "Exploded View",
       canvas: { w: 606, h: 714 },
@@ -2221,6 +2302,8 @@ export const pelicanCaseStudy: CaseStudyPelican = {
     {
       title: "YOLO detection and tracking",
       srcs: ["/images/pelican/detect1.mp4", "/images/pelican/detect2.mp4"],
+      // The lid open with the bottle in hand, just before the drop
+      pdfStills: ["/images/pelican/pdf-detect1.jpg", "/images/pelican/pdf-detect2.jpg"],
     },
   ],
   challenges: [

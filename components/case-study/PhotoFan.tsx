@@ -10,12 +10,13 @@ import { motion } from "framer-motion";
 // overlap. Source photos can be wildly different aspect ratios — object-cover
 // inside a fixed-ratio card keeps the fan visually consistent regardless.
 // Positions are % of the container (not Tailwind position utilities) so the
-// overlap between cards can be tuned precisely — card 2 sits right enough to
-// clear the illustration's "PLEASE DON'T POLLUTE" text instead of covering
-// it, and card 3 is pulled up to overlap card 2 instead of sitting clear of it.
+// overlap between cards can be tuned precisely — card 2 (PELICAN's
+// illustration) sits high enough that card 3 doesn't cover its "PLEASE DON'T
+// POLLUTE" text, and card 3 is pulled up to overlap card 2 instead of
+// sitting clear of it.
 const CARDS = [
   { top: 0, left: 0, width: 56, rotate: -8, z: 10 },
-  { top: 8, left: 48, width: 52, rotate: 7, z: 20 },
+  { top: 2, left: 48, width: 52, rotate: 7, z: 20 },
   { top: 34, left: 18, width: 66, rotate: -4, z: 30 },
 ];
 

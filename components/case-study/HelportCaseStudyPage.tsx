@@ -8,6 +8,7 @@ import CaseStudyShell from "./CaseStudyShell";
 import CaseStudySection from "./CaseStudySection";
 import Reveal from "./Reveal";
 import IconBadge from "./IconBadge";
+import { usePdfMode } from "./PdfMode";
 import HelportResearch from "./HelportResearch";
 import { CountUp, useHoverReplay } from "./researchMotion";
 import LinkedInPostEmbed from "./LinkedInPostEmbed";
@@ -330,6 +331,7 @@ function DemoIterations({
 }: {
   demoIterations: CaseStudyHelport["demoIterations"];
 }) {
+  const pdf = usePdfMode();
   return (
     <div className="mb-11 flex flex-col gap-16">
       <div className="flex flex-col gap-16">
@@ -433,6 +435,13 @@ function DemoIterations({
                     {video.subtitle}
                   </h3>
                 </div>
+                {pdf && video.pdfStill ? (
+                  <img
+                    src={video.pdfStill}
+                    alt=""
+                    className="mx-auto w-full max-w-2xl rounded-xl border border-[var(--color-border)]"
+                  />
+                ) : (
                 <video
                   src={video.src}
                   autoPlay
@@ -446,6 +455,7 @@ function DemoIterations({
                   disablePictureInPicture
                   className="mx-auto w-full max-w-2xl rounded-xl border border-[var(--color-border)] object-cover"
                 />
+                )}
                 <p className="mx-auto w-full max-w-2xl text-[16px] leading-relaxed text-[var(--color-fg)]">
                   {video.explanation}
                 </p>

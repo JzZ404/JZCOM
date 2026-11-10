@@ -72,15 +72,15 @@ export default function ThresholdChart({ low, high, lowLabel, highLabel, title, 
   }`;
 
   return (
-    <figure ref={figureRef} className="rounded-xl bg-[var(--color-card)] p-5 sm:p-8">
+    <figure ref={figureRef} className="rounded-xl bg-[var(--color-card)] p-5 sm:p-7">
       {title && <h3 className="mb-1.5 font-serif text-[19px] font-bold text-[var(--color-fg)]">{title}</h3>}
       {caption && (
-        <figcaption className="mb-8 max-w-[65ch] text-[15px] leading-relaxed text-[var(--color-muted)]">
+        <figcaption className="mb-5 max-w-[65ch] text-[15px] leading-relaxed text-[var(--color-muted)]">
           {caption}
         </figcaption>
       )}
 
-      <div className="relative h-56">
+      <div className="relative h-36">
         {/* Stretched to fill the box (non-scaling strokes keep lines crisp);
             text sits in HTML on top so it stays a readable size. */}
         <svg

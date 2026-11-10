@@ -36,18 +36,23 @@ export default function CaseStudySection({
       viewport={{ once: false, margin: "-80px" }}
       transition={{ duration: 0.5, ease: "easeOut" }}
       className={`scroll-mt-28 px-10 ${className}`}
+      data-case-study-section
     >
-      <div className="mb-2 flex items-center gap-2">
-        {icon && (
-          <img src={icon.src} alt={icon.alt} className="h-6 w-6 shrink-0 object-contain" />
-        )}
-        <div className="font-mono text-xs font-semibold tracking-wider text-[var(--color-primary)] uppercase">
-          {number}
+      {/* The number and title as one block, so a page break in the PDF
+          portfolio never separates them */}
+      <div data-section-head>
+        <div className="mb-2 flex items-center gap-2">
+          {icon && (
+            <img src={icon.src} alt={icon.alt} className="h-6 w-6 shrink-0 object-contain" />
+          )}
+          <div className="font-mono text-xs font-semibold tracking-wider text-[var(--color-primary)] uppercase">
+            {number}
+          </div>
         </div>
+        <h2 className="mb-3.5 font-serif text-[length:var(--text-h2)] font-bold text-[var(--color-fg)]">
+          {title}
+        </h2>
       </div>
-      <h2 className="mb-3.5 font-serif text-[length:var(--text-h2)] font-bold text-[var(--color-fg)]">
-        {title}
-      </h2>
       {children}
     </motion.div>
   );

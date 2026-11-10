@@ -14,7 +14,9 @@ import ResponsibleAiSafeguards from "./ResponsibleAiSafeguards";
 import AlioTechStack from "./AlioTechStack";
 import AlioResearchStats from "./AlioResearchStats";
 import Reveal from "./Reveal";
-import AlternatingVideos from "./AlternatingVideos";
+import AlternatingVideos, { PDF_VIDEO } from "./AlternatingVideos";
+import { usePdfMode } from "./PdfMode";
+import AlioScreens from "./AlioScreens";
 import { IconGlyph } from "./IconBadge";
 
 const ALIO_PROBLEM_HIGHLIGHTS = [
@@ -54,6 +56,7 @@ export default function AlioCaseStudyPage({
   caseStudy: CaseStudyAlio;
   nextProject: Project;
 }) {
+  const pdf = usePdfMode();
   const tocItems = [
     { id: "overview", label: "Overview" },
     { id: "why", label: "Research" },
@@ -216,7 +219,21 @@ export default function AlioCaseStudyPage({
             // the other, so the alternating layout reads as it arrives.
             <div key={i} className="grid grid-cols-1 gap-8 sm:grid-cols-2 sm:items-center">
               <Reveal variant={i % 2 === 0 ? "left" : "right"} className={i % 2 === 1 ? "sm:order-2" : ""}>
-                {feature.media && feature.media.length > 1 ? (
+                {pdf && feature.pdfStills ? (
+                  // Sized like the two-phone rows' videos (620x1360 shape)
+                  <div className="grid grid-cols-2 gap-4">
+                    {feature.pdfStills.map((src) => (
+                      <img
+                        key={src}
+                        src={src}
+                        alt=""
+                        width={620}
+                        height={1360}
+                        className={`w-full rounded-[1.4rem] object-cover shadow-[0_20px_40px_-12px_rgba(0,0,0,0.35)] ${PDF_VIDEO}`}
+                      />
+                    ))}
+                  </div>
+                ) : feature.media && feature.media.length > 1 ? (
                   <AlternatingVideos media={feature.media} />
                 ) : feature.media ? (
                   <figure className="mx-auto w-3/5">
@@ -234,7 +251,7 @@ export default function AlioCaseStudyPage({
                       onPointerLeave={(e) => {
                         if (e.pointerType === "mouse") e.currentTarget.play().catch(() => {});
                       }}
-                      className="w-full rounded-[1.4rem] shadow-[0_20px_40px_-12px_rgba(0,0,0,0.35)]"
+                      className={`w-full rounded-[1.4rem] shadow-[0_20px_40px_-12px_rgba(0,0,0,0.35)] ${pdf ? PDF_VIDEO : ""}`}
                       autoPlay
                       muted
                       loop
@@ -256,7 +273,9 @@ export default function AlioCaseStudyPage({
                 // Text on the left under a single video on the left (centered at
                 // w-3/5, so inset 20%) starts at that video's left edge
                 className={`${i % 2 === 1 ? "sm:order-1" : ""} ${
-                  i % 2 === 1 && caseStudy.prototypeDemo.features[i - 1]?.media?.length === 1 ? "sm:pl-[20%]" : ""
+                  i % 2 === 1 && !(pdf && feature.pdfStills) && caseStudy.prototypeDemo.features[i - 1]?.media?.length === 1
+                    ? "sm:pl-[20%]"
+                    : ""
                 }`}
               >
                 <h3 className="mb-1.5 flex items-center gap-2.5 font-serif text-[19px] font-bold text-[var(--color-fg)]">
@@ -274,6 +293,13 @@ export default function AlioCaseStudyPage({
           ))}
         </div>
       </CaseStudySection>
+
+      {/* PDF portfolio only: every screen of both apps, after the demo */}
+      {pdf && caseStudy.screens && (
+        <CaseStudySection id="screens" number="06 — Demo" title="Every screen">
+          <AlioScreens groups={caseStudy.screens} />
+        </CaseStudySection>
+      )}
 
       <CaseStudySection id="design-system" number="07 — Design System" title="Built to scale">
         <Reveal variant="scale" className="mb-11">

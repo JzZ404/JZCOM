@@ -1,13 +1,18 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { usePdfMode } from "./PdfMode";
 
 type Side = "left" | "right";
-type Clip = { src: string; side?: Side; caption?: string; playbackRate?: number };
+type Clip = { src: string; side?: Side; caption?: string; playbackRate?: number; pdfStill?: string };
 
 const SIDES: Side[] = ["left", "right"];
 // Clips without a side alternate left, right, left, …
 const sideOf = (clip: Clip, i: number): Side => clip.side ?? (i % 2 ? "right" : "left");
+
+// In the PDF portfolio: sized so a demo feature fits a page with room to
+// spare
+export const PDF_VIDEO = "mx-auto max-h-[600px] w-auto!";
 
 // Two columns of clips that take turns, playing in list order and looping.
 // The playing column is bright; the other waits dimmed, frozen on the last
@@ -16,6 +21,8 @@ const sideOf = (clip: Clip, i: number): Side => clip.side ?? (i % 2 ? "right" : 
 // Every clip stays mounted (stacked, only one visible per column) so a switch
 // never flashes an empty frame while the next clip loads.
 export default function AlternatingVideos({ media }: { media: Clip[] }) {
+  // The PDF portfolio shows both columns at full strength, at print size
+  const pdf = usePdfMode();
   const [active, setActive] = useState(0);
   // The clip each column is showing: the one playing, or the last one it played.
   const [shown, setShown] = useState<Record<Side, number>>(() => ({
@@ -65,8 +72,19 @@ export default function AlternatingVideos({ media }: { media: Clip[] }) {
               if (e.pointerType === "mouse" && playing) videos.current[active]?.play().catch(() => {});
             }}
           >
-            <div className={`grid transition-opacity duration-500 ${playing ? "opacity-100" : "opacity-40"}`}>
-              {media.map((clip, i) =>
+            <div className={`grid transition-opacity duration-500 ${playing || pdf ? "opacity-100" : "opacity-40"}`}>
+              {/* In the PDF, a column whose first clip has a still shows that
+                  instead, at the video's exact size (its width and height
+                  attributes give it the video's 620x1360 shape) */}
+              {pdf && media[shown[side]]?.pdfStill ? (
+                <img
+                  src={media[shown[side]].pdfStill}
+                  alt=""
+                  width={620}
+                  height={1360}
+                  className={`col-start-1 row-start-1 w-full rounded-[1.4rem] object-cover shadow-[0_20px_40px_-12px_rgba(0,0,0,0.35)] ${PDF_VIDEO}`}
+                />
+              ) : media.map((clip, i) =>
                 sideOf(clip, i) !== side ? null : (
                   <video
                     key={clip.src}
@@ -80,7 +98,7 @@ export default function AlternatingVideos({ media }: { media: Clip[] }) {
                     onEnded={() => playNext(i)}
                     className={`col-start-1 row-start-1 w-full rounded-[1.4rem] shadow-[0_20px_40px_-12px_rgba(0,0,0,0.35)] ${
                       i === shown[side] ? "" : "invisible"
-                    }`}
+                    } ${pdf ? PDF_VIDEO : ""}`}
                   />
                 ),
               )}
