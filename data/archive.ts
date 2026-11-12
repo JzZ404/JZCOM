@@ -70,14 +70,6 @@ export const archiveProjects: ArchiveProject[] = [
     column: 2,
   },
   {
-    id: "helport",
-    title: "Helport AI Agent",
-    caption: "",
-    layout: "stack",
-    images: [{ src: "/images/archive/helport.png", aspectRatio: 1736 / 1068 }],
-    column: 0,
-  },
-  {
     id: "claw",
     title: "Claw",
     caption: "",

@@ -13,8 +13,8 @@ import { projects } from "@/data/projects";
 // code-cloud, Robotics HUD — see components/CategoryBackdrop.tsx) no longer
 // have a row to render behind and are unused here for now. Left in place,
 // untouched, in case a different treatment brings them back.
-const LEFT_COLUMN_SLUGS = ["alio", "helport", "focusfarm", "pelican"];
-const RIGHT_COLUMN_SLUGS = ["nest", "poopidex", "drunky"];
+const LEFT_COLUMN_SLUGS = ["alio", "nest", "focusfarm", "pelican"];
+const RIGHT_COLUMN_SLUGS = ["helport", "poopidex", "drunky"];
 
 function bySlug(slugs: string[]) {
   return slugs
